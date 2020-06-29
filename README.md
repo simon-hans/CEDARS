@@ -18,7 +18,8 @@ The [UMLS](https://www.nlm.nih.gov/research/umls/index.html) is a rich compendiu
 Basic Concepts
 --------------
 
-![title](GitHub Schema 2 A new color.png)
+<img src="GitHub Schema 2 A new color.png" alt="alt text" width="200"/>
+
 
 Operational Schema
 ------------------
