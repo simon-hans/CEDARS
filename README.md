@@ -27,12 +27,12 @@ Sample Code
 
 The R CEDARS package includes a small simulated clinical notes corpora. This corpora is fictitious and does not contain information from real patients. Once access to MongoDB has been achieved, you can install and test drive CEDARS with the following code:
 
-<pre>
+```R
 # Substitute your credentials
 db_user_name <- "myname"
-db_user_pw <- "mypassword
+db_user_pw <- "mypassword"
 db_host <- "myserver"
-<code>
+```
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
 
