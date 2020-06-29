@@ -41,4 +41,4 @@ Future Development
 
 We are currently documenting the performance of CEDARS with a focus on oncology clinical research. At the present time, we wish to solidify the CEDARS user interface and ensure a smooth experience in multi-user settings. In the longer term, plug-in modules featuring enhanced query generation and adaptive learning will be integrated into the R workflow. Support for other NLP engines and extensive parallel processing are also desirable.
 
-Please communicate with package author Simon Mantha MD MPH if you want to discuss new features or using this software for your clinical research application.
+Please communicate with package author Simon Mantha, MD, MPH (<smantha@cedars.io>) if you want to discuss new features or using this software for your clinical research application.
