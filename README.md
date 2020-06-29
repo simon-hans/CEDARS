@@ -32,8 +32,6 @@ The R CEDARS package includes a small simulated clinical notes corpora. This cor
 db_user_name <- "myname"
 db_user_pw <- "mypassword
 db_host <- "myserver"
-
-
 <code>
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
