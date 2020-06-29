@@ -1,4 +1,4 @@
-Clinical Events Detection And Recording System
+Clinical 
 
 New Code Below
 ==============
