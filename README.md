@@ -6,8 +6,8 @@ CEDARS (Clinical Event Detection and Recording System) is a computational paradi
 Requirements
 ------------
 
-R 3.5.0 and package dependencies
-RStudio
+R 3.5.0 and package dependencies<br>
+RStudio<br>
 MongoDB
 
 CEDARS can be installed locally or on a server. In the latter case, Shiny Server (open source or commercial version) will need to be installed. A business-grade server installation of MongoDB is vastly preferred, even if CEDARS is run locally. Because by definition CEDARS handles protected health informsation (PHI), special consideration should be given to ensure HIPAA (Health Insurance Portability and Accountability Act) compliance, including but not limited to using HTTPS, at-rest encryption, minimum password requirements and limiting operation to within institutional firewalls when indicated. **CEDARS is provided as-is with no guarantee whatsoever and users agree to be held responsible for compliance with their local government/institutional regulations.** All CEDARS installations should be reviewed with institutional information security authorities.
