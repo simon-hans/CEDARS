@@ -15,6 +15,11 @@ CEDARS can be installed locally or on a server. In the latter case, Shiny Server
 
 The [UMLS](https://www.nlm.nih.gov/research/umls/index.html) is a rich compendium of biomedical lexicons. It is maintained by the National Institutes of Health and requires establishing an account in order to access the associated files. Those files are not included with the CEDARS R package, but CEDARS is designed to use them natively so individual users can easily include them in their annotation pipeline. NegEx ([Chapman *et al*, Stud Health Technol Inform. 2013; 192: 677–681.](https://pubmed.ncbi.nlm.nih.gov/23920642/) is included with CEDARS.
 
+Basic Concepts
+--------------
+
+![title](GitHub Schema 2 A new color.png)
+
 Operational Schema
 ------------------
 
