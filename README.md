@@ -6,7 +6,7 @@ CEDARS (Clinical Event Detection and Recording System) is a computational paradi
 Requirements
 ------------
 
-R 3.5.0 and package dependencies<br>
+R 3.5.0 or above and package dependencies<br>
 RStudio<br>
 MongoDB<br>
 Unified Medical Language System (UMLS) MRCONSO.RRF file (desirable but not required)
