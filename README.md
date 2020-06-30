@@ -8,7 +8,7 @@ Requirements
 
 R 3.5.0 and package dependencies<br>
 RStudio<br>
-MongoDB
+MongoDB<br>
 Unified Medical Language System (UMLS) MRCONSO.RRF file (desirable but not required)
 
 CEDARS can be installed locally or on a server. In the latter case, Shiny Server (open source or commercial version) will be required. A business-grade server installation of MongoDB is vastly preferred, even if CEDARS is run locally. Because by definition CEDARS handles protected health informsation (PHI), special consideration should be given to ensure HIPAA (Health Insurance Portability and Accountability Act) compliance, including but not limited to using HTTPS, encryption at rest, minimum password requirements and limiting operation to within institutional firewalls when indicated. **CEDARS is provided as-is with no guarantee whatsoever and users agree to be held responsible for compliance with their local government/institutional regulations.** All CEDARS installations should be reviewed with institutional information security authorities.
@@ -18,13 +18,13 @@ The [UMLS](https://www.nlm.nih.gov/research/umls/index.html) is a rich compendiu
 Basic Concepts
 --------------
 
-<img src="GitHub Schema 2 A new color.png" alt="alt text" width="200"/>
+<img src="GitHub Schema 2 A new color.png" alt="alt text" width="400"/>
 
 
 Operational Schema
 ------------------
 
-![title](GitHub Schema 1 B new color.png)
+<img src="GitHub Schema 1 B new color.png" alt="alt text" width="400"/>
 
 CEDARS is modular and all information for any given annotation project is stored in one MongoDB database. User credentials, original clinical notes, NLP annotations and patient-specific information are stored in dedicated collections. Once clinical notes have been uploaded, they are passed through the NLP pipeline. Currently only UDPipe is supported and integrated with CEDARS. If desired, the annotation pipeline can include negation and medical concept tagging by NegEx and UMLS respectively.
 
