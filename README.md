@@ -18,13 +18,13 @@ The [UMLS](https://www.nlm.nih.gov/research/umls/index.html) is a rich compendiu
 Basic Concepts
 --------------
 
-<img src="GitHub Schema 2 A new color.png" alt="alt text" width="400"/>
+<img src="GitHub Schema 2 A new color.png" alt="alt text" width="500"/>
 
 
 Operational Schema
 ------------------
 
-<img src="GitHub Schema 1 B new color.png" alt="alt text" width="400"/>
+<img src="GitHub Schema 1 B new color.png" alt="alt text" width="500"/>
 
 CEDARS is modular and all information for any given annotation project is stored in one MongoDB database. User credentials, original clinical notes, NLP annotations and patient-specific information are stored in dedicated collections. Once clinical notes have been uploaded, they are passed through the NLP pipeline. Currently only UDPipe is supported and integrated with CEDARS. If desired, the annotation pipeline can include negation and medical concept tagging by NegEx and UMLS respectively.
 
