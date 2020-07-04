@@ -140,13 +140,13 @@ start_local <- function(user, password, host) {
 
 save_credentials <- function(user, password, host, destination_path = getwd()) {
 
-    app_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny/CEDARS.R", sep = "")
+    app_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny/app.R", sep = "")
 
     g_user <- user
     g_password <- password
     g_host <- host
 
-    file.copy(from = app_path, to = paste(destination_path, "/CEDARS.R", sep = ""))
+    file.copy(from = app_path, to = paste(destination_path, "/app.R", sep = ""))
 
     save(g_user, g_password, g_host, file = paste(destination_path, "/db_credentials.Rdata", sep = ""))
 
