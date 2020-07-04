@@ -1,0 +1,25 @@
+Package: CEDARS
+Title: Simple and Efficient Pipeline for Electronic Health Record Annotation
+Version: 0.1
+Authors@R: 
+    person(given = "Simon",
+           family = "Mantha",
+           role = c("aut", "cre"),
+           email = "smantha@cedars.io",
+           comment = c(ORCID = "0000-0003-4277-5261"))
+Description: Search EHR documents for keywords and UMLS concept ID's.
+Depends: R (>= 3.5.0)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Imports:
+  fastmatch,
+  jsonlite,
+  mongolite,
+  parallel,
+  readr,
+  shiny,
+  udpipe,
+  utils
