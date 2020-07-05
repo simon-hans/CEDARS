@@ -20,12 +20,15 @@ umls_processor <- function(annotated_text, umls_selected, max_n_grams_length) {
     colnames(annotated_text) <- gsub("CUI", "umls_CUI", colnames(annotated_text))
     
     while (i <= max_n_grams_length) {
-        annotated_text <- annotated_text[order(annotated_text$doc_id, annotated_text$paragraph_id, annotated_text$sentence_id, annotated_text$start, decreasing = FALSE, method = "radix"), ]
+        annotated_text <- annotated_text[order(annotated_text$doc_id, annotated_text$paragraph_id, annotated_text$sentence_id, 
+            annotated_text$start, decreasing = FALSE, method = "radix"), ]
         annotated_text$grams <- udpipe::txt_nextgram(annotated_text$tolower_token, n = i, sep = " ")
         annotated_text <- fast_merge_umls(annotated_text, umls_selected, "grams", i)
         annotated_text$umls_CUI[!is.na(annotated_text$CUI)] <- annotated_text$CUI[!is.na(annotated_text$CUI)]
-        annotated_text <- annotated_text[order(annotated_text$doc_id, annotated_text$paragraph_id, annotated_text$sentence_id, annotated_text$start, decreasing = FALSE, method = "radix"), ]
-        annotated_text$umls_end[!is.na(annotated_text$CUI)] <- annotated_text$end[(1:length(annotated_text[, 1]))[!is.na(annotated_text$CUI)] + i - 1]
+        annotated_text <- annotated_text[order(annotated_text$doc_id, annotated_text$paragraph_id, annotated_text$sentence_id, 
+            annotated_text$start, decreasing = FALSE, method = "radix"), ]
+        annotated_text$umls_end[!is.na(annotated_text$CUI)] <- annotated_text$end[(1:length(annotated_text[, 1]))[!is.na(annotated_text$CUI)] + 
+            i - 1]
         # We overwrite older phrases included in newer, larger ones
         temp <- list()
         for (j in (1:length(annotated_text[, 1]))[!is.na(annotated_text$CUI)]) temp[[j]] <- j + (1:(i - 1))
@@ -42,7 +45,8 @@ umls_processor <- function(annotated_text, umls_selected, max_n_grams_length) {
     annotated_text$grams <- NULL
     annotated_text$tolower_token <- NULL
     
-    annotated_text <- annotated_text[order(annotated_text$doc_id, annotated_text$paragraph_id, annotated_text$sentence_id, annotated_text$start, decreasing = FALSE, method = "radix"), ]
+    annotated_text <- annotated_text[order(annotated_text$doc_id, annotated_text$paragraph_id, annotated_text$sentence_id, 
+        annotated_text$start, decreasing = FALSE, method = "radix"), ]
     
     annotated_text
     

@@ -15,8 +15,8 @@
 
 sentence_search <- function(parse_result, annotations, use_negation, hide_duplicates) {
     
-    retained_fields <- c("patient_id", "doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "text_sequence", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", 
-        "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
+    retained_fields <- c("patient_id", "doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "text_sequence", "text_tag_1", 
+        "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
     retained_fields <- retained_fields[retained_fields %in% colnames(annotations)]
     
     query_vect <- parse_result$query_vect
@@ -50,7 +50,8 @@ sentence_search <- function(parse_result, annotations, use_negation, hide_duplic
         
         # Iterating
         
-        unique_sentences$selected <- sapply(unique_sentences$unique_id, sentence_eval, unique_sentences, annotations, query_vect, keyword_mask, keyword_elements, cui_mask, cui_elements, use_negation)
+        unique_sentences$selected <- sapply(unique_sentences$unique_id, sentence_eval, unique_sentences, annotations, query_vect, 
+            keyword_mask, keyword_elements, cui_mask, cui_elements, use_negation)
         
         unique_sentences <- unique_sentences[!is.na(unique_sentences$selected), ]
         
@@ -105,14 +106,17 @@ lemma_match <- function(annotations, keyword_elements) {
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @return If sentence matches query, returns sentences with marked tokens/CUI's, otherwise NA.
 
-sentence_eval <- function(unique_id, unique_sentences, annotations, query_vect, keyword_mask, keyword_elements, cui_mask, cui_elements, use_negation) {
+sentence_eval <- function(unique_id, unique_sentences, annotations, query_vect, keyword_mask, keyword_elements, cui_mask, cui_elements, 
+    use_negation) {
     
     selected_text_id <- unique_sentences$text_id[unique_sentences$unique_id == unique_id]
     selected_paragraph_id <- unique_sentences$paragraph_id[unique_sentences$unique_id == unique_id]
     selected_sentence_id <- unique_sentences$sentence_id[unique_sentences$unique_id == unique_id]
     
     if (use_negation == TRUE & "negated" %in% colnames(annotations)) 
-        selected_annotations <- subset(annotations, text_id == selected_text_id & paragraph_id == selected_paragraph_id & sentence_id == selected_sentence_id & negated == FALSE) else selected_annotations <- subset(annotations, text_id == selected_text_id & paragraph_id == selected_paragraph_id & sentence_id == selected_sentence_id)
+        selected_annotations <- subset(annotations, text_id == selected_text_id & paragraph_id == selected_paragraph_id & sentence_id == 
+            selected_sentence_id & negated == FALSE) else selected_annotations <- subset(annotations, text_id == selected_text_id & paragraph_id == selected_paragraph_id & 
+        sentence_id == selected_sentence_id)
     
     query_construct <- query_vect
     # query_construct[keyword_mask] <- keyword_elements %in% selected_annotations$lemma
@@ -163,7 +167,8 @@ mark <- function(annotations, cui_elements) {
     
     annotations$temp_unique <- 1:length(annotations[, 1])
     
-    annotations$token[annotations$lemma_match == TRUE] <- paste("*START*", annotations$token[annotations$lemma_match == TRUE], "*END*", sep = "")
+    annotations$token[annotations$lemma_match == TRUE] <- paste("*START*", annotations$token[annotations$lemma_match == TRUE], 
+        "*END*", sep = "")
     
     if ("umls_CUI" %in% colnames(annotations)) {
         
@@ -171,7 +176,8 @@ mark <- function(annotations, cui_elements) {
         annos_df <- subset(annotations, select = c("temp_unique", "text_id", "start", "end"))
         annos_df <- merge(cui_df, annos_df, by = "text_id", all.y = FALSE)
         annos_df <- subset(annos_df, start.x <= start.y & umls_end >= end)
-        annotations$token[annotations$temp_unique %in% annos_df$temp_unique] <- paste("*START*", annotations$token[annotations$temp_unique %in% annos_df$temp_unique], "*END*", sep = "")
+        annotations$token[annotations$temp_unique %in% annos_df$temp_unique] <- paste("*START*", annotations$token[annotations$temp_unique %in% 
+            annos_df$temp_unique], "*END*", sep = "")
         
     }
     
@@ -258,7 +264,8 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, databas
     j <- 0
     
     for (i in 1:length_list) {
-        # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked A record is considered open for annotation if admin lock was successful
+        # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked A record is
+        # considered open for annotation if admin lock was successful
         unlock_records(uri_fun, user, password, host, database)
         open <- lock_records_admin(uri_fun, user, password, host, database, patient_vect[i])
         if (open == TRUE) {
@@ -271,18 +278,22 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, databas
             
             if (length(sentences[, 1] > 0)) {
                 
-                retained_fields <- c("patient_id", "doc_id", "text_sequence", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", 
-                  "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
+                retained_fields <- c("patient_id", "doc_id", "text_sequence", "paragraph_id", "sentence_id", "text_date", "selected", 
+                  "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", 
+                  "text_tag_8", "text_tag_9", "text_tag_10")
                 retained_fields <- retained_fields[retained_fields %in% colnames(sentences)]
                 
-                sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_sequence, sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
+                sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_sequence, sentences$paragraph_id, 
+                  sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
                 sentences$unique_id <- 1:length(sentences[, 1])
                 sentences$reviewed <- rep(FALSE, length(sentences[, 1]))
                 sentences <- subset(sentences, select = c("unique_id", "reviewed", retained_fields))
                 
-                sentences$note_text <- sapply(sentences$doc_id, aggregate_note, annotations, parse_result$keyword_elements, parse_result$cui_elements)
+                sentences$note_text <- sapply(sentences$doc_id, aggregate_note, annotations, parse_result$keyword_elements, 
+                  parse_result$cui_elements)
                 
-                update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"updated\" : false }}", sep = "")
+                update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"updated\" : false }}", 
+                  sep = "")
                 
                 patients_con$update(query, update_value)
                 
@@ -292,7 +303,8 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, databas
         
         unlock_records_admin(uri_fun, user, password, host, database, patient_vect[i])
         
-        cat(paste(c("Completed search for patient ID ", patient_vect[i], ", # ", i, " of ", length_list, ".\n"), sep = "", collapse = ""))
+        cat(paste(c("Completed search for patient ID ", patient_vect[i], ", # ", i, " of ", length_list, ".\n"), sep = "", 
+            collapse = ""))
         
     }
     

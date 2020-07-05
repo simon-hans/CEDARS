@@ -55,7 +55,8 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
     
     # Running the NLP engine chosen by the user
     if (nlp_engine == "udpipe") {
-        annotated_text <- udpipe::udpipe_annotate(nlp_model, text, doc_id = text_id, tokenizer = "tokenizer", tagger = "default", parser = "default")
+        annotated_text <- udpipe::udpipe_annotate(nlp_model, text, doc_id = text_id, tokenizer = "tokenizer", tagger = "default", 
+            parser = "default")
         annotated_text <- as.data.frame(annotated_text, detailed = TRUE)
     }
     
@@ -67,11 +68,12 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
         annotated_text <- negex_processor(annotated_text, negex_simp, negex_depth)
     
     # Adding back tags
-    tag_data <- c(text_date, text_sequence, doc_section_name, doc_id, text_tag_1, text_tag_2, text_tag_3, text_tag_4, text_tag_5, text_tag_6, text_tag_7, text_tag_8, text_tag_9, text_tag_10)
+    tag_data <- c(text_date, text_sequence, doc_section_name, doc_id, text_tag_1, text_tag_2, text_tag_3, text_tag_4, text_tag_5, 
+        text_tag_6, text_tag_7, text_tag_8, text_tag_9, text_tag_10)
     tags <- t(matrix(rep(tag_data, length(annotated_text[, 1])), nrow = length(tag_data), ncol = length(annotated_text[, 1])))
     tags <- as.data.frame(tags)
-    colnames(tags) <- c("text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", 
-        "text_tag_10")
+    colnames(tags) <- c("text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", 
+        "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
     
     annotated_text <- cbind(annotated_text, tags)
     
@@ -95,8 +97,9 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
 
 patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected, max_n_grams_length, negex_depth) {
     
-    sub_corpus_short <- subset(sub_corpus, select = c("text", "text_id", "text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", 
-        "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10"))
+    sub_corpus_short <- subset(sub_corpus, select = c("text", "text_id", "text_date", "text_sequence", "doc_section_name", 
+        "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", 
+        "text_tag_9", "text_tag_10"))
     
     sub_corpus_short <- split.data.frame(sub_corpus_short, row(sub_corpus_short)[, 1])
     
@@ -114,7 +117,8 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
     if (max_n_grams_length > 0 & !is.na(umls_selected)) 
         output <- umls_processor(output, umls_selected, max_n_grams_length)
     
-    output <- output[order(output$doc_id, output$paragraph_id, output$sentence_id, output$token_id, decreasing = FALSE, method = "radix"), ]
+    output <- output[order(output$doc_id, output$paragraph_id, output$sentence_id, output$token_id, decreasing = FALSE, method = "radix"), 
+        ]
     
     output
     
@@ -139,7 +143,8 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
 
-batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user, password, host, database, max_n_grams_length, negex_depth, select_cores) {
+batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user, password, 
+    host, database, max_n_grams_length, negex_depth, select_cores) {
     
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
     
@@ -147,7 +152,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
     
     cat("Initializing cluster...\n\n")
     
-    # We create a computing cluster If requested # of cores > available minus one, will use available minus one If no specified # of desired cores, will use available minus one
+    # We create a computing cluster If requested # of cores > available minus one, will use available minus one If no specified
+    # # of desired cores, will use available minus one
     no_cores <- parallel::detectCores() - 1
     if (is.na(select_cores) | select_cores > no_cores | select_cores < 1) 
         cl <- parallel::makeCluster(no_cores) else {
@@ -159,7 +165,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
     
     if (!is.na(cl[1])) {
         
-        parallel::clusterExport(cl, c("sanitize", "standardize_nlp", "negation_tagger", "negex_token_tagger", "id_expander", "negex_processor", "negex_simp", "negex_depth", "URL"), envir = environment())
+        parallel::clusterExport(cl, c("sanitize", "standardize_nlp", "negation_tagger", "negex_token_tagger", "id_expander", 
+            "negex_processor", "negex_simp", "negex_depth", "URL"), envir = environment())
         
         parallel::clusterCall(cl, function() {
             nlp_model <- udpipe::udpipe_load_model(URL)
@@ -173,15 +180,16 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
     j <- 0
     
     for (i in 1:length_list) {
-        # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked A record is considered open for annotation if 1) the patient is not in the roster yet or
-        # 2) admin lock was successful
+        # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked A record is
+        # considered open for annotation if 1) the patient is not in the roster yet or 2) admin lock was successful
         unlock_records(uri_fun, user, password, host, database)
         open <- lock_records_admin(uri_fun, user, password, host, database, patient_vect[i])
         if (open == TRUE) {
             
             sub_corpus <- db_download(uri_fun, user, password, host, database, patient_vect[i])
             if (length(sub_corpus[, 1]) > 0) {
-                annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected, max_n_grams_length, negex_depth)
+                annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected, max_n_grams_length, 
+                  negex_depth)
                 row.names(annotations) <- NULL
                 db_upload(uri_fun, user, password, host, database, patient_vect[i], annotations)
                 
@@ -189,7 +197,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
             
             unlock_records_admin(uri_fun, user, password, host, database, patient_vect[i])
             
-            cat(paste(c("Completed annotations for patient ID ", patient_vect[i], ", # ", i, " of ", length_list, ".\n"), sep = "", collapse = ""))
+            cat(paste(c("Completed annotations for patient ID ", patient_vect[i], ", # ", i, " of ", length_list, ".\n"), sep = "", 
+                collapse = ""))
             
         } else j <- j + 1
         
@@ -231,8 +240,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' }
 #' @export
 
-automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", URL, uri_fun = mongo_uri_standard, user, password, host, database, max_n_grams_length = 7, negex_depth = 6, 
-    select_cores = NA) {
+automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", URL, uri_fun = mongo_uri_standard, 
+    user, password, host, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA) {
     
     annotations_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
     notes_con <- mongo_connect(uri_fun, user, password, host, database, "NOTES")
@@ -256,7 +265,8 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     
     print("Finding patients with missing annotations...")
     
-    # We are using simple code to find which text segments need to be annotated Does all of one patient, not efficient, should go with text_id's Ideally this would be replaced by a MongoDB query (faster)
+    # We are using simple code to find which text segments need to be annotated Does all of one patient, not efficient, should
+    # go with text_id's Ideally this would be replaced by a MongoDB query (faster)
     
     # All text_id's with an existing annotation
     all_annotated <- unlist(annotations_con$find(query = "{}", fields = "{ \"text_id\" : 1, \"_id\" : 0 }"))
@@ -278,7 +288,8 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
         
         print("Annotating...")
         
-        batch_processor_db(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user, password, host, database, max_n_grams_length, negex_depth, select_cores)
+        batch_processor_db(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user, password, 
+            host, database, max_n_grams_length, negex_depth, select_cores)
         
     } else print("No records to annotate!")
     
@@ -313,8 +324,8 @@ upload_notes <- function(uri_fun, user, password, host, database, notes) {
         if (anyNA(date_check) | any(date_check)) 
             print("Error: date format incorrect, must use %Y-%m-%d.") else {
             
-            standard_fields <- c("patient_id", "text_id", "text", "text_date", "doc_id", "text_sequence", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", 
-                "text_tag_8", "text_tag_9", "text_tag_10")
+            standard_fields <- c("patient_id", "text_id", "text", "text_date", "doc_id", "text_sequence", "text_tag_1", "text_tag_2", 
+                "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
             
             fields_present <- colnames(notes)[colnames(notes) %in% standard_fields]
             notes <- subset(notes, select = fields_present)
