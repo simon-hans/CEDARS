@@ -64,8 +64,9 @@ mongo_connect <- function(uri_fun, user, password, host, database, mongo_collect
 db_download <- function(uri_fun, user, password, host, database, patient_id) {
     
     # Expected fields
-    fields <- c("text", "text_id", "text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", "text_tag_2", 
-        "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
+    fields <- c("text", "text_id", "text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", 
+        "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", 
+        "text_tag_10")
     
     mongo_con <- mongo_connect(uri_fun, user, password, host, database, "NOTES")
     query <- paste("{\"patient_id\" :", patient_id, "}", sep = " ")
@@ -99,8 +100,8 @@ db_upload <- function(uri_fun, user, password, host, database, patient_id, annot
     
     annotations <- cbind(rep(patient_id, length(annotations[, 1])), annotations)
     colnames(annotations)[1] <- "patient_id"
-    annotations <- annotations[order(annotations$text_id, annotations$paragraph_id, annotations$sentence_id, annotations$token_id, 
-        decreasing = FALSE, method = "radix"), ]
+    annotations <- annotations[order(annotations$text_id, annotations$paragraph_id, annotations$sentence_id, 
+        annotations$token_id, decreasing = FALSE, method = "radix"), ]
     
     # Turning the 'updated' indicator on
     patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
@@ -134,8 +135,9 @@ patient_roster_update <- function(uri_fun, user, password, host, database) {
     active_patients <- patients_con$distinct("patient_id")
     
     missing_patients <- unique_patients[!(unique_patients %in% active_patients)]
-    missing_patients <- data.frame(patient_id = missing_patients, reviewed = rep(FALSE, length(missing_patients)), locked = rep(FALSE, 
-        length(missing_patients)), updated = rep(FALSE, length(missing_patients)), admin_locked = rep(FALSE, length(missing_patients)))
+    missing_patients <- data.frame(patient_id = missing_patients, reviewed = rep(FALSE, length(missing_patients)), 
+        locked = rep(FALSE, length(missing_patients)), updated = rep(FALSE, length(missing_patients)), admin_locked = rep(FALSE, 
+            length(missing_patients)))
     
     patients_con$insert(missing_patients)
     
@@ -165,8 +167,8 @@ populate_annotations <- function(uri_fun, user, password, host, database) {
     annotations_con$index(add = "{\"lemma\" : 1}")
     annotations_con$index(add = "{\"doc_id\" : 1}")
     
-    # mongolite still does not support creation of unique indexes We enforce that each annotation record should have aunique
-    # combination fo text ID, paragraph, sentence and token ID
+    # mongolite still does not support creation of unique indexes We enforce that each annotation record should
+    # have aunique combination fo text ID, paragraph, sentence and token ID
     annotations_con$run("{\"createIndexes\": \"ANNOTATIONS\", \"indexes\" : [{ \"key\" : { \"text_id\" : 1, \"paragraph_id\" : 1, \"sentence_id\" : 1, \"token_id\" : 1}, \"name\": \"annotations_index\", \"unique\": true}]}")
     
 }
@@ -283,7 +285,8 @@ populate_query <- function(uri_fun, user, password, host, database) {
 #' }
 #' @export
 
-save_query <- function(uri_fun, user, password, host, database, search_query, use_negation, hide_duplicates, skip_after_event) {
+save_query <- function(uri_fun, user, password, host, database, search_query, use_negation, hide_duplicates, 
+    skip_after_event) {
     
     search_query <- sanitize_query(search_query)
     
@@ -296,8 +299,9 @@ save_query <- function(uri_fun, user, password, host, database, search_query, us
     if (skip_after_event == TRUE) 
         converted_skip_after_event <- "true" else converted_skip_after_event <- "false"
     
-    update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation, " , \"hide_duplicates\" : ", 
-        converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, "}", sep = "")
+    update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation, 
+        " , \"hide_duplicates\" : ", converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, 
+        "}", sep = "")
     
     query_con$replace(query = "{}", update = update_value, upsert = TRUE)
     
@@ -537,8 +541,8 @@ add_end_user <- function(uri_fun, user, password, host, database, end_user, end_
         
         users_con <- mongo_connect(uri_fun, user, password, host, database, "USERS")
         
-        new_user <- data.frame(user = end_user, password = end_user_password, date_created = strftime(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", 
-            "UTC"))
+        new_user <- data.frame(user = end_user, password = end_user_password, date_created = strftime(Sys.time(), 
+            "%Y-%m-%dT%H:%M:%SZ", "UTC"))
         
         users_con$insert(new_user)
         
@@ -664,16 +668,16 @@ terminate_project <- function(uri_fun, user, password, host, database) {
     if (first_answer != "yes") 
         stop("Database deletion cancelled") else {
         
-        second_answer <- readline(paste("Are you absolutely positive you want to permanently delete ", database, "? (yes/no) ", 
-            sep = ""))
+        second_answer <- readline(paste("Are you absolutely positive you want to permanently delete ", database, 
+            "? (yes/no) ", sep = ""))
         
     }
     
     if (second_answer != "yes") 
         stop("Database deletion cancelled") else {
         
-        # Dropping all collections Since there are no collections left the database is deleted Direct deletion of database is not
-        # allowed, maybe because it should be done from admin DB?
+        # Dropping all collections Since there are no collections left the database is deleted Direct deletion of
+        # database is not allowed, maybe because it should be done from admin DB?
         
         mongo_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
         mongo_con$drop()
@@ -737,8 +741,8 @@ terminate_project_new <- function(uri_fun, user, password, host, database) {
     if (first_answer != "yes") 
         stop("Database deletion cancelled") else {
         
-        second_answer <- readline(paste("Are you absolutely positive you want to permanently delete ", database, "? (yes/no) ", 
-            sep = ""))
+        second_answer <- readline(paste("Are you absolutely positive you want to permanently delete ", database, 
+            "? (yes/no) ", sep = ""))
         
     }
     

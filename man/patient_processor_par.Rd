@@ -12,7 +12,8 @@ patient_processor_par(
   negex_simp,
   umls_selected,
   max_n_grams_length,
-  negex_depth
+  negex_depth,
+  single_core_model
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ patient_processor_par(
 \item{max_n_grams_length}{Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.}
 
 \item{negex_depth}{Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.}
+
+\item{single_core_model}{NLP model in case parallel processing is not used.}
 }
 \value{
 NLP annotations dataframe.

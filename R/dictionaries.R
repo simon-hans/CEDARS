@@ -31,8 +31,8 @@ mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_f
     
     print("Processing table...")
     
-    colnames(mrconso) <- c("CUI", "LAT", "TS", "LUI", "STT", "SUI", "ISPREF", "AUI", "SAUI", "SCUI", "SDUI", "SAB", "TTY", 
-        "CODE", "STR", "SRL", "SUPPRESS", "CVF")
+    colnames(mrconso) <- c("CUI", "LAT", "TS", "LUI", "STT", "SUI", "ISPREF", "AUI", "SAUI", "SCUI", "SDUI", 
+        "SAB", "TTY", "CODE", "STR", "SRL", "SUPPRESS", "CVF")
     mrconso[, is.na(colnames(mrconso))] <- NULL
     
     print("Selecting subsets of interest...")
@@ -47,10 +47,10 @@ mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_f
     mrconso$STR <- tolower(mrconso$STR)
     
     # Removing non-standard characters, often found in chemical names
-    match.vect <- grepl(",", mrconso$STR) | grepl("\\(", mrconso$STR) | grepl("\\)", mrconso$STR) | grepl("'", mrconso$STR) | 
-        grepl("\"", mrconso$STR) | grepl("<", mrconso$STR) | grepl(">", mrconso$STR) | grepl("\\[", mrconso$STR) | grepl("\\]", 
-        mrconso$STR) | grepl("\\{", mrconso$STR) | grepl("\\}", mrconso$STR) | grepl("#", mrconso$STR) | grepl("\\^", mrconso$STR) | 
-        grepl(":", mrconso$STR) | grepl(";", mrconso$STR)
+    match.vect <- grepl(",", mrconso$STR) | grepl("\\(", mrconso$STR) | grepl("\\)", mrconso$STR) | grepl("'", 
+        mrconso$STR) | grepl("\"", mrconso$STR) | grepl("<", mrconso$STR) | grepl(">", mrconso$STR) | grepl("\\[", 
+        mrconso$STR) | grepl("\\]", mrconso$STR) | grepl("\\{", mrconso$STR) | grepl("\\}", mrconso$STR) | grepl("#", 
+        mrconso$STR) | grepl("\\^", mrconso$STR) | grepl(":", mrconso$STR) | grepl(";", mrconso$STR)
     mrconso <- mrconso[!match.vect, ]
     
     # Cleaning up
@@ -94,12 +94,12 @@ mrrel_upload <- function(path, uri_fun, user, password, host, database) {
     
     print("Reading file...")
     
-    mrrel_names <- c("CUI1", "AUI1", "STYPE1", "REL", "CUI2", "AUI2", "STYPE2", "RELA", "RUI", "SRUI", "RSAB", "VSAB", "SL", 
-        "RG", "DIR", "SUPPRESS", "CVF")
-    mrrel_types <- cols(CUI1 = col_character(), AUI1 = col_character(), STYPE1 = col_character(), REL = col_character(), CUI2 = col_character(), 
-        AUI2 = col_character(), STYPE2 = col_character(), RELA = col_character(), RUI = col_character(), SRUI = col_character(), 
-        RSAB = col_character(), VSAB = col_character(), SL = col_character(), RG = col_character(), DIR = col_character(), 
-        SUPPRESS = col_character(), CVF = col_character())
+    mrrel_names <- c("CUI1", "AUI1", "STYPE1", "REL", "CUI2", "AUI2", "STYPE2", "RELA", "RUI", "SRUI", "RSAB", 
+        "VSAB", "SL", "RG", "DIR", "SUPPRESS", "CVF")
+    mrrel_types <- cols(CUI1 = col_character(), AUI1 = col_character(), STYPE1 = col_character(), REL = col_character(), 
+        CUI2 = col_character(), AUI2 = col_character(), STYPE2 = col_character(), RELA = col_character(), RUI = col_character(), 
+        SRUI = col_character(), RSAB = col_character(), VSAB = col_character(), SL = col_character(), RG = col_character(), 
+        DIR = col_character(), SUPPRESS = col_character(), CVF = col_character())
     mrrel <- readr::read_delim(path, col_names = mrrel_names, delim = "|", quote = "", col_types = mrrel_types)
     
     print("Keeping relationships for concepts of interest...")

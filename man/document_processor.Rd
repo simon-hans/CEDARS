@@ -5,7 +5,14 @@
 \title{Functions to process documents with NLP engine
 Process a Document}
 \usage{
-document_processor(text_df, text_format, nlp_engine, negex_simp, negex_depth)
+document_processor(
+  text_df,
+  text_format,
+  nlp_engine,
+  negex_simp,
+  negex_depth,
+  single_core_model = NA
+)
 }
 \arguments{
 \item{text_df}{Dataframe of 1 row, containing all text metadata, including: text_id, text_date, text_sequence, doc_section_name, doc_id, text_tag_1, text_tag_2, text_tag_3, text_tag_4, text_tag_5, text_tag_6, text_tag_7, text_tag_8, text_tag_9 and text_tag_10.}
@@ -17,6 +24,8 @@ document_processor(text_df, text_format, nlp_engine, negex_simp, negex_depth)
 \item{negex_simp}{Simplified negex.}
 
 \item{negex_depth}{Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.}
+
+\item{single_core_model}{NLP model in case parallel processing is not used.}
 }
 \value{
 NLP annotations dataframe.

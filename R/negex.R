@@ -16,8 +16,8 @@ negex_processor <- function(annotated_text, negex_simp, negex_depth = 6) {
     i <- 2
     
     annotated_text$tolower_token <- tolower(annotated_text$token)
-    annotated_text <- merge(annotated_text, subset(negex_simp, n_grams_length = 1, select = c("item", "category", "closure")), 
-        by.x = "tolower_token", by.y = "item", all.x = TRUE, all.y = FALSE)
+    annotated_text <- merge(annotated_text, subset(negex_simp, n_grams_length = 1, select = c("item", "category", 
+        "closure")), by.x = "tolower_token", by.y = "item", all.x = TRUE, all.y = FALSE)
     annotated_text$negex_end <- NA
     annotated_text$negex_end[!is.na(annotated_text$category) | !is.na(annotated_text$closure)] <- annotated_text$token_id[!is.na(annotated_text$category) | 
         !is.na(annotated_text$closure)]
@@ -30,8 +30,8 @@ negex_processor <- function(annotated_text, negex_simp, negex_depth = 6) {
         annotated_text <- annotated_text[order(annotated_text$paragraph_id, annotated_text$sentence_id, annotated_text$start, 
             decreasing = FALSE, method = "radix"), ]
         annotated_text$grams <- udpipe::txt_nextgram(annotated_text$tolower_token, n = i, sep = " ")
-        annotated_text <- merge(annotated_text, subset(negex_simp, n_grams_length = i, select = c("item", "category", "closure")), 
-            by.x = "grams", by.y = "item", all.x = TRUE, all.y = FALSE)
+        annotated_text <- merge(annotated_text, subset(negex_simp, n_grams_length = i, select = c("item", "category", 
+            "closure")), by.x = "grams", by.y = "item", all.x = TRUE, all.y = FALSE)
         annotated_text$negex_category[!is.na(annotated_text$category) | !is.na(annotated_text$closure)] <- annotated_text$category[!is.na(annotated_text$category) | 
             !is.na(annotated_text$closure)]
         annotated_text$negex_closure[!is.na(annotated_text$category) | !is.na(annotated_text$closure)] <- annotated_text$closure[!is.na(annotated_text$category) | 
@@ -59,8 +59,8 @@ negex_processor <- function(annotated_text, negex_simp, negex_depth = 6) {
     if (any(!is.na(annotated_text$negex_category))) 
         annotated_text <- negation_tagger(annotated_text, negex_depth) else annotated_text$negated <- rep(FALSE, length(annotated_text[, 1]))
     
-    annotated_text <- annotated_text[order(annotated_text$paragraph_id, annotated_text$sentence_id, annotated_text$start, decreasing = FALSE, 
-        method = "radix"), ]
+    annotated_text <- annotated_text[order(annotated_text$paragraph_id, annotated_text$sentence_id, annotated_text$start, 
+        decreasing = FALSE, method = "radix"), ]
     
     annotated_text
     
@@ -76,8 +76,8 @@ negex_processor <- function(annotated_text, negex_simp, negex_depth = 6) {
 
 negation_tagger <- function(annotated_text, negex_depth) {
     
-    work_df <- subset(annotated_text, !is.na(negex_category), select = c("paragraph_id", "sentence_id", "token_id", "negex_category", 
-        "negex_end"))
+    work_df <- subset(annotated_text, !is.na(negex_category), select = c("paragraph_id", "sentence_id", "token_id", 
+        "negex_category", "negex_end"))
     
     work_df$token_id <- lapply(1:length(work_df[, 1]), negex_token_tagger, work_df, negex_depth)
     
@@ -85,11 +85,13 @@ negation_tagger <- function(annotated_text, negex_depth) {
     
     work_df$sentence_id <- lapply(1:length(work_df[, 1]), id_expander, work_df, "sentence_id")
     
-    work_df <- data.frame(paragraph_id = unlist(work_df$paragraph_id), sentence_id = unlist(work_df$sentence_id), token_id = unlist(work_df$token_id))
+    work_df <- data.frame(paragraph_id = unlist(work_df$paragraph_id), sentence_id = unlist(work_df$sentence_id), 
+        token_id = unlist(work_df$token_id))
     work_df$negated <- TRUE
     work_df <- work_df[!duplicated(work_df), ]
     
-    annotated_text <- merge(annotated_text, work_df, by = c("paragraph_id", "sentence_id", "token_id"), all.x = TRUE, all.y = FALSE)
+    annotated_text <- merge(annotated_text, work_df, by = c("paragraph_id", "sentence_id", "token_id"), all.x = TRUE, 
+        all.y = FALSE)
     annotated_text$negated[is.na(annotated_text$negated)] <- FALSE
     
     annotated_text
