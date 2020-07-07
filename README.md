@@ -81,6 +81,9 @@ save_query(uri_fun, db_user_name, db_user_pw, db_host, mongo_database, search_qu
 # Starts the CEDARS GUI locally
 # Your user name is "John", password is "strongpassword"
 start_local(db_user_name, db_user_pw, db_host, mongo_database)
+
+# Remove project from MongoDB
+terminate_project(uri_fun, db_user_name, db_user_pw, db_host, mongo_database)
 ```
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
