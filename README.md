@@ -31,7 +31,7 @@ Operational Schema
 
 CEDARS is modular and all information for any given annotation project is stored in one MongoDB database. User credentials, original clinical notes, NLP annotations and patient-specific information are stored in dedicated collections. Once clinical notes have been uploaded, they are passed through the NLP pipeline. Currently only UDPipe is supported and integrated with CEDARS. If desired, the annotation pipeline can include negation and medical concept tagging by NegEx and UMLS respectively.
 
-Multiple users can load the web GUI and annotate records at the same time. Once accessed, patient records are locked for the user.
+Multiple users can load the web GUI and annotate records at the same time. Once accessed, a given patient record is locked for the user.
 
 Sample Code
 -----------
