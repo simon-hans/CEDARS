@@ -91,8 +91,9 @@ get_data <- function(uri_fun, user, password, host, database, end_user, end_user
 
             if (dim(patient)[1] > 0) {
 
-                committed <- commit_patient(uri_fun, user, password, host, database, end_user, search_query,
+            commit_result <- commit_patient(uri_fun, user, password, host, database, end_user, search_query,
                   use_negation, hide_duplicates, patient_id)
+            committed <- commit_result$committed
 
                 if (committed == TRUE) {
 
@@ -136,9 +137,12 @@ get_data <- function(uri_fun, user, password, host, database, end_user, end_user
 
                 # We try to commit to a patient until we find one with sentences left to evaluate
                 committed <- FALSE
-                while (committed == FALSE) {
-                  committed <- commit_patient(uri_fun, user, password, host, database, end_user, search_query,
+                no_patient_left <- FALSE
+                while (committed == FALSE & no_patient_left == FALSE) {
+                  commit_result <- commit_patient(uri_fun, user, password, host, database, end_user, search_query,
                     use_negation, hide_duplicates)
+                  committed <- commit_result$committed
+                  no_patient_left <- commit_result$no_patient_left
                 }
 
                 # Assessment is repeated
@@ -329,8 +333,10 @@ commit_patient <- function(uri_fun, user, password, host, database, end_user, se
 
     patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
 
-    sentences <- get_patient(uri_fun, user, password, host, database, end_user, search_query, use_negation, hide_duplicates,
+    sentences_result <- get_patient(uri_fun, user, password, host, database, end_user, search_query, use_negation, hide_duplicates,
         patient_id)
+    sentences <- sentences_result$sentences
+    no_patient_left <- sentences_result$no_patient_left
 
     # If there are no sentences after inital search, we keep looking.  This does not apply if patient ID for
     # search was specified.
@@ -410,7 +416,11 @@ commit_patient <- function(uri_fun, user, password, host, database, end_user, se
 
     }
 
-    committed
+    out <- list()
+    out$committed <- committed
+    out$no_patient_left <- no_patient_left
+
+    out
 
 }
 
@@ -432,7 +442,9 @@ commit_patient <- function(uri_fun, user, password, host, database, end_user, se
 get_patient <- function(uri_fun, user, password, host, database, end_user, search_query, use_negation, hide_duplicates,
     patient_id = NA) {
 
-    selected_patient <- select_patient(uri_fun, user, password, host, database, end_user, patient_id)
+    selection_result <- select_patient(uri_fun, user, password, host, database, end_user, patient_id)
+    selected_patient <- selection_result$selected_patient
+    no_patient_left <- selection_result$no_patient_left
 
     if (is.na(selected_patient))
         sentences <- NA else {
@@ -520,7 +532,11 @@ get_patient <- function(uri_fun, user, password, host, database, end_user, searc
 
     }
 
-    sentences
+    out <- list()
+    out$sentences <- sentences
+    out$no_patient_left <- no_patient_left
+
+    out
 
 }
 
@@ -605,6 +621,7 @@ select_patient <- function(uri_fun, user, password, host, database, end_user, pa
         query <- paste("{ \"end_user\" : ", "\"", end_user, "\", ", " \"locked\" : true}", sep = "")
         previously_selected <- patients_con$find(query)
         if (nrow(previously_selected) > 0) selected_patient <- patient_id else selected_patient <- NA
+        no_patient_left <- FALSE
 
     } else {
 
@@ -631,12 +648,20 @@ select_patient <- function(uri_fun, user, password, host, database, end_user, pa
 
     }
 
-    if (length(selected_patient) == 0)
+    if (length(selected_patient) == 0) {
+
         selected_patient <- NA
+        no_patient_left <- TRUE
+
+    } else no_patient_left <- FALSE
 
     }
 
-    selected_patient
+    out <- list()
+    out$selected_patient <- selected_patient
+    out$no_patient_left <- no_patient_left
+
+    out
 
 }
 
