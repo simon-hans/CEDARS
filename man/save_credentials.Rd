@@ -4,7 +4,7 @@
 \alias{save_credentials}
 \title{Save MongoDB Credentials}
 \usage{
-save_credentials(user, password, host, destination_path = getwd())
+save_credentials(user, password, host, database, destination_path = getwd())
 }
 \arguments{
 \item{user}{MongoDB user name.}
@@ -12,6 +12,8 @@ save_credentials(user, password, host, destination_path = getwd())
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB server host.}
+
+\item{database}{MongoDB database name.}
 
 \item{destination_path}{Folder where the files should be saved. Default is working directory.}
 }

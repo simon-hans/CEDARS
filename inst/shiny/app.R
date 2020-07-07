@@ -15,8 +15,6 @@ ui <- fluidPage(
 
     titlePanel("Clinical Event Detection And Recording System"),
 
-    textInput(inputId = "database", label = "Database:"),
-
     textInput(inputId = "user_id", label = "User ID:"),
 
     passwordInput(inputId = "end_user_pw", label = "Password:"),
@@ -154,14 +152,14 @@ server <- function(input, output, session) {
     data <- eventReactive(eventExpr = updated(), {
 
         # Will not post if the "SEARCH" button was pressed
-        if (is.na(id_for_search) & (!is.na(position) & (!is.na(new_event_date) | adjudicated == TRUE))) post_wrapper(input$database, input$user_id, input$end_user_pw, position, new_event_date, input$input_comments)
+        if (is.na(id_for_search) & (!is.na(position) & (!is.na(new_event_date) | adjudicated == TRUE))) post_wrapper(g_database, input$user_id, input$end_user_pw, position, new_event_date, input$input_comments)
 
         updateDateInput(session = session, inputId = "event_date", value = NA)
         updateDateInput(session = session, inputId = "search_patient_id", value = NA)
 
-        if (input$database != "") {
+        if (input$user_id != "") {
 
-            output <- get_wrapper(input$database, input$user_id, input$end_user_pw, TRUE, get_position, id_for_search)
+            output <- get_wrapper(g_database, input$user_id, input$end_user_pw, TRUE, get_position, id_for_search)
             id_for_search <<- NA
 
             if (!(output[1] %in% c("error_0", "error_1", "error_2", "error_3", "error_4"))){

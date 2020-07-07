@@ -15,7 +15,7 @@ mongo_connect(uri_fun, user, password, host, database, mongo_collection)
 
 \item{host}{MongoDB host server.}
 
-\item{database}{MongoDB database name..}
+\item{database}{MongoDB database name.}
 
 \item{mongo_collection}{MongoDB collection; if NA, will connect to DB itself.}
 }

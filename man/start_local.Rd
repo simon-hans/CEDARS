@@ -4,7 +4,7 @@
 \alias{start_local}
 \title{Start CEDARS Locally}
 \usage{
-start_local(user, password, host)
+start_local(user, password, host, database)
 }
 \arguments{
 \item{user}{DB user name.}
@@ -12,6 +12,8 @@ start_local(user, password, host)
 \item{password}{DB password.}
 
 \item{host}{Host server.}
+
+\item{database}{MongoDB database name.}
 }
 \description{
 Starts CEDARS locally from RStudio. This is a functional approach and is easier to implement than a full-fledged Shiny Server. Multiple users can access the same CEDARS project on the MongoDB server using separate local R sessions, however in that case MongoDB credentials would have to be shared to all. The best option for multi-user implementations is to use Shiny Server.

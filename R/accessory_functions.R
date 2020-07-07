@@ -10,11 +10,11 @@
 #' @return Cleaned text in ASCII format stripped of '*' characters.
 
 sanitize <- function(text) {
-    
+
     text <- gsub("[^\\x00-\\x7F]", " ", text, perl = TRUE)
     text <- gsub("\\*", " ", text)
     text
-    
+
 }
 
 
@@ -25,13 +25,13 @@ sanitize <- function(text) {
 #' @return Cleaned query.
 
 sanitize_query <- function(query) {
-    
+
     query <- gsub("[^\\x00-\\x7F]", " ", query, perl = TRUE)
     query <- gsub("\\*+", "*", query)
     query <- gsub("\\(+", "(", query)
     query <- gsub("\\)+", ")", query)
     query
-    
+
 }
 
 
@@ -42,11 +42,11 @@ sanitize_query <- function(query) {
 #' @return Formatted keywords.
 
 format_keywords <- function(keyword_elements) {
-    
+
     keyword_elements <- tolower(keyword_elements)
     keyword_elements <- utils::glob2rx(keyword_elements, trim.head = TRUE, trim.tail = TRUE)
     keyword_elements
-    
+
 }
 
 
@@ -58,23 +58,23 @@ format_keywords <- function(keyword_elements) {
 #' @return A dataframe with NLP annotations.
 
 standardize_nlp <- function(input_df, engine) {
-    
+
     if (engine == "udpipe") {
-        
-        output_df <- data.frame(text_id = input_df$doc_id, paragraph_id = input_df$paragraph_id, sentence_id = input_df$sentence_id, 
-            start = input_df$start, end = input_df$end, token = input_df$token, lemma = input_df$lemma, token_id = input_df$token_id, 
-            upos = input_df$upos, xpos = input_df$xpos, head_token_id = input_df$head_token_id, dependency = input_df$dep_rel, 
+
+        output_df <- data.frame(text_id = input_df$doc_id, paragraph_id = input_df$paragraph_id, sentence_id = input_df$sentence_id,
+            start = input_df$start, end = input_df$end, token = input_df$token, lemma = input_df$lemma, token_id = input_df$token_id,
+            upos = input_df$upos, xpos = input_df$xpos, head_token_id = input_df$head_token_id, dependency = input_df$dep_rel,
             features = input_df$feats)
     }
-    
+
     output_df$upos <- as.character(output_df$upos)
     output_df$token_id <- as.character(output_df$token_id)
     output_df$token_id <- as.numeric(output_df$token_id)
     output_df$head_token_id <- as.character(output_df$head_token_id)
     output_df$head_token_id <- as.numeric(output_df$head_token_id)
-    
+
     output_df
-    
+
 }
 
 
@@ -85,17 +85,17 @@ standardize_nlp <- function(input_df, engine) {
 #' @return Text string with HTML markup.
 
 colorize <- function(get_output) {
-    
+
     get_output$selected <- gsub("\\*START\\*", "<span style=\"color:red;font-weight:bold\">", get_output$selected)
     get_output$selected <- gsub("\\*END\\*", "</span>", get_output$selected)
-    
+
     get_output$note_text <- gsub("\\*START\\*", "<span style=\"color:red;font-weight:bold\">", get_output$note_text)
     get_output$note_text <- gsub("\\*END\\*", "</span>", get_output$note_text)
-    
+
     get_output$note_text <- gsub("\\n", "<br>", get_output$note_text)
-    
+
     get_output
-    
+
 }
 
 
@@ -105,24 +105,27 @@ colorize <- function(get_output) {
 #' @param user DB user name.
 #' @param password DB password.
 #' @param host Host server.
+#' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' start_local(user = 'John', password = 'db_password_1234', host = 'server1234')
 #' }
 #' @export
 
-start_local <- function(user, password, host) {
-    
+start_local <- function(user, password, host, database) {
+
     g_user <- user
     g_password <- password
     g_host <- host
-    
+    g_database <- database
+
     g_user <<- g_user
     g_password <<- g_password
     g_host <<- g_host
-    
+    g_database <<- g_database
+
     shiny::runApp(appDir = paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny", sep = ""))
-    
+
 }
 
 
@@ -132,6 +135,7 @@ start_local <- function(user, password, host) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB server host.
+#' @param database MongoDB database name.
 #' @param destination_path Folder where the files should be saved. Default is working directory.
 #' @examples
 #' \dontrun{
@@ -140,18 +144,19 @@ start_local <- function(user, password, host) {
 #' }
 #' @export
 
-save_credentials <- function(user, password, host, destination_path = getwd()) {
-    
+save_credentials <- function(user, password, host, database, destination_path = getwd()) {
+
     app_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny/app.R", sep = "")
-    
+
     g_user <- user
     g_password <- password
     g_host <- host
-    
+    g_database <- database
+
     file.copy(from = app_path, to = paste(destination_path, "/app.R", sep = ""))
-    
-    save(g_user, g_password, g_host, file = paste(destination_path, "/db_credentials.Rdata", sep = ""))
-    
+
+    save(g_user, g_password, g_host, g_database, file = paste(destination_path, "/db_credentials.Rdata", sep = ""))
+
 }
 
 
