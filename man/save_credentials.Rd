@@ -4,7 +4,14 @@
 \alias{save_credentials}
 \title{Save MongoDB Credentials}
 \usage{
-save_credentials(user, password, host, database, destination_path = getwd())
+save_credentials(
+  user,
+  password,
+  host,
+  database,
+  LDAP,
+  destination_path = getwd()
+)
 }
 \arguments{
 \item{user}{MongoDB user name.}
@@ -15,6 +22,8 @@ save_credentials(user, password, host, database, destination_path = getwd())
 
 \item{database}{MongoDB database name.}
 
+\item{LDAP}{is LDAP being used? In this case, CEDARS will not prompt for user ID/password and a check will NOT be made on the users table. Access will be granted, relying on LDAP authentication. Annotations will be stamped with LDAP user name.}
+
 \item{destination_path}{Folder where the files should be saved. Default is working directory.}
 }
 \description{
@@ -23,6 +32,6 @@ Saves MongoDB credentials as 'db_credentials.Rdata' and Shiny app file as 'app.R
 \examples{
 \dontrun{
 save_credentials(user = 'John', password = 'db_password_1234', host = 'server1234',
-destination_path = getwd())
+database = 'myDB', LDAP = FALSE, destination_path = getwd())
 }
 }

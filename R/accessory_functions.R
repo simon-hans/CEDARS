@@ -137,14 +137,15 @@ start_local <- function(user, password, host, database) {
 #' @param host MongoDB server host.
 #' @param database MongoDB database name.
 #' @param destination_path Folder where the files should be saved. Default is working directory.
+#' @param LDAP is LDAP being used? In this case, CEDARS will not prompt for user ID/password and a check will NOT be made on the users table. Access will be granted, relying on LDAP authentication. Annotations will be stamped with LDAP user name.
 #' @examples
 #' \dontrun{
 #' save_credentials(user = 'John', password = 'db_password_1234', host = 'server1234',
-#' destination_path = getwd())
+#' database = 'myDB', LDAP = FALSE, destination_path = getwd())
 #' }
 #' @export
 
-save_credentials <- function(user, password, host, database, destination_path = getwd()) {
+save_credentials <- function(user, password, host, database, LDAP, destination_path = getwd()) {
 
     app_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny/app.R", sep = "")
 
@@ -152,10 +153,11 @@ save_credentials <- function(user, password, host, database, destination_path = 
     g_password <- password
     g_host <- host
     g_database <- database
+    g_ldap <- LDAP
 
     file.copy(from = app_path, to = paste(destination_path, "/app.R", sep = ""))
 
-    save(g_user, g_password, g_host, g_database, file = paste(destination_path, "/db_credentials.Rdata", sep = ""))
+    save(g_user, g_password, g_host, g_database, g_ldap, file = paste(destination_path, "/db_credentials.Rdata", sep = ""))
 
 }
 
