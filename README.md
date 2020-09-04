@@ -1,7 +1,7 @@
 Overview
 --------
 
-CEDARS (Clinical Event Detection and Recording System) is a computational paradigm for collection and aggregation of time-to-event data in retrospective clinical studies. Born out of a practical need for a more efficient way to conduct medical research, it aims to systematize and accelerate the review of electronic health record (EHR) corpora. It accomplishes those goals by deploying natural language processing (NLP) as a tool to assist detection and characterization of clinical events by human abstractors. In its current iteration, CEDARS is avalaible as an open-source R package under [GPL-3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
+CEDARS (Clinical Event Detection and Recording System) is a computational paradigm for collection and aggregation of time-to-event data in retrospective clinical studies. Developed out of a practical need for a more efficient way to conduct medical research, it aims to systematize and accelerate the review of electronic health record (EHR) corpora. It accomplishes those goals by deploying natural language processing (NLP) as a tool to assist detection and characterization of clinical events by human abstractors. In its current iteration, CEDARS is avalaible as an open-source R package under [GPL-3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 Requirements
 ------------
@@ -20,6 +20,9 @@ Basic Concepts
 
 <img src="GitHub Schema 2 A new color.png" alt="alt text" width="500"/>
 
+Sentences with keywords or concepts of interest are presented to the end user one at a time and in chronological order. The user assesses each sentence, determining whether or not a clinical event is being reported. The whole note or report drawn from the EHR is available for review in the GUI. If no event is declared in the sentence, CEDARS presents the next sentence for the same patient (#1). If an event date is entered, CEDARS moves to the next unreviewed sentence before the event date. If there are no sentences left to review before the event, the GUI moves to the next patient (#2) and the process is repeated with the following record (#3 and #4), until all selected sentences have been reviewed.
+
+In order for CEDARS to be sufficiently sensitive and not miss and unacceptable number of clinical events, the keyword/concept search query must be well thought and exhaustive. The performance of CEDARS will vary by medical area, since the extent of medical lexicon will vary substantially between event types.
 
 Operational Schema
 ------------------
@@ -27,6 +30,8 @@ Operational Schema
 <img src="GitHub Schema 1 B new color.png" alt="alt text" width="500"/>
 
 CEDARS is modular and all information for any given annotation project is stored in one MongoDB database. User credentials, original clinical notes, NLP annotations and patient-specific information are stored in dedicated collections. Once clinical notes have been uploaded, they are passed through the NLP pipeline. Currently only UDPipe is supported and integrated with CEDARS. If desired, the annotation pipeline can include negation and medical concept tagging by NegEx and UMLS respectively.
+
+Multiple users can load the web GUI and annotate records at the same time. Once accessed, a given patient record is locked for the user.
 
 Sample Code
 -----------
@@ -55,6 +60,9 @@ udmodel_path <- "C:/R/NLP_models/latestversion.udpipe"
 # Name for MongoDB database which will contain the CEDARS project
 mongo_database <- "EXAMPLE"
 
+# The 'standard' MongoDB URI format is used
+uri_fun <- mongo_uri_standard
+
 # We create the database and all required collections
 create_project(uri_fun, db_user_name, db_user_pw, db_host, mongo_database, "CEDARS Example Project", "Dr Smith")
 
@@ -81,6 +89,9 @@ save_query(uri_fun, db_user_name, db_user_pw, db_host, mongo_database, search_qu
 # Starts the CEDARS GUI locally
 # Your user name is "John", password is "strongpassword"
 start_local(db_user_name, db_user_pw, db_host, mongo_database)
+
+# Remove project from MongoDB
+terminate_project(uri_fun, db_user_name, db_user_pw, db_host, mongo_database)
 ```
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
