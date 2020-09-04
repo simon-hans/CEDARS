@@ -60,6 +60,9 @@ udmodel_path <- "C:/R/NLP_models/latestversion.udpipe"
 # Name for MongoDB database which will contain the CEDARS project
 mongo_database <- "EXAMPLE"
 
+# The 'standard' MongoDB URI format is used
+uri_fun <- mongo_uri_standard
+
 # We create the database and all required collections
 create_project(uri_fun, db_user_name, db_user_pw, db_host, mongo_database, "CEDARS Example Project", "Dr Smith")
 
