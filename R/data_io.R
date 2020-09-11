@@ -46,7 +46,7 @@ get_wrapper <- function(database, end_user, end_user_password, html = TRUE, posi
 #' }
 #' @export
 
-post_wrapper <- function(database, end_user, end_user_password, position, event_date, pt_comments, LDAP = FALSE) {
+post_wrapper <- function(database, end_user, end_user_password, position, event_date, pt_comments, ldap = FALSE) {
 
     post_data(g_mongodb_uri_fun, g_user, g_password, g_host, database, end_user, end_user_password, position, event_date,
         pt_comments, ldap)
