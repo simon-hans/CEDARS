@@ -15,9 +15,17 @@ ui <- fluidPage(
 
     titlePanel("Clinical Event Detection And Recording System"),
 
-    textInput(inputId = "user_id", label = "User ID:"),
+    # Logon displayed only if LDAP not in use
 
-    passwordInput(inputId = "end_user_pw", label = "Password:"),
+    conditionalPanel(condition = "output.display_logon == 'TRUE'", textInput(inputId = "user_id", label = "User ID:")),
+
+    conditionalPanel(condition = "output.display_logon == 'TRUE'", passwordInput(inputId = "end_user_pw", label = "Password:")),
+    
+    # Conversely, if LDAP in use current user name will be displayed
+    
+    conditionalPanel(condition = "output.display_logon == 'FALSE'", tags$h3("LDAP User name:")),
+    
+    div(style = "border: 2px solid black; padding: 4px; width: fit-content", textOutput(outputId = "session_user")),
 
     tags$h3("Event date:"),
 
@@ -79,7 +87,7 @@ ui <- fluidPage(
 
 
 server <- function(input, output, session) {
-
+    
     if (!exists("position")) position <- NA
     if (!exists("get_position")) get_position <- NA
     if (!exists("max_position")) max_position <- NA
@@ -152,14 +160,21 @@ server <- function(input, output, session) {
     data <- eventReactive(eventExpr = updated(), {
 
         # Will not post if the "SEARCH" button was pressed
-        if (is.na(id_for_search) & (!is.na(position) & (!is.na(new_event_date) | adjudicated == TRUE))) post_wrapper(g_database, input$user_id, input$end_user_pw, position, new_event_date, input$input_comments)
+        if (is.na(id_for_search) & (!is.na(position) & (!is.na(new_event_date) | adjudicated == TRUE))) {
+            
+            if (g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
+            post_wrapper(g_database, end_user_id, input$end_user_pw, position, new_event_date, input$input_comments, ldap = g_ldap)
+            
+        }
 
         updateDateInput(session = session, inputId = "event_date", value = NA)
         updateDateInput(session = session, inputId = "search_patient_id", value = NA)
 
-        if (input$user_id != "") {
+        if (input$user_id != "" | g_ldap == TRUE) {
 
-            output <- get_wrapper(g_database, input$user_id, input$end_user_pw, TRUE, get_position, id_for_search)
+            if (g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
+            
+            output <- get_wrapper(g_database, end_user_id, input$end_user_pw, TRUE, get_position, id_for_search, ldap = g_ldap)
             id_for_search <<- NA
 
             if (!(output[1] %in% c("error_0", "error_1", "error_2", "error_3", "error_4"))){
@@ -249,7 +264,12 @@ server <- function(input, output, session) {
         output$patient_id <- renderText(paste("Patient ID: ", data()$patient_id, sep=""))
 
         output$tags_table <- renderTable(data.frame(Tag_1 = data()$text_tag_1, Tag_2 = data()$text_tag_2, Tag_3 = data()$text_tag_3, Tag_4 = data()$text_tag_4, Tag_5 = data()$text_tag_5, Tag_6 = data()$text_tag_6, Tag_7 = data()$text_tag_7, Tag_8 = data()$text_tag_8, Tag_9 = data()$text_tag_9, Tag_10 = data()$text_tag_10))
-
+        
+        output$session_user <- renderText({session$user})
+        
+        output$display_logon <- renderText({!g_ldap})
+        outputOptions(output, "display_logon", suspendWhenHidden = FALSE) 
+        
 }
 
 
