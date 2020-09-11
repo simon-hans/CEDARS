@@ -14,7 +14,8 @@ get_data(
   end_user_password,
   html = TRUE,
   position,
-  patient_id = NA
+  patient_id = NA,
+  ldap = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ get_data(
 \item{position}{Sentence position within the sequence of selected sentences for a given patient.}
 
 \item{patient_id}{Used if a specific patient record is requested, instead of a search for next record to annotate.}
+
+\item{ldap}{Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.}
 }
 \value{
 A list with patient-specific information and a dataframe with selected sentences along with sentence-specific data.

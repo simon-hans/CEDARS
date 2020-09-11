@@ -27,8 +27,8 @@ umls_processor <- function(annotated_text, umls_selected, max_n_grams_length) {
         annotated_text$umls_CUI[!is.na(annotated_text$CUI)] <- annotated_text$CUI[!is.na(annotated_text$CUI)]
         annotated_text <- annotated_text[order(annotated_text$doc_id, annotated_text$paragraph_id, annotated_text$sentence_id, 
             annotated_text$start, decreasing = FALSE, method = "radix"), ]
-        annotated_text$umls_end[!is.na(annotated_text$CUI)] <- annotated_text$end[(1:length(annotated_text[, 
-            1]))[!is.na(annotated_text$CUI)] + i - 1]
+        annotated_text$umls_end[!is.na(annotated_text$CUI)] <- annotated_text$end[(1:length(annotated_text[, 1]))[!is.na(annotated_text$CUI)] + 
+            i - 1]
         # We overwrite older phrases included in newer, larger ones
         temp <- list()
         for (j in (1:length(annotated_text[, 1]))[!is.na(annotated_text$CUI)]) temp[[j]] <- j + (1:(i - 1))

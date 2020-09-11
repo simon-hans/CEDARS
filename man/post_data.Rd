@@ -14,7 +14,8 @@ post_data(
   end_user_password,
   position,
   event_date,
-  pt_comments
+  pt_comments,
+  ldap = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ post_data(
 \item{event_date}{Date of clinical event as determined by human reviewer.}
 
 \item{pt_comments}{Patient-specific comments from the reviewer.}
+
+\item{ldap}{Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.}
 }
 \description{
 Saves sentence review status and event time about an individual for whom the electronic health record text was reviewed. Main way for end user to enter data into CEDARS.

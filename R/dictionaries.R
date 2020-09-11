@@ -31,8 +31,8 @@ mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_f
     
     print("Processing table...")
     
-    colnames(mrconso) <- c("CUI", "LAT", "TS", "LUI", "STT", "SUI", "ISPREF", "AUI", "SAUI", "SCUI", "SDUI", 
-        "SAB", "TTY", "CODE", "STR", "SRL", "SUPPRESS", "CVF")
+    colnames(mrconso) <- c("CUI", "LAT", "TS", "LUI", "STT", "SUI", "ISPREF", "AUI", "SAUI", "SCUI", "SDUI", "SAB", 
+        "TTY", "CODE", "STR", "SRL", "SUPPRESS", "CVF")
     mrconso[, is.na(colnames(mrconso))] <- NULL
     
     print("Selecting subsets of interest...")
