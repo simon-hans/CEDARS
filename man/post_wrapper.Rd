@@ -10,7 +10,8 @@ post_wrapper(
   end_user_password,
   position,
   event_date,
-  pt_comments
+  pt_comments,
+  ldap = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ post_wrapper(
 \item{event_date}{Date of clinical event as determined by human reviewer.}
 
 \item{pt_comments}{Patient-specific comments from the reviewer.}
+
+\item{ldap}{Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.}
 }
 \description{
 Posts results of human reviewer annotation to MongoDB. Uses DB credentials pre-loaded in the main environment. For use with Shiny or REST POST (latter yet to be implemented).
