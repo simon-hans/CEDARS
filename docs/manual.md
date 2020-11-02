@@ -1,10 +1,10 @@
-Getting Started
----------------
+# manual
+
+## Getting Started
 
 This is a test
 
-
-Installing NegEx
-----------------
+## Installing NegEx
 
 other test
+
