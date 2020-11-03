@@ -1,6 +1,6 @@
 # Table of contents
 
 * [Overview](../README.md)
-* [Test](../TEST.md)
+* [Test](../test.md)
 * [Manual](manual.md)
 
