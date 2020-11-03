@@ -1,5 +1,5 @@
 # Table of contents
 
-* [README](../README.md)
-* [manual](manual.md)
+* [Overview](../README.md)
+* [Manual](manual.md)
 
