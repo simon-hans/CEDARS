@@ -1,4 +1,5 @@
 root: ./docs/
 
 structure:  
-    summary: SUMMARY.md  
+    summary: SUMMARY.md
+    new_overview: ../README.md
