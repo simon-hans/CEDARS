@@ -32,6 +32,19 @@ The add_end_user() function adds an end user (i.e. data abstractor) to the proje
 
 ## Building the Search Query
 
+The CEDARS search query incorporates the following wildcards:
+
+"?": for one character, for example "r?d" would match "red" or "rod" but not "reed"
+"\*": for zero to any number of characters, for example "r*" would match "red", "rod", "reed", "rd", etc.
+
+CEDARS also applies the following Boolean operators:
+
+"AND": both conditions present
+"OR": either present present
+"!": negation, for example "!red" would only match sentences without the word "red"
+
+Lastly, the "(" and ")" operators can be used to further develop logic within a query.
+
 ## Preparing Data for Event Detection
 
 ### Transferring Electronic Medical Record Corpora
