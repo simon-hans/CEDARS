@@ -2,7 +2,7 @@
 
 ## Overview
 
-CEDARS \(Clinical Event Detection and Recording System\) is a computational paradigm for collection and aggregation of time-to-event data in retrospective clinical studies. Developed out of a practical need for a more efficient way to conduct medical research, it aims to systematize and accelerate the review of electronic health record \(EHR\) corpora. It accomplishes those goals by deploying natural language processing \(NLP\) as a tool to assist detection and characterization of clinical events by human abstractors. In its current iteration, CEDARS is available as an open-source R package under [GPL-3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
+CEDARS \(Clinical Event Detection and Recording System\) is a computational paradigm for collection and aggregation of time-to-event data in retrospective clinical studies. Developed out of a practical need for a more efficient way to conduct medical research, it aims to systematize and accelerate the review of electronic health record \(EHR\) corpora. It accomplishes those goals by deploying natural language processing \(NLP\) as a tool to assist detection and characterization of clinical events by human abstractors. In its current iteration, CEDARS is available as an open-source R package under [GPL-3 license](https://www.gnu.org/licenses/gpl-3.0.en.html) and can be downloaded from [GitHub](https://github.com/simon-hans/CEDARS).
 
 ## Requirements
 
@@ -17,7 +17,7 @@ The [UMLS](https://www.nlm.nih.gov/research/umls/index.html) is a rich compendiu
 
 ## Basic Concepts
 
-![alt text](.gitbook/assets/GitHub%20Schema%202%20A%20new%20color.png)
+![CEDARS Workflow](docs/pics/GitHub%20Schema%202%20B%20blue%20&%20gold.png)
 
 Sentences with keywords or concepts of interest are presented to the end user one at a time and in chronological order. The user assesses each sentence, determining whether or not a clinical event is being reported. The whole note or report drawn from the EHR is available for review in the GUI. If no event is declared in the sentence, CEDARS presents the next sentence for the same patient \(\#1\). If an event date is entered, CEDARS moves to the next unreviewed sentence before the event date. If there are no sentences left to review before the event, the GUI moves to the next patient \(\#2\) and the process is repeated with the following record \(\#3 and \#4\), until all selected sentences have been reviewed.
 
@@ -25,7 +25,7 @@ In order for CEDARS to be sufficiently sensitive and not miss and unacceptable n
 
 ## Operational Schema
 
-![alt text](.gitbook/assets/GitHub%20Schema%201%20B%20new%20color.png)
+![CEDARS Operational Schema](docs/pics/GitHub%20Schema%201%20C%20blue.png)
 
 CEDARS is modular and all information for any given annotation project is stored in one MongoDB database. User credentials, original clinical notes, NLP annotations and patient-specific information are stored in dedicated collections. Once clinical notes have been uploaded, they are passed through the NLP pipeline. Currently only UDPipe is supported and integrated with CEDARS. If desired, the annotation pipeline can include negation and medical concept tagging by NegEx and UMLS respectively.
 

@@ -1,4 +1,4 @@
-# CEDARS User Manual
+# CEDARS Administrator Manual
 
 ## Getting Started
 
