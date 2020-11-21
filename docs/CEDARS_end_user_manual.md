@@ -48,6 +48,8 @@ Often the sentence and note presented to you will hint at a possible event but r
 
 ### Entering an Event Date
 
+Any known event date will be displayed at the beginning of section titled "Event date:". Most of the time this field will be empty, since generally speaking CEDARS projects aim to determine event dates for a cohort for which no prior information exists. However, CEDARS can also be used to verify known event dates, in which case the interface might display an event date for a patient you have not yet assessed. Your CEDARS system administrator will discuss this aspect with you before starting the project.
+
 Once you have determined a clinical event did indeed occur, the next step is to assess its timing. As noted above, you might have to travel between sentences or consult complete notes to confirm the date. Once you are ready to enter this information, click on the data entry field under the "ENTER NEW DATE" button. You will be prompted with a calendar. Once the date displayed is correct, press on button "ENTER NEW DATE".
 
 Given the nature of clinical narratives, not all events will be precisely dated. For example, a clinician might refer to an event only with the month and year, not the day. Such information can still be entered by using simple approximation guidelines. In CEDARS, if only the year of an event is known, enter July 1st of that year (e.g. "2020-07-01"). If only they year and month are known, enter the 15th day of that month/year (e.g. "2020-11-15" if the event was in November of 2020).
