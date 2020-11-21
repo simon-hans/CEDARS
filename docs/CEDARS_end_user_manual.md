@@ -24,3 +24,34 @@ Using an internet browser, navigate to the web page provided by your CEDARS syst
 
 As soon as you are logged in, CEDARS will start looking for the next available patient with information to review. It might take a few moments before the first sentence is presented to you. The following is an example from a simulated cohort:
 
+
+Keywords or concepts are highlighted in red to help you located them in the text.
+
+### Evaluating a Sentence
+
+Typically you will be able to make up your mind just by reading the sentence itself. If the sentence is ambiguous and you would like to obtain more context, the note or report from which the sentence was drawn is presented in its entirety at the bottom of the screen under the section "Selected note:".
+
+### Annotating a Negative Sentence
+
+In many cases, the sentence you are looking at will be a false positive, i.e. it does not represent the kind of event you were tasked to report. In this case, simply click on the button "ADJUDICATE SENTENCE". This will mark the sentence as such and move to the next one in line.
+
+### Move Between Sentences Within a Patient's Record
+
+Often the sentence and note presented to you will hint at a possible event but remain ambiguous, or an event will be obvious but the timing unclear. In such cases, you can move from sentence to sentence by using the "<<< PREVIOUS" and "NEXT >>>" buttons. You will go from sentence to sentence, following the timeline of electronic record notes/reports. Note that using previous/next will not annotate sentences or otherwise enter information in the CEDARS database.
+
+## Entering Information About a Patient
+
+### Entering an Event Date
+
+Once you have ascertained the timing of a clinical event, click on the data entry field under the "ENTER NEW DATE" button. You will be prompted with a calendar. Once the date displayed is correct, press on button "ENTER NEW DATE".
+
+### Deleting an Event Date
+
+It is possible to replace an erroneous date by entering a new one in the date entry field. If there was actually no event, the previously entered date can be deleted by clicking on button "DELETE OLD DATE".
+
+### Entering Comments About a Patient
+
+
+## Search for a Specific Patient
+
+If you want to go back to a specific patient later on, take note of the patient ID number. CEDARS will automatically present you for the next available patient to review, so if you have already annotated all sentences for a given patient, the only way to find that record again is to do a search. In this case, simply enter the patient ID number under in the box under "Search for patient" and click button "SEARCH".
