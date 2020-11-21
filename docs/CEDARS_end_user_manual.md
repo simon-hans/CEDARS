@@ -24,7 +24,7 @@ Using an internet browser, navigate to the web page provided by your CEDARS syst
 
 As soon as you are logged in, CEDARS will start looking for the next available patient with information to review. It might take a few moments before the first sentence is presented to you. The following is an example from a simulated cohort:
 
-![Simulated Patient Example - Data Entry Interface](pics/interface%20A.png
+![Simulated Patient Example - Data Entry Interface](pics/interface%20A.png)
 
 Keywords or concepts are highlighted in red to help you located them in the text.
 
