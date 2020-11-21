@@ -26,7 +26,7 @@ As soon as you are logged in, CEDARS will start looking for the next available p
 
 ![Simulated Patient Example - Data Entry Interface](pics/interface%20A.png)
 
-Keywords or concepts are highlighted in red to help you located them in the text.
+Keywords or concepts are highlighted in red to help you locate them in the text.
 
 ### Evaluating a Sentence
 
