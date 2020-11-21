@@ -56,3 +56,7 @@ At any point you can enter comments about a patient, however those will be saved
 ## Search for a Specific Patient
 
 If you want to go back to a specific patient later on, take note of the patient ID number. CEDARS will automatically present you for the next available patient to review, so if you have already annotated all sentences for a given patient, the only way to find that record again is to do a search. In this case, simply enter the patient ID number under in the box under "Search for patient" and click button "SEARCH".
+
+## Record Locking
+
+Only one end user can access a specific patient in the CEDARS database. If someone else is already looking at a given patient, you will be locked from accessing it.
