@@ -32,7 +32,7 @@ Keywords or concepts are highlighted in red to help you locate them in the text.
 
 Only one sentence to review will be presented at any given time. It can be found at the beginning of the section titled "Selected sentence:".
 
-Typically you will be able to make up your mind just by reading the sentence itself. If the sentence is ambiguous and you would like to obtain more context, you can review the note or report from which the sentence was drawn, situated at the bottom of the screen under the section "Selected note:". Also, completeley at the bottom of the screen you will find a list of tags with associated data. The information presented here will vary, but would typically include the patient's name, the type of note, the author etc.
+Your first task is to determine whether or not the sentence refers to an actual clinical event of interest, i.e. a true positive. Typically you will be able to make up your mind just by reading the sentence itself. If the sentence is ambiguous and you would like to obtain more context, you can review the note or report from which the sentence was drawn, situated at the bottom of the screen under the section "Selected note:". Also, completeley at the bottom of the screen you will find a list of tags with associated data. The information presented here will vary, but would typically include the patient's name, the type of note, the author etc.
 
 For your reference, the date of entry for the note from which the sentence was drawn is indicated below the sentence, along with sentence position (first, second, third in line etc) and patient ID.
 
@@ -48,7 +48,9 @@ Often the sentence and note presented to you will hint at a possible event but r
 
 ### Entering an Event Date
 
-Once you have ascertained the timing of a clinical event, click on the data entry field under the "ENTER NEW DATE" button. You will be prompted with a calendar. Once the date displayed is correct, press on button "ENTER NEW DATE".
+Once you have determined a clinical event did indeed occur, the next step is to assess its timing. As noted above, you might have to travel between sentences or consult complete notes to confirm the date. Once you are ready to enter this information, click on the data entry field under the "ENTER NEW DATE" button. You will be prompted with a calendar. Once the date displayed is correct, press on button "ENTER NEW DATE".
+
+Given the nature of clinical narratives, not all events will be precisely dated. For example, a clinician might refer to an event only with the month and year, not the day. Such information can still be entered by using simple approximation guidelines. In CEDARS, if only the year of an event is known, enter July 1st of that year (e.g. "2020-07-01"). If only they year and month are known, enter the 15th day of that month/year (e.g. "2020-11-15" if the event was in November of 2020).
 
 ### Deleting an Event Date
 
