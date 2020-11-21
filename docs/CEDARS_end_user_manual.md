@@ -52,7 +52,7 @@ Any known event date will be displayed at the beginning of section titled "Event
 
 Once you have determined a clinical event did indeed occur, the next step is to assess its timing. As noted above, you might have to travel between sentences or consult complete notes to confirm the date. Once you are ready to enter this information, click on the data entry field under the "ENTER NEW DATE" button. You will be prompted with a calendar. Once the date displayed is correct, press on button "ENTER NEW DATE".
 
-Given the nature of clinical narratives, not all events will be precisely dated. For example, a clinician might refer to an event only with the month and year, not the day. Such information can still be entered by using simple approximation guidelines. In CEDARS, if only the year of an event is known, enter July 1st of that year (e.g. "2020-07-01"). If only they year and month are known, enter the 15th day of that month/year (e.g. "2020-11-15" if the event was in November of 2020).
+Given the nature of clinical narratives, not all events will be precisely dated. For example, a clinician might refer to an event only with the month and year, not the day. Such information can still be entered by using simple approximation guidelines. In CEDARS, if only the year of an event is known, enter July 1st of that year (e.g. "2020-07-01"). If only they year and month are known, enter the 15th day of that month/year (e.g. "2020-11-15" if the event was in November of 2020). When approximating a date, it is good practice to document this detail in a comment (see below).
 
 ### Deleting an Event Date
 
@@ -60,7 +60,7 @@ It is possible to replace an erroneous date by entering a new one in the date en
 
 ### Entering Comments About a Patient
 
-At any point you can enter comments about a patient, however those will be saved only if you 1) adjudicate the sentence or 2) enter an event date.
+At any point you can enter comments about a patient in the data entry field under "New comments:", however those will be saved only if you 1) adjudicate the sentence or 2) enter an event date.
 
 ## Search for a Specific Patient
 
