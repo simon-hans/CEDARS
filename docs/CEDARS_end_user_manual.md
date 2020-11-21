@@ -51,6 +51,7 @@ It is possible to replace an erroneous date by entering a new one in the date en
 
 ### Entering Comments About a Patient
 
+At any point you can enter comments about a patient, however those will be saved only if you 1) adjudicate the sentence or 2) enter an event date.
 
 ## Search for a Specific Patient
 
