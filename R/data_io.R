@@ -557,7 +557,8 @@ get_patient <- function(uri_fun, user, password, host, database, end_user, searc
 
 #' Aggregate Contents of a Note
 #'
-#' When using atomized notes, this function 'pastes' back the different sections together in the intended order.
+#' When using atomized notes, this function 'pastes' back the different sections together in the intended order. Preselected lemmas are marked, along with those for which thr CUI is
+#' in the list of interest.
 #' @param selected_doc_id Document ID for the note to which the sentence belongs.
 #' @param annotations NLP annotations dataframe.
 #' @param cui_elements Vector of UMLS concept unique identifier (CUI) elements derived from the search query.
