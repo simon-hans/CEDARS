@@ -92,7 +92,7 @@ get_data <- function(uri_fun, user, password, host, database, end_user, end_user
 
             # Finding out if patient ID exists
             # Only numeric patient ID's are accepted, anything else will result in no patient found
-            if (is.numeric(patient_id)) patient <- patients_con$find(paste("{ \"patient_id\" : ", patient_id, "}", sep = "")) else patient <- data.frame(a=NULL, b=NULL)
+            if (!is.na(as.numeric(patient_id))) patient <- patients_con$find(paste("{ \"patient_id\" : ", patient_id, "}", sep = "")) else patient <- data.frame(a=NULL, b=NULL)
 
             if (dim(patient)[1] > 0) {
 
