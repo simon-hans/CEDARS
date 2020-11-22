@@ -799,33 +799,39 @@ download_outcomes <- function(uri_fun, user, password, host, database) {
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
 #' @param database MongoDB database name.
-#' @param event_dates Dataframe of patient ID's with dates of clinical events.
+#' @param patient_ids Vector of patient ID's.
+#' @param event_dates Vector of clinical event dates.
 #' @examples
 #' \dontrun{
 #' upload_events(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT', event_dates = events_df)
+#' host = 'server1234', database = 'TEST_PROJECT', patient_ids = ids, event_dates = events)
 #' }
 #' @export
 
-upload_events <- function(uri_fun, user, password, host, database, event_dates) {
+upload_events <- function(uri_fun, user, password, host, database, patient_ids, event_dates) {
 
-    event_dates <- subset(event_dates, select = c("patient_id", "event_date"))
-    event_dates$event_date <- paste("\"", event_dates$event_date, "\"", sep = "")
-    event_dates$event_date[event_dates$event_date == "\"NA\""] <- "null"
+    if (class(event_dates) != "Date") print("Error: event dates must be of class Date!") else {
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+        event_dates <- data.frame(patient_id = patient_ids, event_date = event_dates)
+        event_dates$event_date <- paste("\"", event_dates$event_date, "\"", sep = "")
+        event_dates$event_date[event_dates$event_date == "\"NA\""] <- "null"
 
-    current_patients <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 }")
+        patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
 
-    current_outcomes <- merge(event_dates, current_patients, by = "patient_id", all.x = FALSE, all.y = FALSE)
+        current_patients <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 }")
 
-    for (i in 1:length(current_outcomes[, 1])) {
+        current_outcomes <- merge(event_dates, current_patients, by = "patient_id", all.x = FALSE, all.y = FALSE)
 
-        pt_query <- paste("{", paste("\"patient_id\" : ", current_outcomes$patient_id[i], sep = ""), "}")
 
-        pt_update <- paste("{ \"$set\" : {\"event_date\" : ", current_outcomes$event_date[i], "}}", sep = "")
+        for (i in 1:length(current_outcomes[, 1])) {
 
-        patients_con$update(pt_query, pt_update)
+            pt_query <- paste("{", paste("\"patient_id\" : ", current_outcomes$patient_id[i], sep = ""), "}")
+
+            pt_update <- paste("{ \"$set\" : {\"event_date\" : ", current_outcomes$event_date[i], "}}", sep = "")
+
+            patients_con$update(pt_query, pt_update)
+
+        }
 
     }
 
