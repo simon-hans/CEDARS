@@ -120,7 +120,13 @@ get_data <- function(uri_fun, user, password, host, database, end_user, end_user
                   out <- "error_3" else out <- "error_4"
 
                 # error_2 = no patient found
-            } else out <- "error_2"
+                # prior accessed record is unlocked
+            } else {
+
+                unlock_user(uri_fun, user, password, host, database, end_user)
+                out <- "error_2"
+
+                }
 
         } else {
 
