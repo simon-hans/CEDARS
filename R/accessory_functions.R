@@ -118,12 +118,13 @@ start_local <- function(user, password, host, database) {
     g_password <- password
     g_host <- host
     g_database <- database
+    g_ldap <- FALSE
 
     g_user <<- g_user
     g_password <<- g_password
     g_host <<- g_host
     g_database <<- g_database
-    g_ldap <<- FALSE
+    g_ldap <<- g_ldap
 
     shiny::runApp(appDir = paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny", sep = ""))
 

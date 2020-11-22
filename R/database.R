@@ -802,12 +802,12 @@ download_outcomes <- function(uri_fun, user, password, host, database) {
 #' @param event_dates Dataframe of patient ID's with dates of clinical events.
 #' @examples
 #' \dontrun{
-#' upload_outcomes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
+#' upload_events(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
 #' host = 'server1234', database = 'TEST_PROJECT', event_dates = events_df)
 #' }
 #' @export
 
-upload_outcomes <- function(uri_fun, user, password, host, database, event_dates) {
+upload_events <- function(uri_fun, user, password, host, database, event_dates) {
 
     event_dates <- subset(event_dates, select = c("patient_id", "event_date"))
     event_dates$event_date <- paste("\"", event_dates$event_date, "\"", sep = "")
