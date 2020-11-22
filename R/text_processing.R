@@ -358,6 +358,15 @@ upload_notes <- function(uri_fun, user, password, host, database, notes) {
 
                 if (anyNA(date_check) | any(date_check)) print("Error: date format incorrect, must use %Y-%m-%d.") else {
 
+                    # Remedy in case there is no text sequence, expected if notes not atomized.
+
+                    if (!("text_sequence" %in% colnames(notes))) {
+
+                        notes$text_sequence <- rep(1, length(notes[,1]))
+                        print("Text sequence missing, importing as is.")
+
+                    }
+
                     standard_fields <- c("patient_id", "text_id", "text", "text_date", "doc_id", "text_sequence", "text_tag_1",
                         "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8",
                         "text_tag_9", "text_tag_10")
