@@ -505,8 +505,7 @@ get_patient <- function(uri_fun, user, password, host, database, end_user, searc
                 # Normally we would expect to have sentences here, not sure if any is new
                 if (length(new_sentences[, 1] > 0)) {
 
-                  new_sentences$note_text <- sapply(new_sentences$doc_id, aggregate_note, annotations, parse_result$keyword_elements,
-                    parse_result$cui_elements)
+                  new_sentences$note_text <- sapply(new_sentences$doc_id, aggregate_note, annotations, parse_result$cui_elements)
                   sentences$selected <- as.character(sentences$selected)
                   new_sentences$reviewed <- NULL
                   new_sentences$unique_id <- NULL
