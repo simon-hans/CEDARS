@@ -4,7 +4,16 @@
 \alias{db_upload}
 \title{Upload Annotations}
 \usage{
-db_upload(uri_fun, user, password, host, database, patient_id, annotations)
+db_upload(
+  uri_fun,
+  user,
+  password,
+  host,
+  port,
+  database,
+  patient_id,
+  annotations
+)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +23,8 @@ db_upload(uri_fun, user, password, host, database, patient_id, annotations)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

@@ -4,7 +4,7 @@
 \alias{unlock_records_admin}
 \title{Remove Admin Lock}
 \usage{
-unlock_records_admin(uri_fun, user, password, host, database, patient_id)
+unlock_records_admin(uri_fun, user, password, host, port, database, patient_id)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ unlock_records_admin(uri_fun, user, password, host, database, patient_id)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

@@ -15,6 +15,7 @@ batch_processor_db(
   user,
   password,
   host,
+  port,
   database,
   max_n_grams_length,
   negex_depth,
@@ -41,6 +42,8 @@ batch_processor_db(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

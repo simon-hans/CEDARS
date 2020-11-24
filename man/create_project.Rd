@@ -9,6 +9,7 @@ create_project(
   user,
   password,
   host,
+  port,
   database,
   project_name,
   investigator_name
@@ -23,6 +24,8 @@ create_project(
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 
 \item{project_name}{Research or QA project name.}
@@ -35,7 +38,7 @@ Creates a new MongoDB database and collections needed for a CEDARS annotation pr
 \examples{
 \dontrun{
 create_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT', project_name = 'Test project',
+host = 'server1234', port = NA, database = 'TEST_PROJECT', project_name = 'Test project',
 investigator_name = 'Dr Smith')
 }
 }

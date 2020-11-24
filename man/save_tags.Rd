@@ -4,7 +4,7 @@
 \alias{save_tags}
 \title{Save Document Tags}
 \usage{
-save_tags(uri_fun, user, password, host, database, tag_vect)
+save_tags(uri_fun, user, password, host, port, database, tag_vect)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ save_tags(uri_fun, user, password, host, database, tag_vect)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 
@@ -25,7 +27,7 @@ Save name of EHR document metadata tags. Individual notes or parts of notes can 
 \examples{
 \dontrun{
 save_tags(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT',
+host = 'server1234', port = NA, database = 'TEST_PROJECT',
 tag_vect = c('note_type', 'note_section', 'author', 'patient_name', NA, NA, NA, NA, NA, NA))
 }
 }

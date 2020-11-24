@@ -105,24 +105,28 @@ colorize <- function(get_output) {
 #' @param user DB user name.
 #' @param password DB password.
 #' @param host Host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
-#' start_local(user = 'John', password = 'db_password_1234', host = 'server1234')
+#' start_local(user = 'John', password = 'db_password_1234', host = 'server1234', port = NA,
+#' database = 'myDB')
 #' }
 #' @export
 
-start_local <- function(user, password, host, database) {
+start_local <- function(user, password, host, port, database) {
 
     g_user <- user
     g_password <- password
     g_host <- host
+    g_port <- port
     g_database <- database
     g_ldap <- FALSE
 
     g_user <<- g_user
     g_password <<- g_password
     g_host <<- g_host
+    g_port <<- g_port
     g_database <<- g_database
     g_ldap <<- g_ldap
 
@@ -137,6 +141,7 @@ start_local <- function(user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB server host.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param destination_path Folder where the files should be saved. Default is working directory.
 #' @param LDAP is LDAP being used? In this case, CEDARS will not prompt for user ID/password and a check will NOT be made on the users table. Access will be granted, relying on LDAP authentication. Annotations will be stamped with LDAP user name.
@@ -147,19 +152,20 @@ start_local <- function(user, password, host, database) {
 #' }
 #' @export
 
-save_credentials <- function(user, password, host, database, LDAP, destination_path = getwd()) {
+save_credentials <- function(user, password, host, port, database, LDAP, destination_path = getwd()) {
 
     app_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny/app.R", sep = "")
 
     g_user <- user
     g_password <- password
     g_host <- host
+    g_port <- port
     g_database <- database
     g_ldap <- LDAP
 
     file.copy(from = app_path, to = paste(destination_path, "/app.R", sep = ""))
 
-    save(g_user, g_password, g_host, g_database, g_ldap, file = paste(destination_path, "/db_credentials.Rdata",
+    save(g_user, g_password, g_host, g_port, g_database, g_ldap, file = paste(destination_path, "/db_credentials.Rdata",
         sep = ""))
 
 }

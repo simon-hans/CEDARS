@@ -9,6 +9,7 @@ save_query(
   user,
   password,
   host,
+  port,
   database,
   search_query,
   use_negation,
@@ -24,6 +25,8 @@ save_query(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 
@@ -41,7 +44,7 @@ Saves the search query. The query consists of keywords/UMLS concept unique ident
 \examples{
 \dontrun{
 save_query(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT', search_query = 'thrombosis AND venous',
+host = 'server1234', port = NA, database = 'TEST_PROJECT', search_query = 'thrombosis AND venous',
 use_negation = TRUE, hide_duplicates = TRUE, skip_after_event = TRUE)
 }
 }

@@ -9,16 +9,25 @@
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @return URI string.
 #' @examples
 #' \dontrun{
-#' mongo_uri_standard(user = 'John', password = 'db_password_1234', host = 'server1234')
+#' mongo_uri_standard(user = 'John', password = 'db_password_1234', host = 'server1234', port = NA)
 #' }
 #' @export
 
-mongo_uri_standard <- function(user, password, host) {
+mongo_uri_standard <- function(user, password, host, port = NA) {
 
-    URI = sprintf("mongodb://%s:%s@%s/", user, password, host)
+    if (is.na(port)) {
+
+        URI = sprintf("mongodb://%s:%s@%s/", user, password, host)
+
+    } else {
+
+        URI = sprintf("mongodb://%s:%s@%s:%s/", user, password, host, port)
+
+    }
 
     URI
 
@@ -32,12 +41,13 @@ mongo_uri_standard <- function(user, password, host) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param mongo_collection MongoDB collection; if NA, will connect to DB itself.
 
-mongo_connect <- function(uri_fun, user, password, host, database, mongo_collection) {
+mongo_connect <- function(uri_fun, user, password, host, port, database, mongo_collection) {
 
-    URI = uri_fun(user, password, host)
+    URI = uri_fun(user, password, host, port)
 
     if (is.na(mongo_collection)) {
 
@@ -57,17 +67,18 @@ mongo_connect <- function(uri_fun, user, password, host, database, mongo_collect
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param patient_id Patient ID for which notes are being requested.
 #' @return Dataframe of full notes and/or note parts with associated metadata.
 
-db_download <- function(uri_fun, user, password, host, database, patient_id) {
+db_download <- function(uri_fun, user, password, host, port, database, patient_id) {
 
     # Expected fields
     fields <- c("text", "text_id", "text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", "text_tag_2",
         "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, database, "NOTES")
+    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")
     query <- paste("{\"patient_id\" :", patient_id, "}", sep = " ")
     notes <- mongo_con$find(query)
 
@@ -91,11 +102,12 @@ db_download <- function(uri_fun, user, password, host, database, patient_id) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param patient_id Patient ID.
 #' @param annotations NLP annotations.
 
-db_upload <- function(uri_fun, user, password, host, database, patient_id, annotations) {
+db_upload <- function(uri_fun, user, password, host, port, database, patient_id, annotations) {
 
     annotations <- cbind(rep(patient_id, length(annotations[, 1])), annotations)
     colnames(annotations)[1] <- "patient_id"
@@ -103,13 +115,13 @@ db_upload <- function(uri_fun, user, password, host, database, patient_id, annot
         decreasing = FALSE, method = "radix"), ]
 
     # Turning the 'updated' indicator on
-    patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
     query_value <- paste("{ \"patient_id\" : ", patient_id, "}", sep = "")
     update_value <- "{ \"$set\" : { \"updated\" : true } }"
     patients_con$update(query = query_value, update = update_value)
 
     # Entering annotations
-    annotations_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
+    annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
     upload_results <- suppressWarnings(annotations_con$insert(annotations, stop_on_error = FALSE))
     print(paste(upload_results$nInserted, " of ", length(annotations[, 1]), " records inserted!", sep = ""))
 
@@ -123,14 +135,15 @@ db_upload <- function(uri_fun, user, password, host, database, patient_id, annot
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 
-patient_roster_update <- function(uri_fun, user, password, host, database) {
+patient_roster_update <- function(uri_fun, user, password, host, port, database) {
 
-    annotations_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
+    annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
     unique_patients <- annotations_con$distinct("patient_id")
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
     active_patients <- patients_con$distinct("patient_id")
 
     missing_patients <- unique_patients[!(unique_patients %in% active_patients)]
@@ -150,17 +163,18 @@ patient_roster_update <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 
-populate_annotations <- function(uri_fun, user, password, host, database) {
+populate_annotations <- function(uri_fun, user, password, host, port, database) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
     # collections <- (mongo_con$run('{'listCollections': 1}')[[1]])$firstBatch
 
     mongo_con$run("{\"create\": \"ANNOTATIONS\"}")
     mongo_con$run("{\"create\": \"PATIENTS\"}")
 
-    annotations_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
+    annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
     annotations_con$index(add = "{\"patient_id\" : 1}")
     annotations_con$index(add = "{\"CUI\" : 1}")
     annotations_con$index(add = "{\"lemma\" : 1}")
@@ -180,15 +194,16 @@ populate_annotations <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 
-populate_notes <- function(uri_fun, user, password, host, database) {
+populate_notes <- function(uri_fun, user, password, host, port, database) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
 
     mongo_con$run("{\"create\": \"NOTES\"}")
 
-    notes_con <- mongo_connect(uri_fun, user, password, host, database, "NOTES")
+    notes_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")
 
     notes_con$index(add = "{\"patient_id\" : 1}")
     notes_con$index(add = "{\"doc_id\" : 1}")
@@ -206,11 +221,12 @@ populate_notes <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 
-populate_users <- function(uri_fun, user, password, host, database) {
+populate_users <- function(uri_fun, user, password, host, port, database) {
 
-    users_con <- mongo_connect(uri_fun, user, password, host, database, "USERS")
+    users_con <- mongo_connect(uri_fun, user, password, host, port, database, "USERS")
 
     # mongolite still does not support creation of unique indexes
     users_con$run("{\"createIndexes\": \"USERS\", \"indexes\" : [{ \"key\" : { \"user\" : 1}, \"name\": \"user\", \"unique\": true}]}")
@@ -225,22 +241,23 @@ populate_users <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 
-populate_dictionaries <- function(uri_fun, user, password, host, database) {
+populate_dictionaries <- function(uri_fun, user, password, host, port, database) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
 
     mongo_con$run("{\"create\": \"NEGEX\"}")
 
     mongo_con$run("{\"create\": \"UMLS_MRCONSO\"}")
-    mrconso_con <- mongo_connect(uri_fun, user, password, host, database, "UMLS_MRCONSO")
+    mrconso_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRCONSO")
     mrconso_con$index(add = "{\"CUI\" : 1}")
     mrconso_con$index(add = "{\"STR\" : 1}")
     mrconso_con$index(add = "{\"grams\" : 1}")
 
     mongo_con$run("{\"create\": \"UMLS_MRREL\"}")
-    mrrel_con <- mongo_connect(uri_fun, user, password, host, database, "UMLS_MRREL")
+    mrrel_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRREL")
     mrrel_con$index(add = "{\"CUI\" : 1}")
 
 }
@@ -253,11 +270,12 @@ populate_dictionaries <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 
-populate_query <- function(uri_fun, user, password, host, database) {
+populate_query <- function(uri_fun, user, password, host, port, database) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
 
     mongo_con$run("{\"create\": \"QUERY\"}")
 
@@ -271,6 +289,7 @@ populate_query <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param search_query Medical corpus query containg keywords/CUI's, boolean elements and other operators ('AND', 'OR', '!', '(', or ')').
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
@@ -279,16 +298,16 @@ populate_query <- function(uri_fun, user, password, host, database) {
 #' @examples
 #' \dontrun{
 #' save_query(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT', search_query = 'thrombosis AND venous',
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', search_query = 'thrombosis AND venous',
 #' use_negation = TRUE, hide_duplicates = TRUE, skip_after_event = TRUE)
 #' }
 #' @export
 
-save_query <- function(uri_fun, user, password, host, database, search_query, use_negation, hide_duplicates, skip_after_event) {
+save_query <- function(uri_fun, user, password, host, port, database, search_query, use_negation, hide_duplicates, skip_after_event) {
 
     search_query <- sanitize_query(search_query)
 
-    query_con <- mongo_connect(uri_fun, user, password, host, database, "QUERY")
+    query_con <- mongo_connect(uri_fun, user, password, host, port, database, "QUERY")
 
     if (use_negation == TRUE)
         converted_negation <- "true" else converted_negation <- "false"
@@ -311,15 +330,16 @@ save_query <- function(uri_fun, user, password, host, database, search_query, us
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' initialize_annotations(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT')
 #' }
 #' @export
 
-initialize_annotations <- function(uri_fun, user, password, host, database) {
+initialize_annotations <- function(uri_fun, user, password, host, port, database) {
 
     first_answer <- readline("Are you sure you want to proceed? All annotations will be irreversibly deleted. (yes/no) ")
 
@@ -335,19 +355,19 @@ initialize_annotations <- function(uri_fun, user, password, host, database) {
 
         # Dropping the collections
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
         mongo_con$drop()
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
         mongo_con$drop()
 
         # Verifying deletion
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
         collections <- (mongo_con$run("{\"listCollections\": 1}")[[1]])$firstBatch
         if ("ANNOTATIONS" %in% collections$name | "PATIENTS" %in% collections$name)
             print("Deletion failed!") else {
 
-            populate_annotations(uri_fun, user, password, host, database)
+            populate_annotations(uri_fun, user, password, host, port, database)
             print("Initialization successful!")
 
         }
@@ -364,15 +384,16 @@ initialize_annotations <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' initialize_patients(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT')
 #' }
 #' @export
 
-initialize_patients <- function(uri_fun, user, password, host, database) {
+initialize_patients <- function(uri_fun, user, password, host, port, database) {
 
     first_answer <- readline("Are you sure you want to proceed? Event data will be irreversibly deleted. (yes/no) ")
 
@@ -388,17 +409,17 @@ initialize_patients <- function(uri_fun, user, password, host, database) {
 
         # Dropping the collection
 
-        patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+        patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
         patients_con$drop()
 
         # Verifying deletion
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
         collections <- (mongo_con$run("{\"listCollections\": 1}")[[1]])$firstBatch
         if ("PATIENTS" %in% collections$name)
             print("Deletion failed!") else {
 
-            patient_roster_update(uri_fun, user, password, host, database)
+            patient_roster_update(uri_fun, user, password, host, port, database)
             print("Initialization successful!")
 
         }
@@ -415,15 +436,16 @@ initialize_patients <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' initialize_users(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT')
 #' }
 #' @export
 
-initialize_users <- function(uri_fun, user, password, host, database) {
+initialize_users <- function(uri_fun, user, password, host, port, database) {
 
     first_answer <- readline("Are you sure you want to proceed? User data will be irreversibly deleted. (yes/no) ")
 
@@ -439,18 +461,18 @@ initialize_users <- function(uri_fun, user, password, host, database) {
 
         # Dropping the collection
 
-        users_con <- mongo_connect(uri_fun, user, password, host, database, "USERS")
+        users_con <- mongo_connect(uri_fun, user, password, host, port, database, "USERS")
         users_con$drop()
 
         # Verifying deletion
 
-        users_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+        users_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
         collections <- (users_con$run("{\"listCollections\": 1}")[[1]])$firstBatch
         if ("USERS" %in% collections$name)
             print("Deletion failed!") else {
 
             print("Initialization successful!")
-            populate_users(uri_fun, user, password, host, database)
+            populate_users(uri_fun, user, password, host, port, database)
 
         }
 
@@ -466,15 +488,16 @@ initialize_users <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' initialize_notes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT')
 #' }
 #' @export
 
-initialize_notes <- function(uri_fun, user, password, host, database) {
+initialize_notes <- function(uri_fun, user, password, host, port, database) {
 
     first_answer <- readline("Are you sure you want to proceed? Clinical notes will be irreversibly deleted. (yes/no) ")
 
@@ -490,18 +513,18 @@ initialize_notes <- function(uri_fun, user, password, host, database) {
 
         # Dropping the collection
 
-        notes_con <- mongo_connect(uri_fun, user, password, host, database, "NOTES")
+        notes_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")
         notes_con$drop()
 
         # Verifying deletion
 
-        notes_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+        notes_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
         collections <- (notes_con$run("{\"listCollections\": 1}")[[1]])$firstBatch
         if ("NOTES" %in% collections$name)
             print("Deletion failed!") else {
 
             print("Initialization successful!")
-            populate_notes(uri_fun, user, password, host, database)
+            populate_notes(uri_fun, user, password, host, port, database)
 
         }
 
@@ -517,18 +540,19 @@ initialize_notes <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
 #' @param end_user_password CEDARS end user password.
 #' @examples
 #' \dontrun{
 #' add_end_user(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT', end_user = 'Mike',
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', end_user = 'Mike',
 #' end_user_password = 'user_pw_5678')
 #' }
 #' @export
 
-add_end_user <- function(uri_fun, user, password, host, database, end_user, end_user_password) {
+add_end_user <- function(uri_fun, user, password, host, port, database, end_user, end_user_password) {
 
     if (nchar(end_user_password) < 8)
         print("User creation failed, password must be at least 8 characters in length!") else {
@@ -536,7 +560,7 @@ add_end_user <- function(uri_fun, user, password, host, database, end_user, end_
         end_user <- as.character(end_user)
         end_user_password <- as.character(end_user_password)
 
-        users_con <- mongo_connect(uri_fun, user, password, host, database, "USERS")
+        users_con <- mongo_connect(uri_fun, user, password, host, port, database, "USERS")
 
         new_user <- data.frame(user = end_user, password = end_user_password, date_created = strftime(Sys.time(),
             "%Y-%m-%dT%H:%M:%SZ", "UTC"))
@@ -562,20 +586,21 @@ add_end_user <- function(uri_fun, user, password, host, database, end_user, end_
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
 #' @examples
 #' \dontrun{
 #' delete_end_user(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT', end_user = 'Mike')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', end_user = 'Mike')
 #' }
 #' @export
 
-delete_end_user <- function(uri_fun, user, password, host, database, end_user) {
+delete_end_user <- function(uri_fun, user, password, host, port, database, end_user) {
 
     end_user <- as.character(end_user)
 
-    users_con <- mongo_connect(uri_fun, user, password, host, database, "USERS")
+    users_con <- mongo_connect(uri_fun, user, password, host, port, database, "USERS")
 
     user_query <- paste("{ \"user\" : ", "\"", end_user, "\" }", sep = "")
     users <- users_con$find(user_query)
@@ -603,20 +628,21 @@ delete_end_user <- function(uri_fun, user, password, host, database, end_user) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param project_name Research or QA project name.
 #' @param investigator_name Investigator name.
 #' @examples
 #' \dontrun{
 #' create_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT', project_name = 'Test project',
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', project_name = 'Test project',
 #' investigator_name = 'Dr Smith')
 #' }
 #' @export
 
-create_project <- function(uri_fun, user, password, host, database, project_name, investigator_name) {
+create_project <- function(uri_fun, user, password, host, port, database, project_name, investigator_name) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, database, "INFO")
+    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "INFO")
 
     info <- data.frame(creation_time = Sys.time(), project = project_name, investigator = investigator_name)
 
@@ -624,17 +650,17 @@ create_project <- function(uri_fun, user, password, host, database, project_name
 
     # Verifying creation
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, "admin", NA)
+    mongo_con <- mongo_connect(uri_fun, user, password, host, port, "admin", NA)
 
     databases <- mongo_con$run("{\"listDatabases\": 1}")[[1]]
 
     if (database %in% databases$name) {
 
-        populate_annotations(uri_fun, user, password, host, database)
-        populate_notes(uri_fun, user, password, host, database)
-        populate_users(uri_fun, user, password, host, database)
-        populate_dictionaries(uri_fun, user, password, host, database)
-        populate_query(uri_fun, user, password, host, database)
+        populate_annotations(uri_fun, user, password, host, port, database)
+        populate_notes(uri_fun, user, password, host, port, database)
+        populate_users(uri_fun, user, password, host, port, database)
+        populate_dictionaries(uri_fun, user, password, host, port, database)
+        populate_query(uri_fun, user, password, host, port, database)
         print("Database creation successful!")
 
     } else print("Database creation failed!")
@@ -649,15 +675,16 @@ create_project <- function(uri_fun, user, password, host, database, project_name
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' terminate_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT')
 #' }
 #' @export
 
-terminate_project <- function(uri_fun, user, password, host, database) {
+terminate_project <- function(uri_fun, user, password, host, port, database) {
 
     first_answer <- readline(paste("Are you sure you want to proceed? All contents of database ", database, " will be irreversibly deleted. (yes/no) ",
         sep = ""))
@@ -676,36 +703,36 @@ terminate_project <- function(uri_fun, user, password, host, database) {
         # Dropping all collections Since there are no collections left the database is deleted Direct deletion of
         # database is not allowed, maybe because it should be done from admin DB?
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "NOTES")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "UMLS_MRCONSO")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRCONSO")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "UMLS_MRREL")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRREL")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "NEGEX")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "NEGEX")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "USERS")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "USERS")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "QUERY")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "QUERY")
         mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, "INFO")
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "INFO")
         mongo_con$drop()
 
         # Verifying deletion
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, "admin", NA)
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, "admin", NA)
         databases <- mongo_con$run("{\"listDatabases\": 1}")[[1]]
         if (database %in% databases$name)
             print("Deletion failed!") else print("Deletion successful!")
@@ -722,15 +749,16 @@ terminate_project <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' terminate_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT')
 #' }
 #' @export
 
-terminate_project_new <- function(uri_fun, user, password, host, database) {
+terminate_project_new <- function(uri_fun, user, password, host, port, database) {
 
     first_answer <- readline(paste("Are you sure you want to proceed? All contents of database ", database, " will be irreversibly deleted. (yes/no) ",
         sep = ""))
@@ -746,14 +774,14 @@ terminate_project_new <- function(uri_fun, user, password, host, database) {
     if (second_answer != "yes")
         stop("Database deletion cancelled") else {
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, database, NA)
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, NA)
 
         query <- paste("{\"dropDatabase\" : ", "\"", database, "\"}", sep = "")
         mongo_con$run(query)
 
         # Verifying deletion
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, "admin", NA)
+        mongo_con <- mongo_connect(uri_fun, user, password, host, port, "admin", NA)
         databases <- mongo_con$run("{\"listDatabases\": 1}")[[1]]
         if (database %in% databases$name)
             print("Deletion failed!") else print("Deletion successful!")
@@ -770,17 +798,18 @@ terminate_project_new <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' download_outcomes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234')
+#' host = 'server1234', port = NA)
 #' }
 #' @export
 
-download_outcomes <- function(uri_fun, user, password, host, database) {
+download_outcomes <- function(uri_fun, user, password, host, port, database) {
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
 
     out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1}")
 
@@ -798,17 +827,18 @@ download_outcomes <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param patient_ids Vector of patient ID's.
 #' @param event_dates Vector of clinical event dates.
 #' @examples
 #' \dontrun{
 #' upload_events(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT', patient_ids = ids, event_dates = events)
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', patient_ids = ids, event_dates = events)
 #' }
 #' @export
 
-upload_events <- function(uri_fun, user, password, host, database, patient_ids, event_dates) {
+upload_events <- function(uri_fun, user, password, host, port, database, patient_ids, event_dates) {
 
     if (class(event_dates) != "Date") print("Error: event dates must be of class Date!") else {
 
@@ -817,7 +847,7 @@ upload_events <- function(uri_fun, user, password, host, database, patient_ids, 
         event_dates$event_date <- paste("\"", event_dates$event_date, "\"", sep = "")
         event_dates$event_date[event_dates$event_date == "\"NA\""] <- "null"
 
-        patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
+        patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
 
         current_patients <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 }")
 
@@ -853,17 +883,18 @@ upload_events <- function(uri_fun, user, password, host, database, patient_ids, 
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
 #' end_users(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT')
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT')
 #' }
 #' @export
 
-end_users <- function(uri_fun, user, password, host, database) {
+end_users <- function(uri_fun, user, password, host, port, database) {
 
-    users_con <- mongo_connect(uri_fun, user, password, host, database, "USERS")
+    users_con <- mongo_connect(uri_fun, user, password, host, port, database, "USERS")
 
     out <- users_con$find(query = "{}", fields = "{ \"user\" : 1 , \"password\" : 1 , \"_id\" : 0 }")
 
@@ -879,21 +910,22 @@ end_users <- function(uri_fun, user, password, host, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param tag_vect Character vector of 10 tag names.
 #' @examples
 #' \dontrun{
 #' save_tags(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', database = 'TEST_PROJECT',
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT',
 #' tag_vect = c('note_type', 'note_section', 'author', 'patient_name', NA, NA, NA, NA, NA, NA))
 #' }
 #' @export
 
-save_tags <- function(uri_fun, user, password, host, database, tag_vect) {
+save_tags <- function(uri_fun, user, password, host, port, database, tag_vect) {
 
     tag_vect <- sanitize(tag_vect)
     tag_vect <- gsub(" ", "_", tag_vect)
-    info_con <- mongo_connect(uri_fun, user, password, host, database, "INFO")
+    info_con <- mongo_connect(uri_fun, user, password, host, port, database, "INFO")
 
     info_con$update("{}", paste("{ \"$set\" : { \"tag_1\" : ", "\"", tag_vect[1], "\"", "}}", sep = ""), upsert = TRUE)
     info_con$update("{}", paste("{ \"$set\" : { \"tag_2\" : ", "\"", tag_vect[2], "\"", "}}", sep = ""), upsert = TRUE)

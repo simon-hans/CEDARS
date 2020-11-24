@@ -17,5 +17,6 @@ aggregate_note(selected_doc_id, annotations, cui_elements)
 Aggregated note in one text string.
 }
 \description{
-When using atomized notes, this function 'pastes' back the different sections together in the intended order.
+When using atomized notes, this function 'pastes' back the different sections together in the intended order. Preselected lemmas are marked, along with those for which thr CUI is
+in the list of interest.
 }

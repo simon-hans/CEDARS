@@ -9,6 +9,7 @@ add_end_user(
   user,
   password,
   host,
+  port,
   database,
   end_user,
   end_user_password
@@ -23,6 +24,8 @@ add_end_user(
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 
 \item{end_user}{CEDARS end user name.}
@@ -35,7 +38,7 @@ Adds an end user. Password must be at least 8 characters in length.
 \examples{
 \dontrun{
 add_end_user(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT', end_user = 'Mike',
+host = 'server1234', port = NA, database = 'TEST_PROJECT', end_user = 'Mike',
 end_user_password = 'user_pw_5678')
 }
 }

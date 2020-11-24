@@ -4,7 +4,7 @@
 \alias{mongo_uri_standard}
 \title{Prepare MongoDB URI string}
 \usage{
-mongo_uri_standard(user, password, host)
+mongo_uri_standard(user, password, host, port = NA)
 }
 \arguments{
 \item{user}{MongoDB user name.}
@@ -12,6 +12,8 @@ mongo_uri_standard(user, password, host)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 }
 \value{
 URI string.
@@ -21,6 +23,6 @@ Formats the MongoDB URI string for use by package mongolite. In this case the 's
 }
 \examples{
 \dontrun{
-mongo_uri_standard(user = 'John', password = 'db_password_1234', host = 'server1234')
+mongo_uri_standard(user = 'John', password = 'db_password_1234', host = 'server1234', port = NA)
 }
 }

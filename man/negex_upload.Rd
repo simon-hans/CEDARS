@@ -4,7 +4,7 @@
 \alias{negex_upload}
 \title{Upload NegEx}
 \usage{
-negex_upload(udmodel_path, uri_fun, user, password, host, database)
+negex_upload(udmodel_path, uri_fun, user, password, host, port, database)
 }
 \arguments{
 \item{udmodel_path}{Path to NLP model file.}
@@ -17,6 +17,8 @@ negex_upload(udmodel_path, uri_fun, user, password, host, database)
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 }
 \description{
@@ -26,6 +28,6 @@ Prepares and uploads NegEx negation lexicon. It is not absolutely required for C
 \dontrun{
 negex_upload(udmodel_path = 'models/english-ewt-ud-2.4-190531.udpipe',
 uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234', host = 'server1234',
-database = 'TEST_PROJECT')
+port = NA, database = 'TEST_PROJECT')
 }
 }

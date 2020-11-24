@@ -4,7 +4,7 @@
 \alias{complete_case}
 \title{Mark a Case as Completed}
 \usage{
-complete_case(uri_fun, user, password, host, database, selected_patient)
+complete_case(uri_fun, user, password, host, port, database, selected_patient)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ complete_case(uri_fun, user, password, host, database, selected_patient)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

@@ -9,6 +9,7 @@ commit_patient(
   user,
   password,
   host,
+  port,
   database,
   end_user,
   search_query,
@@ -25,6 +26,8 @@ commit_patient(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

@@ -4,7 +4,7 @@
 \alias{start_local}
 \title{Start CEDARS Locally}
 \usage{
-start_local(user, password, host, database)
+start_local(user, password, host, port, database)
 }
 \arguments{
 \item{user}{DB user name.}
@@ -13,6 +13,8 @@ start_local(user, password, host, database)
 
 \item{host}{Host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 }
 \description{
@@ -20,6 +22,7 @@ Starts CEDARS locally from RStudio. This is a functional approach and is easier 
 }
 \examples{
 \dontrun{
-start_local(user = 'John', password = 'db_password_1234', host = 'server1234')
+start_local(user = 'John', password = 'db_password_1234', host = 'server1234', port = NA,
+database = 'myDB')
 }
 }

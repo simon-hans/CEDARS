@@ -235,6 +235,7 @@ parse_query <- function(search_query) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
@@ -243,9 +244,9 @@ parse_query <- function(search_query) {
 #' }
 #' @export
 
-pre_search <- function(patient_vect = NA, uri_fun, user, password, host, database) {
+pre_search <- function(patient_vect = NA, uri_fun, user, password, host, port, database) {
 
-    query_con <- mongo_connect(uri_fun, user, password, host, database, "QUERY")
+    query_con <- mongo_connect(uri_fun, user, password, host, port, database, "QUERY")
     db_results <- query_con$find("{}")
     search_query <- db_results$query[1]
     use_negation <- db_results$exclude_negated[1]
@@ -254,10 +255,10 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, databas
     parse_result <- parse_query(search_query)
 
     # Making sure all patients with annotations are considered
-    patient_roster_update(uri_fun, user, password, host, database)
+    patient_roster_update(uri_fun, user, password, host, port, database)
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, database, "PATIENTS")
-    annotations_con <- mongo_connect(uri_fun, user, password, host, database, "ANNOTATIONS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
 
     # We find which patients do not have a completed search yet and have not been reviewed either
     pending_patients <- patients_con$find("{ \"sentences\" : null , \"reviewed\" : false }", "{ \"_id\" : 0, \"patient_id\" : 1}")$patient_id
@@ -275,8 +276,8 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, databas
     for (i in 1:length_list) {
         # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked
         # A record is considered open for annotation if admin lock was successful
-        unlock_records(uri_fun, user, password, host, database)
-        open <- lock_records_admin(uri_fun, user, password, host, database, patient_vect[i])
+        unlock_records(uri_fun, user, password, host, port, database)
+        open <- lock_records_admin(uri_fun, user, password, host, port, database, patient_vect[i])
         if (open == TRUE) {
 
             query <- paste("{ \"patient_id\" : ", patient_vect[i], "}", sep = "")
@@ -308,11 +309,11 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, databas
 
                 patients_con$update(query, update_value)
 
-            } else complete_case(uri_fun, user, password, host, database, patient_vect[i])
+            } else complete_case(uri_fun, user, password, host, port, database, patient_vect[i])
 
         } else j <- j + 1
 
-        unlock_records_admin(uri_fun, user, password, host, database, patient_vect[i])
+        unlock_records_admin(uri_fun, user, password, host, port, database, patient_vect[i])
 
         cat(paste(c("Completed search for patient ID ", patient_vect[i], ", # ", i, " of ", length_list, ".\n"),
             sep = "", collapse = ""))

@@ -5,7 +5,7 @@
 \title{Unlock User-Specific Records
 Removes any pending lock(s) for a specific user. Normally there should not be more than one record locked per user at any given time, but if there were more than one, i.e. DB corruption, all locks would be lifted at once.}
 \usage{
-unlock_user(uri_fun, user, password, host, database, end_user)
+unlock_user(uri_fun, user, password, host, port, database, end_user)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -15,6 +15,8 @@ unlock_user(uri_fun, user, password, host, database, end_user)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 
@@ -27,6 +29,6 @@ Removes any pending lock(s) for a specific user. Normally there should not be mo
 \examples{
 \dontrun{
 unlock_user(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT', end_user = 'Mike')
+host = 'server1234', port= NA, database = 'TEST_PROJECT', end_user = 'Mike')
 }
 }

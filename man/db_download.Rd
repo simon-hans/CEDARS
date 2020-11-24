@@ -4,7 +4,7 @@
 \alias{db_download}
 \title{Obtain Patient Notes}
 \usage{
-db_download(uri_fun, user, password, host, database, patient_id)
+db_download(uri_fun, user, password, host, port, database, patient_id)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ db_download(uri_fun, user, password, host, database, patient_id)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

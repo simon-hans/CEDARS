@@ -5,7 +5,7 @@
 \title{Initialize Annotations
 Deletes all NLP annotations and patient-specific information, including clinical event dates.New, empty 'ANNOTATIONS' and 'PATIENTS' collections are created. Dictionaries and original patient notes are preserved.}
 \usage{
-initialize_annotations(uri_fun, user, password, host, database)
+initialize_annotations(uri_fun, user, password, host, port, database)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -16,6 +16,8 @@ initialize_annotations(uri_fun, user, password, host, database)
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 }
 \description{
@@ -25,6 +27,6 @@ Deletes all NLP annotations and patient-specific information, including clinical
 \examples{
 \dontrun{
 initialize_annotations(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT')
+host = 'server1234', port = NA, database = 'TEST_PROJECT')
 }
 }

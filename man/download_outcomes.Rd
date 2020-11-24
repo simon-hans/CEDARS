@@ -4,7 +4,7 @@
 \alias{download_outcomes}
 \title{Download Event Data}
 \usage{
-download_outcomes(uri_fun, user, password, host, database)
+download_outcomes(uri_fun, user, password, host, port, database)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -15,6 +15,8 @@ download_outcomes(uri_fun, user, password, host, database)
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 }
 \description{
@@ -23,6 +25,6 @@ Downloads patient event data. Typically done after all records have been annotat
 \examples{
 \dontrun{
 download_outcomes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234')
+host = 'server1234', port = NA)
 }
 }

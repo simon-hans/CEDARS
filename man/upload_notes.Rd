@@ -4,7 +4,7 @@
 \alias{upload_notes}
 \title{Upload Notes to Database}
 \usage{
-upload_notes(uri_fun, user, password, host, database, notes)
+upload_notes(uri_fun, user, password, host, port, database, notes)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ upload_notes(uri_fun, user, password, host, database, notes)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 
@@ -25,6 +27,6 @@ Allows user to populate notes in database from dataframe; could be easily insert
 \examples{
 \dontrun{
 upload_notes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT', notes = simulated_patients)
+host = 'server1234', port = NA, database = 'TEST_PROJECT', notes = simulated_patients)
 }
 }

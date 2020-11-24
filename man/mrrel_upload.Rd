@@ -4,7 +4,7 @@
 \alias{mrrel_upload}
 \title{Upload UMLS Relationships}
 \usage{
-mrrel_upload(path, uri_fun, user, password, host, database)
+mrrel_upload(path, uri_fun, user, password, host, port, database)
 }
 \arguments{
 \item{path}{Path to file MRREL.RRF.}
@@ -17,6 +17,8 @@ mrrel_upload(path, uri_fun, user, password, host, database)
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 }
 \description{
@@ -25,6 +27,6 @@ Prepares and uploads UMLS MRREL.RRF file. This file is not included in the CEDAR
 \examples{
 \dontrun{
 mrrel_upload(path = 'dictionaries/MRREL.RRF', uri_fun = mongo_uri_standard, user = 'John',
-password = 'db_password_1234', host = 'server1234', database = 'TEST_PROJECT')
+password = 'db_password_1234', host = 'server1234', port = NA, database = 'TEST_PROJECT')
 }
 }

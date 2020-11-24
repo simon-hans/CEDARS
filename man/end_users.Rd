@@ -4,7 +4,7 @@
 \alias{end_users}
 \title{Download End User List}
 \usage{
-end_users(uri_fun, user, password, host, database)
+end_users(uri_fun, user, password, host, port, database)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -15,6 +15,8 @@ end_users(uri_fun, user, password, host, database)
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 }
 \description{
@@ -23,6 +25,6 @@ Downloads list of CEDARS end users along with their passwords.
 \examples{
 \dontrun{
 end_users(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', database = 'TEST_PROJECT')
+host = 'server1234', port = NA, database = 'TEST_PROJECT')
 }
 }

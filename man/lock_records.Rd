@@ -9,6 +9,7 @@ lock_records(
   user,
   password,
   host,
+  port,
   database,
   end_user,
   patient_id = NA
@@ -22,6 +23,8 @@ lock_records(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

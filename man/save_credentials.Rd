@@ -8,6 +8,7 @@ save_credentials(
   user,
   password,
   host,
+  port,
   database,
   LDAP,
   destination_path = getwd()
@@ -19,6 +20,8 @@ save_credentials(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB server host.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

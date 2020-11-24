@@ -4,7 +4,7 @@
 \alias{populate_notes}
 \title{Prepare Database for Patient Notes}
 \usage{
-populate_notes(uri_fun, user, password, host, database)
+populate_notes(uri_fun, user, password, host, port, database)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ populate_notes(uri_fun, user, password, host, database)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 }

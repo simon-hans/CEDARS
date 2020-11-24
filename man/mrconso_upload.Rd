@@ -13,6 +13,7 @@ mrconso_upload(
   user,
   password,
   host,
+  port,
   database
 )
 }
@@ -33,6 +34,8 @@ mrconso_upload(
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 }
 \description{
@@ -42,6 +45,7 @@ Prepares and uploads UMLS MRCONSO.RRF file. This file is not included in the CED
 \dontrun{
 mrconso_upload(path = 'dictionaries/MRCONSO.RRF', language = 'ENG', subsets = c('SNOMEDCT_US',
 'MTHICD9', 'ICD9CM', 'ICD10', 'ICD10CM', 'DSM-5', 'MSH', 'RXNORM', 'NCI'), max_grams = 7,
-user = 'John', password = 'db_password_1234', host = 'server1234', database = 'TEST_PROJECT')
+user = 'John', password = 'db_password_1234', host = 'server1234', port = NA,
+database = 'TEST_PROJECT')
 }
 }

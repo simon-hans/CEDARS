@@ -9,6 +9,7 @@ get_data(
   user,
   password,
   host,
+  port,
   database,
   end_user,
   end_user_password,
@@ -26,6 +27,8 @@ get_data(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB server host.}
+
+\item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
 

@@ -13,6 +13,7 @@ automatic_NLP_processor(
   user,
   password,
   host,
+  port,
   database,
   max_n_grams_length = 7,
   negex_depth = 6,
@@ -36,6 +37,8 @@ automatic_NLP_processor(
 
 \item{host}{MongoDB host server.}
 
+\item{port}{MongoDB port.}
+
 \item{database}{MongoDB database name.}
 
 \item{max_n_grams_length}{Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.}
@@ -51,7 +54,7 @@ Accepts a list of patient ID's or alternatively can perform NLP annotations on a
 \dontrun{
 automatic_NLP_processor(patient_vect = NA, text_format = 'latin1', nlp_engine = 'udpipe',
 URL = 'models/english-ewt-ud-2.4-190531.udpipe', uri_fun = mongo_uri_standard, user = 'John',
-password = 'db_password_1234', host = 'server1234', database = 'TEST_PROJECT',
+password = 'db_password_1234', host = 'server1234', port = NA, database = 'TEST_PROJECT',
 max_n_grams_length = 7, negex_depth = 6, select_cores = NA)
 }
 }
