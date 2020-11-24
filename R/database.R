@@ -813,6 +813,7 @@ upload_events <- function(uri_fun, user, password, host, database, patient_ids, 
     if (class(event_dates) != "Date") print("Error: event dates must be of class Date!") else {
 
         event_dates <- data.frame(patient_id = patient_ids, event_date = event_dates)
+        event_dates$event_date <- as.character(event_dates$event_date)
         event_dates$event_date <- paste("\"", event_dates$event_date, "\"", sep = "")
         event_dates$event_date[event_dates$event_date == "\"NA\""] <- "null"
 
@@ -822,14 +823,21 @@ upload_events <- function(uri_fun, user, password, host, database, patient_ids, 
 
         current_outcomes <- merge(event_dates, current_patients, by = "patient_id", all.x = FALSE, all.y = FALSE)
 
+        len_set <- length(current_outcomes[, 1])
 
-        for (i in 1:length(current_outcomes[, 1])) {
+        for (i in 1:len_set) {
 
             pt_query <- paste("{", paste("\"patient_id\" : ", current_outcomes$patient_id[i], sep = ""), "}")
 
-            pt_update <- paste("{ \"$set\" : {\"event_date\" : ", current_outcomes$event_date[i], "}}", sep = "")
+            if (current_outcomes$event_date[i] == "null") {
+
+                pt_update <- paste("{ \"$unset\" : {\"event_date\" : ", current_outcomes$event_date[i], "}}", sep = "")
+
+            } else pt_update <- paste("{ \"$set\" : {\"event_date\" : ", current_outcomes$event_date[i], "}}", sep = "")
 
             patients_con$update(pt_query, pt_update)
+
+            print(paste("Updated record", i, "of", len_set))
 
         }
 
