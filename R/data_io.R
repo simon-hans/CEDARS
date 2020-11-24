@@ -262,8 +262,10 @@ post_data <- function(uri_fun, user, password, host, database, end_user, end_use
                   update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"event_date\" : ",
                     "\"", event_date, "\"", " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
 
-                  update_value <- paste("{\"$unset\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"event_date\" : null",
-                    " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "")
+                 # update_value <- paste("{\"$unset\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"event_date\" : null",
+                  #  " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "")
+
+                        update_value <- paste("{\"$unset\":{\"event_date\" : null }}", sep = "")
 
                 }
 
