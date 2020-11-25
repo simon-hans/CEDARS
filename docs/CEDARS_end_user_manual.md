@@ -12,7 +12,7 @@ If sentence detection is based only on reporting sentences with the words "deep 
 
 Sentences are presented in chronological order. Once you have identified and dated a clinical event, CEDARS might be set up by bypass all following sentences for this patient and move on to the next patient. This approach will be used when your system administrator only aims at capturing the first instance of an event of interest. Also, once you have evaluated all sentences of interest for a given patient, CEDARS will move on to the next patient seamlessly. This sequence of events is illustrated below:
 
-![CEDARS Workflow](pics/GitHub%20Schema%202%20B%20blue%20&%20gold.png)
+![CEDARS Workflow](pics/GitHub%20Schema%202%20C.png)
 
 ## Login
 
