@@ -26,7 +26,7 @@ Extracting clinical events dates with CEDARS is a simple, sequential process:
 
 Creating the database and populating it with data pertaining to the project occurs as follows:
 
-![Preparing the Database](pics/GitHub%20Schema%203%20D.png)
+![Preparing the Database](pics/GitHub%20Schema%203%20E.png)
 
 ### Initializing a Project
 
