@@ -3,6 +3,9 @@
 
 @import "{{ site.theme }}";
 
+header {
+  background: 328CC1;
+}
 
 body {
   background-color: white;
@@ -14,8 +17,13 @@ h1 {
   text-align: left;
 }
 
+h2 {
+  color: black;
+  font-family: arial;
+  text-align: left;
+}
+
 p {
   color: black;
   font-family: arial;
-  font-size: 20px;
 }
