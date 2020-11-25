@@ -7,6 +7,10 @@ div#header {
   background: #328CC1;
 }
 
+#header nav li a {
+  background: #328CC1;
+}
+
 body {
   background-color: white;
 }
@@ -18,6 +22,12 @@ h1 {
 }
 
 h2 {
+  color: black;
+  font-family: arial;
+  text-align: left;
+}
+
+h3 {
   color: black;
   font-family: arial;
   text-align: left;
