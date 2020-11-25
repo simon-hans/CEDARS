@@ -11,12 +11,13 @@ div#header {
 #header nav li a {
   background-color: #0B3C5D;
   border: #0B3C5D;
-  box-shadow: #0B3C5D;
+  box-shadow: black;
 }
 
 #header nav li a:hover {
   background-color: #0B3C5D;
-  box-shadow: #0B3C5D;
+  border: #0B3C5D;
+  box-shadow: black;
 }
 
 body {
