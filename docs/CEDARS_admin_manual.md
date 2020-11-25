@@ -20,7 +20,7 @@ CEDARS was tested on a desktop PC. All dependency packages need to be installed.
 
 Creating the database and populating it with data pertaining to the project is a simple, sequential process:
 
-![Preparing the Database](GitHub%20Schema%203%20D.png)
+![Preparing the Database](pics/GitHub%20Schema%203%20D.png)
 
 ### Initializing a Project
 
