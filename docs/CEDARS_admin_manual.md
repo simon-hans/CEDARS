@@ -18,11 +18,13 @@ CEDARS was tested on a desktop PC. All dependency packages need to be installed.
 
 ## Overview of Project Execution
 
+Extracting clinical events dates with CEDARS is a simple, sequential process:
 
+![Project Execution Overview](pics/GitHub%20Schema%204%20A.png)
 
 ## Database Setup
 
-Creating the database and populating it with data pertaining to the project is a simple, sequential process:
+Creating the database and populating it with data pertaining to the project occurs as follows:
 
 ![Preparing the Database](pics/GitHub%20Schema%203%20D.png)
 
