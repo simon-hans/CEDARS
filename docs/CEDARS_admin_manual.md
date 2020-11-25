@@ -16,7 +16,11 @@ CEDARS was tested on a desktop PC. All dependency packages need to be installed.
 
 ## CEDARS App RStudio Connect Installation
 
-## Populating the Database
+## Overview of Project Execution
+
+
+
+## Database Setup
 
 Creating the database and populating it with data pertaining to the project is a simple, sequential process:
 
