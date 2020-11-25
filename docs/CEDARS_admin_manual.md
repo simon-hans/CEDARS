@@ -16,6 +16,12 @@ CEDARS was tested on a desktop PC. All dependency packages need to be installed.
 
 ## CEDARS App RStudio Connect Installation
 
+## Populating the Database
+
+Creating the database and populating it with data pertaining to the project is a simple, sequential process.
+
+
+
 ### Initializing a Project
 
 Each data collection task on a given cohort of patients is a distinct CEDARS "project" with its own MongoDB database with all collections needed to operate. Different projects cannot share the same database or collections. This encapsulation allows for reliable backup and deletion of project data upon completion, also avoiding data corruption due to cross-talk between different annotation tasks.
