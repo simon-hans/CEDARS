@@ -229,7 +229,7 @@ parse_query <- function(search_query) {
 
 #' Execute Search on a Set of Records
 #'
-#' Batches a keyword/CUI search for a cohort of patients. Useful to speed up the process by end users, since search results will be pre-populated. Locks each record before proceeding with search on existing NLP annotations.
+#' Batches a keyword/CUI search for a cohort of patients. Useful to speed up the process by end users, since search results will be pre-populated. Locks each record before proceeding with search on existing NLP annotations. Patient records with no matching sentences or a known event date at or before the earliest matching sentence will be marked as reviewed. The latter assumes the query orders to skip sentences after events.
 #' @param patient_vect Vector of patient ID's. Default is NA, in which case all unlocked records will be searched.
 #' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
@@ -284,6 +284,10 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, port, d
 
             annotations <- annotations_con$find(query)
 
+            # Getting event date
+            patient_info <- patients_con$find(query)
+            if (!is.null(patient_info$event_date)) event_date <- as.Date(patient_info$event_date) else event_date <- NA
+
             sentences <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
 
             unique_sentences <- sentences$unique_sentences
@@ -308,6 +312,10 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, port, d
                   sep = "")
 
                 patients_con$update(query, update_value)
+
+                # If there is an event date and it is at or before all sentences, we mark case as reviewed
+                # This is enforced only if the query orders to skip sentences after events
+                if (db_results$skip_after_event == TRUE & !is.na(event_date) & event_date <= min(as.Date(unique_sentences$text_date))) complete_case(uri_fun, user, password, host, port, database, patient_vect[i])
 
             } else complete_case(uri_fun, user, password, host, port, database, patient_vect[i])
 
