@@ -68,4 +68,4 @@ If you want to go back to a specific patient later on, take note of the patient 
 
 ## Record Locking
 
-Only one end user can access a specific patient in the CEDARS database. If someone else is already looking at a given patient, you will be locked from accessing it.
+Only one end user at a time can review or enter information about any given patient in the CEDARS database. If someone else is already looking at a specific patient record, you will be locked from accessing it.
