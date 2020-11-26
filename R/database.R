@@ -802,12 +802,12 @@ terminate_project_new <- function(uri_fun, user, password, host, port, database)
 #' @param database MongoDB database name.
 #' @examples
 #' \dontrun{
-#' download_outcomes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
+#' download_events(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
 #' host = 'server1234', port = NA)
 #' }
 #' @export
 
-download_outcomes <- function(uri_fun, user, password, host, port, database) {
+download_events <- function(uri_fun, user, password, host, port, database) {
 
     patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
 
