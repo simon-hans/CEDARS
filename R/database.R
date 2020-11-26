@@ -811,7 +811,45 @@ download_events <- function(uri_fun, user, password, host, port, database) {
 
     patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
 
-    out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1}")
+    out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1, \"sentences\" : 1}")
+
+    # Counting sentences
+
+    out$event_date <- as.Date(out$event_date)
+
+    len_out <- length(out[,1])
+
+    out$sentences_total <- rep(NA, len_out)
+    out$sentences_reviewed <- rep(NA, len_out)
+    out$sentences_bef_event <- rep(NA, len_out)
+
+    for (i in 1:len_out){
+
+        sentence_df <- out$sentences[[i]]
+
+        if (!is.null(sentence_df)) {
+
+            sentence_df$text_date <- as.Date(sentence_df$text_date)
+
+            out$sentences_total[i] <- length(sentence_df[,1])
+            out$sentences_reviewed[i] <- sum(sentence_df$reviewed)
+
+            if (is.na(out$event_date[i])) {
+
+                out$sentences_bef_event[i] <- length(sentence_df[,1])
+
+            } else out$sentences_bef_event[i] <- length(subset(sentence_df, text_date < out$event_date[i])[,1])
+
+            print(paste("assessed patient record", i, "of", len_out))
+
+        }
+
+    }
+
+    out$sentences_total[is.na(out$sentences_total)] <- 0
+    out$sentences_reviewed[is.na(out$sentences_reviewed)] <- 0
+    out$sentences_bef_event[is.na(out$sentences_bef_event)] <- 0
+    out$sentences <- NULL
 
     out <- out[order(out$patient_id, decreasing = FALSE, method = "radix"), ]
 
