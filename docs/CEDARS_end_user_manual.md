@@ -12,7 +12,7 @@ If sentence detection is based only on reporting sentences with the words "deep 
 
 Sentences are presented in chronological order. Once you have identified and dated a clinical event, CEDARS might be set up by bypass all following sentences for this patient and move on to the next patient. This approach will be used when your system administrator only aims at capturing the first instance of an event of interest. Also, once you have evaluated all sentences of interest for a given patient, CEDARS will move on to the next patient seamlessly. This sequence of events is illustrated below:
 
-![CEDARS Workflow](pics/GitHub%20Schema%202%20B%20blue%20&%20gold.png)
+![CEDARS Workflow](pics/GitHub%20Schema%202%20C.png)
 
 ## Login
 
@@ -32,7 +32,7 @@ Keywords or concepts are highlighted in red to help you locate them in the text.
 
 Only one sentence to review will be presented at any given time. It can be found at the beginning of the section titled "Selected sentence:".
 
-Your first task is to determine whether or not the sentence refers to an actual clinical event of interest, i.e. if the sentence is a true positive. Typically you will be able to make up your mind just by reading the sentence itself. If the sentence is ambiguous and you would like to obtain more context, you can review the note or report from which the sentence was drawn, situated at the bottom of the screen under the section "Selected note:". Also, completeley at the bottom of the screen you will find a list of tags with associated data. The information presented here will vary, but would typically include the patient's name, the type of note, the author etc.
+Your first task is to determine whether or not the sentence refers to an actual clinical event of interest, i.e. if the sentence is a true positive. Typically you will be able to make up your mind just by reading the sentence itself. If the sentence is ambiguous and you would like to obtain more context, you can review the note or report from which the sentence was drawn, situated at the bottom of the screen under the section "Selected note:". Also, completely at the bottom of the screen you will find a list of tags with associated data. The information presented here will vary, but would typically include the patient's name, the type of note, the author etc.
 
 For your reference, the date of entry for the note from which the sentence was drawn is indicated below the sentence, along with sentence position (first, second, third in line for review, etc) and patient ID.
 
