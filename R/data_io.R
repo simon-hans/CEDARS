@@ -80,7 +80,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
         patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
 
         # If user clicked SEARCH patient_id will be 0, in which case we unlock user which will trigger search for next available patient
-        if (patient_id == 0) {
+        if (!is.na(patient_id) & patient_id == 0) {
 
             unlock_user(uri_fun, user, password, host, port, database, end_user)
             patient_id <- NA
