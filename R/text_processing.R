@@ -355,7 +355,8 @@ upload_notes <- function(uri_fun, user, password, host, port, database, notes) {
     if (anyNA(match(c("patient_id", "text_id", "text", "text_date", "doc_id"), colnames(notes))))
         print("Error: missing field.") else {
 
-            if (!is.numeric(notes$patient_id)) print("Error: patient ID must be numeric.") else {
+            if (is.numeric(notes$patient_id)) min_val <- min(notes$patient_id) else min_val <- 0
+            if (min_val <=0) print("Error: patient ID must be numeric and >0.") else {
 
                 date_check <- !(as.character(as.Date(notes$text_date, format = "%Y-%m-%d")) == notes$text_date)
 
