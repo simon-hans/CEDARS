@@ -150,7 +150,7 @@ server <- function(input, output, session) {
     observeEvent(eventExpr = input$id_search, {
 
         id_for_search <<- input$search_patient_id
-        if (id_for_search == "") id_for_search <<- NA
+        if (id_for_search == "") id_for_search <<- 0
         # position <<- 1
 
         updated(Sys.time())
