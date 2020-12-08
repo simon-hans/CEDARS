@@ -811,7 +811,7 @@ download_events <- function(uri_fun, user, password, host, port, database) {
 
     patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
 
-    out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1, \"sentences\" : 1}")
+    out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1, \"time_locked\" : 1, \"sentences\" : 1}")
 
     # Counting sentences
 
@@ -822,6 +822,25 @@ download_events <- function(uri_fun, user, password, host, port, database) {
     out$sentences_total <- rep(NA, len_out)
     out$sentences_reviewed <- rep(NA, len_out)
     out$sentences_bef_event <- rep(NA, len_out)
+    out$case_time <- rep(NA, len_out)
+    out$sentence_time <- rep(NA, len_out)
+    out$sentences_bef_event_list <- rep(NA, len_out)
+
+    # Computing approximate time spent per case per user
+
+    out <- out[order(out$end_user, out$time_locked, decreasing = TRUE, method = "radix"), ]
+
+    if (sum(!is.na(out$time_locked))>1) {
+
+        delta <- out$time_locked - c(out$time_locked[-1], NA)
+
+        delta <- c(NA, delta[1:(length(delta)-1)])
+
+        out$case_time <- delta
+
+    }
+
+    out$case_time[!duplicated(out$end_user)] <- NA
 
     for (i in 1:len_out){
 
@@ -838,6 +857,10 @@ download_events <- function(uri_fun, user, password, host, port, database) {
 
                 out$sentences_bef_event[i] <- length(sentence_df[,1])
 
+                clean_sentences <- gsub("\\*START\\*", "", sentence_df$selected)
+                clean_sentences <- gsub("\\*END\\*", "", clean_sentences)
+                out$sentences_bef_event_list[i] <- paste(1:length(sentence_df[,1]), clean_sentences, sep=": ", collapse="\r")
+
             } else out$sentences_bef_event[i] <- length(subset(sentence_df, text_date < out$event_date[i])[,1])
 
             print(paste("assessed patient record", i, "of", len_out))
@@ -850,6 +873,7 @@ download_events <- function(uri_fun, user, password, host, port, database) {
     out$sentences_reviewed[is.na(out$sentences_reviewed)] <- 0
     out$sentences_bef_event[is.na(out$sentences_bef_event)] <- 0
     out$sentences <- NULL
+    out$sentence_time <- round(out$case_time/out$sentences_reviewed, digits=0)
 
     out <- out[order(out$patient_id, decreasing = FALSE, method = "radix"), ]
 
