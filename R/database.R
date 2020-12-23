@@ -811,7 +811,7 @@ download_events <- function(uri_fun, user, password, host, port, database) {
 
     patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
 
-    out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1, \"time_locked\" : 1, \"sentences\" : 1}")
+    out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1, \"time_locked\" : 1, \"pt_comments\" : 1, \"sentences\" : 1}")
 
     # Counting sentences
 
