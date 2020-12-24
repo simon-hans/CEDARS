@@ -859,7 +859,8 @@ download_events <- function(uri_fun, user, password, host, port, database) {
 
                 clean_sentences <- gsub("\\*START\\*", "", sentence_df$selected)
                 clean_sentences <- gsub("\\*END\\*", "", clean_sentences)
-                out$sentences_bef_event_list[i] <- paste(1:length(sentence_df[,1]), clean_sentences, sep=": ", collapse="\r")
+                sent_dates <- sentence_df$text_date
+                out$sentences_bef_event_list[i] <- paste(paste("\"", clean_sentences, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
 
             } else out$sentences_bef_event[i] <- length(subset(sentence_df, text_date < out$event_date[i])[,1])
 
