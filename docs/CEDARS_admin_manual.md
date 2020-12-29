@@ -27,13 +27,20 @@ NegEx \([Chapman _et al_, Stud Health Technol Inform. 2013; 192: 677–681.](htt
 
 ![CEDARS Operational Schema](pics/GitHub%20Schema%201%20C%20blue.png)
 
-The CEDARS app runs from within a Shiny instance. It is possible to use either a dedicated server running Shiny Server or RStudio Connect. The former is typically more costly and labor intensive, the latter is easy to use from RStudio desktop but requires an existing RStudio Connect installation within your organization.
+The CEDARS app runs from within a Shiny instance. It is possible to use either RStudio Connect or alternatively a dedicated server running Shiny Server. The former is easy to use from RStudio desktop but requires an existing RStudio Connect installation within your organization, while the latter is typically more costly and labor intensive.
 
-Users connect to the Shiny app by accessing a web URL
+Users connect to the Shiny app by accessing a web URL provided by RStudio Connect or a web server on a dedicated Shiny Server installation. CEDARS performs the operations to pull data from the database, process it and present it to the end users. Data entered by users is processed by CEDARS and saved to the database. RStudio Connect and Shiny Server Pro allow for the automatic generation of multiple processes ("workers") when multiple end users access the app simultaneously, however this is rarely needed with CEDARS since in most implementations only a few abstractors (i.e. <5) will have access to the interface. In most cases, if pre-search is used (see below), CEDARS will run fairly quickly with 2 simultaneous users in a single-threaded setup.
+
+CEDARS can handle authentication, but ideally this will be done by Active Directory through RStudio Connect. This approach ensures optimal integration within an organization.
 
 ### Installing CEDARS
 
 ## CEDARS R Package on Desktop Installation
+
+From RStudio, and with the devtools package installed:
+
+devtools::install_github("simon-hans/CEDARS", upgrade="never")
+
 
 ## CEDARS App Server Installation
 
