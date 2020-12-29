@@ -39,8 +39,9 @@ CEDARS can handle authentication, but ideally this will be done by Active Direct
 
 From RStudio, and with the devtools package installed:
 
+```r
 devtools::install_github("simon-hans/CEDARS", upgrade="never")
-
+```
 
 ## CEDARS App Server Installation
 
