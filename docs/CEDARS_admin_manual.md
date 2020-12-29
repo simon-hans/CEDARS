@@ -19,7 +19,9 @@ utils
 
 RStudio is required to use the app locally and to publish it to RStudio Connect. A MongoDB installation is required to hold all the project data, preferably on a dedicated server.
 
-Lastly, the Unified Medical Language System (UMLS) MRCONSO.RRF file is required for searches usinf Concept Unique Idnetifiers (CUI's). 
+Lastly, the Unified Medical Language System (UMLS) MRCONSO.RRF file is required for searches using Concept Unique Identifiers (CUI's). The [UMLS](https://www.nlm.nih.gov/research/umls/index.html) is a rich compendium of biomedical lexicons. It is maintained by the National Institutes of Health \(NIH\) and requires establishing an account in order to access the associated files. Those files are not included with the CEDARS R package, but CEDARS is designed to use them natively so individual users can easily include them in their annotation pipeline. 
+
+NegEx \([Chapman _et al_, Stud Health Technol Inform. 2013; 192: 677–681.](https://pubmed.ncbi.nlm.nih.gov/23920642/)\) is included with CEDARS.
 
 ### System Architecture
 
