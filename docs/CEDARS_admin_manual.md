@@ -4,7 +4,7 @@
 
 ### Requirements
 
-CEDARS is provided as-is with no guarantee whatsoever and users agree to be held responsible for compliance with their local government/institutional regulations. All CEDARS installations should be reviewed with institutional information security authorities.
+**CEDARS is provided as-is with no guarantee whatsoever and users agree to be held responsible for compliance with their local government/institutional regulations.** All CEDARS installations should be reviewed with institutional information security authorities.
 
 CEDARS was tested on a desktop PC. R 3.5.0 or above and all dependency packages need to be installed:
 
