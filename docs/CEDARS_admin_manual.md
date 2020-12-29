@@ -4,6 +4,8 @@
 
 ### Requirements
 
+CEDARS is provided as-is with no guarantee whatsoever and users agree to be held responsible for compliance with their local government/institutional regulations. All CEDARS installations should be reviewed with institutional information security authorities.
+
 CEDARS was tested on a desktop PC. R 3.5.0 or above and all dependency packages need to be installed:
 
 fastmatch
@@ -15,10 +17,17 @@ shiny
 udpipe
 utils
 
+RStudio is required to use the app locally and to publish it to RStudio Connect. A MongoDB installation is required to hold all the project data, preferably on a dedicated server.
+
+Lastly, the Unified Medical Language System (UMLS) MRCONSO.RRF file is required for searches usinf Concept Unique Idnetifiers (CUI's). 
 
 ### System Architecture
 
 ![CEDARS Operational Schema](pics/GitHub%20Schema%201%20C%20blue.png)
+
+The CEDARS app runs from within a Shiny instance. It is possible to use either a dedicated server running Shiny Server or RStudio Connect. The former is typically more costly and labor intensive, the latter is easy to use from RStudio desktop but requires an existing RStudio Connect installation within your organization.
+
+Users connect to the Shiny app by accessing a web URL
 
 ### Installing CEDARS
 
