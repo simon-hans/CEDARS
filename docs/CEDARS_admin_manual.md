@@ -18,6 +18,8 @@ utils
 
 ### System Architecture
 
+![CEDARS Operational Schema](pics/GitHub%20Schema%201%20C%20blue.png)
+
 ### Installing CEDARS
 
 ## CEDARS R Package on Desktop Installation
