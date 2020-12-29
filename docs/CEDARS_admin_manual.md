@@ -4,7 +4,17 @@
 
 ### Requirements
 
-CEDARS was tested on a desktop PC. All dependency packages need to be installed.
+CEDARS was tested on a desktop PC. R 3.5.0 or above and all dependency packages need to be installed:
+
+fastmatch
+jsonlite
+mongolite
+parallel
+readr
+shiny
+udpipe
+utils
+
 
 ### System Architecture
 
