@@ -8,14 +8,14 @@ CEDARS is provided as-is with no guarantee whatsoever and users agree to be held
 
 CEDARS was tested on a desktop PC. R 3.5.0 or above and all dependency packages need to be installed:
 
-fastmatch
-jsonlite
-mongolite
-parallel
-readr
-shiny
-udpipe
-utils
+fastmatch  
+jsonlite  
+mongolite  
+parallel  
+readr  
+shiny  
+udpipe  
+utils  
 
 RStudio is required to use the app locally and to publish it to RStudio Connect. A MongoDB installation is required to hold all the project data, preferably on a dedicated server.
 
