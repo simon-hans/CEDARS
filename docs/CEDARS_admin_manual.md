@@ -51,7 +51,7 @@ devtools::install_github("simon-hans/CEDARS", upgrade="never")
 
 Extracting clinical events dates with CEDARS is a simple, sequential process:
 
-![Project Execution Overview](pics/GitHub%20Schema%204%20A.png)
+![Project Execution Overview](pics/GitHub%20Schema%204%20B.png)
 
 ## Database Setup
 
