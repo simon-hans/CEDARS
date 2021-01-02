@@ -35,7 +35,7 @@ CEDARS can handle authentication, but ideally this will be done by Active Direct
 
 ### Installing CEDARS
 
-## CEDARS R Package on Desktop Installation
+#### CEDARS R Package on Desktop Installation
 
 From RStudio, and with the devtools package installed:
 
@@ -43,37 +43,39 @@ From RStudio, and with the devtools package installed:
 devtools::install_github("simon-hans/CEDARS", upgrade="never")
 ```
 
-## CEDARS App Server Installation
+#### CEDARS App Server Installation
 
-## CEDARS App RStudio Connect Installation
+#### CEDARS App RStudio Connect Installation
 
-## Overview of Project Execution
+## Project Execution
+
+### Overview
 
 Extracting clinical events dates with CEDARS is a simple, sequential process:
 
 ![Project Execution Overview](pics/GitHub%20Schema%204%20B.png)
 
-## Database Setup
+### App Installation
+
+### Database Setup
 
 Creating the database and populating it with data pertaining to the project occurs as follows:
 
 ![Preparing the Database](pics/GitHub%20Schema%203%20E.png)
 
-### Initializing a Project
+#### Project Initialization
 
 Each data collection task on a given cohort of patients is a distinct CEDARS "project" with its own MongoDB database with all collections needed to operate. Different projects cannot share the same database or collections. This encapsulation allows for reliable backup and deletion of project data upon completion, also avoiding data corruption due to cross-talk between different annotation tasks.
 
 Initialization is the process by which necessary collections are generated and populated with project-specific data. Once initialization is complete, data entry by human observers can start.
 
-## Creating MongoDB Collections
-
 The function create_project() generates a database which will hold all collections pertaining to the project. If the CEDARS project administrator has database creation privileges, a new MongoDB instance will be created and collections generated automatically. If database creation privileges have not been granted, it is possible to have the MongoDB administrator create the blank database. Once this is done, create_project() can be used to generate the collections.
 
-## Adding End Users
+##### Adding End Users
 
 The add_end_user() function adds an end user (i.e. data abstractor) to the project. This will be done with CEDARS from the R console only if not using another authentication system, e.g. Active Directory with RStudio Connect.
 
-## Building the Search Query
+#### Building the Search Query
 
 The CEDARS search query incorporates the following wildcards:
 
