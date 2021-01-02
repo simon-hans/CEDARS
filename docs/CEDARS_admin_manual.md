@@ -81,11 +81,11 @@ Both the app.R and db_credentials.Rdata files must be uploaded to the Shiny inst
 
 #### RStudio Connect
 
+This option assumes you have an account with your institution's RStudio Connect service. From within RStudio, simply navigate to the folder where the app was saved and click on the app.R file. Click the "Publish ot Server" icon, making sure both necessary files are included and hit "Publish".
+
 #### CEDARS Server
 
-A discussion of the installation process for Shiny Server is beyond the scope of this manual; pertinent information can be found on the maker's [website](https://rstudio.com/products/shiny/download-server/). 
-
-
+A discussion of the installation process and use for Shiny Server is beyond the scope of this manual; pertinent information can be found on the maker's [website](https://rstudio.com/products/shiny/download-server/). The CEDARS app.R and db_credentials.Rdata files should be uploaded to the desired app directory.
 
 ### Database Setup
 
@@ -95,15 +95,31 @@ Creating the database and populating it with data pertaining to the project occu
 
 #### Project Initialization
 
-Each data collection task on a given cohort of patients is a distinct CEDARS "project" with its own MongoDB database with all collections needed to operate. Different projects cannot share the same database or collections. This encapsulation allows for reliable backup and deletion of project data upon completion, also avoiding data corruption due to cross-talk between different annotation tasks.
+Each data collection task on a given cohort of patients is a distinct CEDARS "project" with its own MongoDB database with all collections needed to operate. Different projects cannot share the same database or collections. This encapsulation allows for reliable backup and deletion of project data upon completion, also avoiding data corruption due to cross-talk between different annotation tasks. Initialization is the process by which necessary collections are generated and populated with project-specific data.
 
-Initialization is the process by which necessary collections are generated and populated with project-specific data. Once initialization is complete, data entry by human observers can start.
+The function create_project() generates a database which will hold all collections pertaining to the project. If the CEDARS project administrator has database creation privileges, a new MongoDB instance will be created and collections generated automatically. If database creation privileges have not been granted, it is possible to have the MongoDB administrator create the blank database. Once this is done, create_project() can be used to generate the collections:
 
-The function create_project() generates a database which will hold all collections pertaining to the project. If the CEDARS project administrator has database creation privileges, a new MongoDB instance will be created and collections generated automatically. If database creation privileges have not been granted, it is possible to have the MongoDB administrator create the blank database. Once this is done, create_project() can be used to generate the collections.
+```r
+uri_fun <- mongo_uri_standard
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
+db_host <- "myserver"
+db_port <- 27017
+db_name <- "MyDB"
+project_name <- "CEDARS Example Project"
+project_owner <- "Dr Smith"
 
+create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, project_name, project_owner)
+```
 
+If the option to use Active Directory was set to FALSE when creating the app, the add_end_user() function must be used to add end users (i.e. data abstractors) to the project:
 
-The add_end_user() function adds an end user (i.e. data abstractor) to the project. This will be done with CEDARS from the R console only if not using another authentication system, e.g. Active Directory with RStudio Connect.
+```r
+new_end_user <- "John"
+new_end_user_pw <- "strongpassword"
+
+add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, new_end_user, new_end_user_pw)
+```
 
 #### Electronic Health Record Corpus Upload
 
