@@ -43,7 +43,9 @@ From RStudio, and with the devtools package installed:
 devtools::install_github("simon-hans/CEDARS", upgrade="never")
 ```
 
-#### CEDARS App Server Installation
+#### CEDARS Server Installation
+
+A discussion of the installation process for Shiny Server is beyond the scope of this manual; pertinent information can be found on the maker's web site.
 
 #### CEDARS App RStudio Connect Installation
 
@@ -104,6 +106,7 @@ Lastly, the "(" and ")" operators can be used to further develop logic within a 
 
 ### Assessment of Clinical Events
 
+The process by which human abstractors annotate patient records for events is described in the [End User Manual](CEDARS_end_user_manual.md).
 
 ### Dataset Download
 
