@@ -170,15 +170,43 @@ for (i in 1:10000){
     
     upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, download_notes)
     
-    print(paste("reports uploaded for patient #", i, sep=""))
+    print(paste("notes uploaded for patient #", i, sep=""))
     
-  } else print(paste("no reports for patient #", i, sep=""))
+  } else print(paste("no notes for patient #", i, sep=""))
   
 }
 ```
 
 #### Natural Language Processing Annotation
 
+CEDARS uses the [UDPipe](https://cran.r-project.org/web/packages/udpipe/vignettes/udpipe-annotation.html) natural language processing (NLP) pipeline for paragraph/sentence boundary detection, tokenization, lemmatization, part-of-speech tagging and dependency parsing. The function automatic_NLP_processor() will assess the project for missing annotations and process documents as needed:
+
+```r
+uri_fun <- mongo_uri_standard
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
+db_host <- "myserver"
+db_port <- 27017
+db_name <- "MyDB"
+txt_format <- "latin1"
+
+# Only UDPipe is supported for now
+nlp_type <- "udpipe"
+
+# Use your favorite model, can be standard issue or custom fitted
+udmodel_path <- "C:/R/NLP_models/latestversion.udpipe"
+
+# We are not using UMLS concept unique identifiers
+max_n_grams <-  0 
+
+# Negation will look up to 6 positions away from index token
+neg_depth <- 6 
+
+# CEDARS supports parallel processing
+sel_cores <- 10
+
+automatic_NLP_processor(NA, txt_format, nlp_type, udmodel_path, uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, max_n_grams, neg_depth, sel_cores)
+```
 
 #### Event Pre-Loading
 
