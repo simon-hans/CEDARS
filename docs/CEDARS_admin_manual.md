@@ -35,7 +35,7 @@ CEDARS can handle authentication, but ideally this will be done by Active Direct
 
 ### Installing CEDARS
 
-#### CEDARS R Package on Desktop Installation
+#### CEDARS R Package Installation
 
 From RStudio, and with the devtools package installed:
 
@@ -43,11 +43,7 @@ From RStudio, and with the devtools package installed:
 devtools::install_github("simon-hans/CEDARS", upgrade="never")
 ```
 
-#### CEDARS Server Installation
-
-A discussion of the installation process for Shiny Server is beyond the scope of this manual; pertinent information can be found on the maker's web site.
-
-#### CEDARS App RStudio Connect Installation
+This will install CEDARS on a desktop or server. In the case of RStudio Connect implementations, CEDARS will be automatically installed when uploading the app through RStudio.
 
 ## Project Execution
 
@@ -58,6 +54,38 @@ Extracting clinical events dates with CEDARS is a simple, sequential process:
 ![Project Execution Overview](pics/GitHub%20Schema%204%20B.png)
 
 ### App Installation
+
+The CEDARS package includes the data entry interface in the form of a Shiny app. However, additional information from the administrator is required for the app instance to connect with MongoDB, including:
+
+database user ID and password  
+host server and port (default is 27017)  
+database name  
+should active directory be used?  
+destination path to save the app, mapped from working directory  
+
+The function save_credentials() must be called to generate the app and associated Rdata file: 
+
+```r
+db_user_name <- "JohnSmith"
+db_user_pw <- "hardpassword"
+db_host <- "myserver"
+db_port <- 27017
+db_name <- "MyDB"
+use_LDAP <- TRUE
+app_path <- "Out/app"
+
+save_credentials(db_user_name, db_user_pw, db_host, db_port, db_name, use_LDAP, app_path)
+```
+
+Both the app.R and db_credentials.Rdata files must be uploaded to the Shiny instance.
+
+#### RStudio Connect
+
+#### CEDARS Server
+
+A discussion of the installation process for Shiny Server is beyond the scope of this manual; pertinent information can be found on the maker's [website](https://rstudio.com/products/shiny/download-server/). 
+
+
 
 ### Database Setup
 
