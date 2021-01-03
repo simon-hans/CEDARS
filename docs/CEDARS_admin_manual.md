@@ -31,7 +31,7 @@ The CEDARS app runs from within a Shiny instance. It is possible to use either R
 
 Users connect to the Shiny app by accessing a web URL provided by RStudio Connect or a web server on a dedicated Shiny Server installation. CEDARS performs the operations to pull data from the database, process it and present it to the end users. Data entered by users is processed by CEDARS and saved to the database. RStudio Connect and Shiny Server Pro allow for the automatic generation of multiple processes ("workers") when multiple end users access the app simultaneously, however this is rarely needed with CEDARS since in most implementations only a few abstractors (i.e. <5) will have access to the interface. In most cases, if pre-search is used (see below), CEDARS will run fairly quickly with 2 simultaneous users in a single-threaded setup.
 
-CEDARS can handle authentication, but ideally this will be done by Active Directory through RStudio Connect. This approach ensures optimal integration within an organization.
+CEDARS can handle authentication, but ideally this will be done by Active Directory through RStudio Connect. This approach ensures optimal integration with an organization's IT architecture.
 
 ### Installing CEDARS
 
@@ -49,25 +49,25 @@ This will install CEDARS on a desktop or server. In the case of RStudio Connect 
 
 ### Overview
 
-Extracting clinical events dates with CEDARS is a simple, sequential process:
+Extracting clinical event dates with CEDARS is a simple, sequential process:
 
 ![Project Execution Overview](pics/GitHub%20Schema%204%20B.png)
 
 ### App Installation
 
-The CEDARS package includes the data entry interface in the form of a Shiny app. However, additional information from the administrator is required for the app instance to connect with MongoDB, including:
+The CEDARS package includes its data entry interface in the form of a Shiny app. However, additional information from the administrator is required for the app instance to connect with MongoDB, including:
 
 database user ID and password  
 host server and port (default is 27017)  
 database name  
-should active directory be used?  
-destination path to save the app, mapped from working directory  
+whether ornot Active Directory will be used for user authentication  
+destination path to save the app, mapped from the R working directory  
 
 The function save_credentials() must be called to generate the app and associated Rdata file: 
 
 ```r
-db_user_name <- "JohnSmith"
-db_user_pw <- "hardpassword"
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
 db_host <- "myserver"
 db_port <- 27017
 db_name <- "MyDB"
@@ -79,11 +79,11 @@ save_credentials(db_user_name, db_user_pw, db_host, db_port, db_name, use_LDAP, 
 
 Both the app.R and db_credentials.Rdata files must be uploaded to the Shiny instance.
 
-#### RStudio Connect
+#### RStudio Connect App Upload
 
 This option assumes you have an account with your institution's RStudio Connect service. From within RStudio, simply navigate to the folder where the app was saved and click on the app.R file. Click the "Publish ot Server" icon, making sure both necessary files are included and hit "Publish".
 
-#### CEDARS Server
+#### RStudio Server App Upload
 
 A discussion of the installation process and use of Shiny Server is beyond the scope of this manual; pertinent information can be found on the maker's [website](https://rstudio.com/products/shiny/download-server/). The CEDARS app.R and db_credentials.Rdata files should be uploaded to the desired app directory.
 
@@ -95,7 +95,7 @@ Creating the database and populating it with data pertaining to the project occu
 
 #### Project Initialization
 
-Each data collection task on a given cohort of patients is a distinct CEDARS "project" with its own MongoDB database with all collections needed to operate. Different projects cannot share the same database or collections. This encapsulation allows for reliable backup and deletion of project data upon completion, also avoiding data corruption due to cross-talk between different annotation tasks. Initialization is the process by which necessary collections are generated and populated with project-specific data.
+Each data collection task on a given cohort of patients is a distinct CEDARS "project" with its own MongoDB database including all collections needed to operate. Different projects cannot share the same database or collections. This encapsulation allows for reliable backup and deletion of project data upon completion, also avoiding data corruption due to cross-talk between different annotation tasks. Initialization is the process by which necessary collections are generated and populated with project-specific data.
 
 The function create_project() generates a database which will hold all collections pertaining to the project. If the CEDARS project administrator has database creation privileges, a new MongoDB instance will be created and collections generated automatically. If database creation privileges have not been granted, it is possible to have the MongoDB administrator create the blank database. Once this is done, create_project() can be used to generate the collections:
 
