@@ -123,7 +123,7 @@ add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, new_e
 
 #### Electronic Health Record Corpus Upload
 
-Function upload_notes() is used to transfer the raw clinical corpus to the CEDARS database. This would typically consist of a collection of clinical notes or radiology reports formatted as a datafrmae with the follwing fields:
+Function upload_notes() is used to transfer the raw clinical corpus to the CEDARS database. This would typically consist of a collection of clinical notes or radiology reports formatted as a dataframe with the follwing fields:
 
 "patient_id" Patient-specific unique identifier, typically a medical record number  
 "text_id" Unique identifier for the text fragment  
@@ -155,7 +155,7 @@ db_name <- "MyDB"
 upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, patient_notes)
 ```
 
-In a typical use case, there would be a large number of patients/notes sitting on a separate server, so a custom batch function to download notes and transfer to CEDARS one patient at a time would have to be devised, e.g.:
+In a typical use case, there would be a large number of patients/notes located on a separate server, so a custom batch function to download notes and transfer to CEDARS one patient at a time would have to be devised, e.g.:
 
 ```r
 for (i in 1:10000){
@@ -242,7 +242,7 @@ Lastly, the "(" and ")" operators can be used to further develop logic within a 
 
 #### Pre-Search
 
-Once NLP annotations are complete and the search query has been defined, if an end user logs into CEDARS the system will automatically start parsing the annotations for matches. However, depending on the frequency (density) of hits, it can takes several seconds to find a sentence to present the end user with. This can impact user experience, especially in multi-user settings. Because of this aspect, ideally records should be pre-searched:
+Once NLP annotations are complete and the search query has been defined, if an end user logs into CEDARS the system will automatically start parsing the annotations for matches. However, depending on the frequency (density) of hits, it can take several seconds to find a sentence to present the end user with. This can impact user experience, especially in multi-user settings. Because of this aspect, ideally records should be pre-searched:
 
 ```r
 uri_fun <- mongo_uri_standard
@@ -283,7 +283,7 @@ Detailed information is provided, including which sentences were reviewed.
 
 ### Audit
 
-CEDARS is by definition semi-automated, and depending on the specific use case and search query some events might be missed. This problem should be quantified by means of a systematic, old-fashion review of randomly selected patients. Typically, at least 200 patients would be selected and their corpora reviewed manually for events. Alternatively, a different method (e.g. billing codes) could be used. This audit dataset should be overlapped with the CEDARS events table to estimate sensitivity of the search query in the cohort at large. If this parameter falls below the previously established minimum acceptable value, the search query scope should be broadened, followed by a database reset, uploading of previously identified events and a new human annotation pass, followed by a repeat audit.
+CEDARS is by definition semi-automated, and depending on the specific use case and search query some events might be missed. This problem should be quantified by means of a systematic, old-fashion review of randomly selected patients. Typically, at least 200 patients would be selected and their corpora reviewed manually for events. Alternatively, a different method (e.g. billing codes) could be used. This audit dataset should be overlapped with the CEDARS event table to estimate sensitivity of the search query in the cohort at large. If this parameter falls below the previously established minimum acceptable value, the search query scope should be broadened, followed by a database reset, uploading of previously identified events and a new human annotation pass, followed by a repeat audit.
 
 ### Project Termination
 
