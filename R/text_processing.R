@@ -13,6 +13,7 @@
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param single_core_model NLP model in case parallel processing is not used.
 #' @return NLP annotations dataframe.
+#' @keywords internal
 
 document_processor <- function(text_df, text_format, nlp_engine, negex_simp, negex_depth, single_core_model = NA) {
 
@@ -97,6 +98,7 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param single_core_model NLP model in case parallel processing is not used.
 #' @return NLP annotations dataframe.
+#' @keywords internal
 
 patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected, max_n_grams_length,
     negex_depth, single_core_model) {
@@ -158,6 +160,7 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 #' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
+#' @keywords internal
 
 batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
     user, password, host, port, database, max_n_grams_length, negex_depth, select_cores) {
@@ -259,7 +262,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
-#' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
+#' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If 0 is chosen, UMLS CUI tags will not be provided.
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
 #' @examples

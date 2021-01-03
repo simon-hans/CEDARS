@@ -19,3 +19,4 @@ Series of duplicated field values.
 \description{
 Duplicates paragraph or sentence ID's to help process negation based on negated token series.
 }
+\keyword{internal}

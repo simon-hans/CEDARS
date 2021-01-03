@@ -33,3 +33,4 @@ NLP annotations dataframe.
 \description{
 Processes one EHR document with NLP pipeline and applies NegEx.
 }
+\keyword{internal}

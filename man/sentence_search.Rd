@@ -24,3 +24,4 @@ Execute Search on EHR Notes for One Patient
 \details{
 Performs search for queries based on lemmas (i.e. keywords) and UMLS CUI's
 }
+\keyword{internal}

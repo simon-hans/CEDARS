@@ -17,3 +17,4 @@ Annotations dataframe with one extra column.
 \description{
 Matches lemmas in NLP annotations to keywords, considering Regex syntax.
 }
+\keyword{internal}

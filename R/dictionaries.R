@@ -191,6 +191,7 @@ negex_upload <- function(udmodel_path, uri_fun, user, password, host, port, data
 #' @param df MRCONSO dataframe.
 #' @param max_grams Maximum length of token in grams.
 #' @return A list which includes the original data for one UMLS concept unique identifier (CUI).
+#' @keywords internal
 
 token_splitter <- function(i, df, max_grams) {
 

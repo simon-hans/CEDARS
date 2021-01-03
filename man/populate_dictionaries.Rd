@@ -22,3 +22,4 @@ populate_dictionaries(uri_fun, user, password, host, port, database)
 \description{
 Set ups collections for the UMLS MRCONSO/MRREL and NegEx files. MRCONSO consists of a list of UMLS concept unique identifiers (CUI's) with corresponding text strings and NegEx is a simple negation lexicon. The UMLS files are not provided as paer of the CEDARS package and must be dowloaded the NIH web site at https://www.nlm.nih.gov/research/umls/index.html. NegEx is included in CEDARS and its use is governed by the Apache License 2.0.
 }
+\keyword{internal}

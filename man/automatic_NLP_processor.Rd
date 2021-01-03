@@ -41,7 +41,7 @@ automatic_NLP_processor(
 
 \item{database}{MongoDB database name.}
 
-\item{max_n_grams_length}{Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.}
+\item{max_n_grams_length}{Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If 0 is chosen, UMLS CUI tags will not be provided.}
 
 \item{negex_depth}{Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.}
 

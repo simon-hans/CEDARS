@@ -8,6 +8,7 @@
 #' Removes non-ASCII characters and '*' from clinical corpora or user input.
 #' @param text Raw text from the EHR.
 #' @return Cleaned text in ASCII format stripped of '*' characters.
+#' @keywords internal
 
 sanitize <- function(text) {
 
@@ -23,6 +24,7 @@ sanitize <- function(text) {
 #' Removes non-ASCII characters from search query and attempts to correct formulation errors.
 #' @param query Raw text from the query.
 #' @return Cleaned query.
+#' @keywords internal
 
 sanitize_query <- function(query) {
 
@@ -40,6 +42,7 @@ sanitize_query <- function(query) {
 #' Prepares keyword element vector, converting wildcards to Regex syntax. Wildcards include '?' for any single character and '*' for any number of characters including zero.
 #' @param keyword_elements Keywords.
 #' @return Formatted keywords.
+#' @keywords internal
 
 format_keywords <- function(keyword_elements) {
 
@@ -56,6 +59,7 @@ format_keywords <- function(keyword_elements) {
 #' @param input_df Data frame produced by the NLP engine.
 #' @param engine NLP engine. At this time only UDPipe is supported.
 #' @return A dataframe with NLP annotations.
+#' @keywords internal
 
 standardize_nlp <- function(input_df, engine) {
 
@@ -83,6 +87,7 @@ standardize_nlp <- function(input_df, engine) {
 #' Adds color and changes font to bold for selected strings of sentences and notes. The current method uses HTML.
 #' @param get_output Dataframe with field 'selected', the latter containing text string corresponding to selected sentences.
 #' @return Text string with HTML markup.
+#' @keywords internal
 
 colorize <- function(get_output) {
 

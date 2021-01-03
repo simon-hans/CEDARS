@@ -24,3 +24,4 @@ mongo_connect(uri_fun, user, password, host, port, database, mongo_collection)
 \description{
 Basic function used by CEDARS to connect to MongoDB instance. Wraps mongo() from mongolite.
 }
+\keyword{internal}

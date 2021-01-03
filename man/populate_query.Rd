@@ -22,3 +22,4 @@ populate_query(uri_fun, user, password, host, port, database)
 \description{
 Sets up the 'QUERY' collection to store the search query and associated information.
 }
+\keyword{internal}

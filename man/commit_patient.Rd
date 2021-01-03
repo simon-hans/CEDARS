@@ -44,3 +44,4 @@ commit_patient(
 \description{
 Selects yet to be assessed patient with at least one positive sentence and locks record in DB for the CEDARS end user.
 }
+\keyword{internal}

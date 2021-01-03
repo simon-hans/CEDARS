@@ -41,3 +41,4 @@ NLP annotations dataframe.
 \description{
 Performs NLP annotations on all documents using previously established cluster, including NegEx and UMLS CUI tags.
 }
+\keyword{internal}

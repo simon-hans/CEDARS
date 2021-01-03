@@ -15,3 +15,4 @@ Text string with HTML markup.
 \description{
 Adds color and changes font to bold for selected strings of sentences and notes. The current method uses HTML.
 }
+\keyword{internal}

@@ -38,3 +38,4 @@ Selected patient_id.
 \description{
 Selects next available patient to review by CEDARS end user. If a patient record is already locked it will be used, otherwise next in line is choosen. If a specific patinet ID was requested, record will be locked and selected.
 }
+\keyword{internal}

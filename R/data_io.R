@@ -70,6 +70,7 @@ post_wrapper <- function(database, end_user, end_user_password, position, event_
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
 #' @param ldap Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.
 #' @return A list with patient-specific information and a dataframe with selected sentences along with sentence-specific data.
+#' @keywords internal
 
 get_data <- function(uri_fun, user, password, host, port, database, end_user, end_user_password, html = TRUE, position,
     patient_id = NA, ldap = FALSE) {
@@ -226,6 +227,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
 #' @param event_date Date of clinical event as determined by human reviewer.
 #' @param pt_comments Patient-specific comments from the reviewer.
 #' @param ldap Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.
+#' @keywords internal
 
 post_data <- function(uri_fun, user, password, host, port, database, end_user, end_user_password, position, event_date,
     pt_comments, ldap = FALSE) {
@@ -322,6 +324,7 @@ post_data <- function(uri_fun, user, password, host, port, database, end_user, e
 #' @param end_user CEDARS end user name.
 #' @param end_user_password CEDARS end user password.
 #' @return TRUE for correct credentials, FALSE for incorrect.
+#' @keywords internal
 
 password_verification <- function(uri_fun, user, password, host, port, database, end_user, end_user_password) {
 
@@ -353,6 +356,7 @@ password_verification <- function(uri_fun, user, password, host, port, database,
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
+#' @keywords internal
 
 commit_patient <- function(uri_fun, user, password, host, port, database, end_user, search_query, use_negation, hide_duplicates,
     patient_id = NA) {
@@ -468,6 +472,7 @@ commit_patient <- function(uri_fun, user, password, host, port, database, end_us
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
+#' @keywords internal
 
 get_patient <- function(uri_fun, user, password, host, port, database, end_user, search_query, use_negation, hide_duplicates,
     patient_id = NA) {
@@ -578,6 +583,7 @@ get_patient <- function(uri_fun, user, password, host, port, database, end_user,
 #' @param annotations NLP annotations dataframe.
 #' @param cui_elements Vector of UMLS concept unique identifier (CUI) elements derived from the search query.
 #' @return Aggregated note in one text string.
+#' @keywords internal
 
 aggregate_note <- function(selected_doc_id, annotations, cui_elements) {
 
@@ -607,6 +613,7 @@ aggregate_note <- function(selected_doc_id, annotations, cui_elements) {
 #' @param section_index Index number for the section within the note.
 #' @param note_list List of dataframes, each one containing NLP annotations for a note section.
 #' @return Vector of pasted sections.
+#' @keywords internal
 
 paste_sections <- function(section_index, note_list) {
 
@@ -638,6 +645,7 @@ paste_sections <- function(section_index, note_list) {
 #' @param end_user CEDARS end user name.
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
 #' @return Selected patient_id.
+#' @keywords internal
 
 select_patient <- function(uri_fun, user, password, host, port, database, end_user, patient_id = NA) {
 
@@ -709,6 +717,7 @@ select_patient <- function(uri_fun, user, password, host, port, database, end_us
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
+#' @keywords internal
 
 lock_records <- function(uri_fun, user, password, host, port, database, end_user, patient_id = NA) {
 
@@ -737,6 +746,7 @@ lock_records <- function(uri_fun, user, password, host, port, database, end_user
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param patient_id Patient ID being locked.
+#' @keywords internal
 
 lock_records_admin <- function(uri_fun, user, password, host, port, database, patient_id) {
 
@@ -775,6 +785,7 @@ lock_records_admin <- function(uri_fun, user, password, host, port, database, pa
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param patient_id ID of patient record being unlocked.
+#' @keywords internal
 
 unlock_records_admin <- function(uri_fun, user, password, host, port, database, patient_id) {
 
@@ -798,6 +809,7 @@ unlock_records_admin <- function(uri_fun, user, password, host, port, database, 
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @keywords internal
 
 unlock_records <- function(uri_fun, user, password, host, port, database) {
 
@@ -845,6 +857,7 @@ unlock_user <- function(uri_fun, user, password, host, port, database, end_user)
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param selected_patient Selected patient.
+#' @keywords internal
 
 complete_case <- function(uri_fun, user, password, host, port, database, selected_patient) {
 

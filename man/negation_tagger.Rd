@@ -17,3 +17,4 @@ Dataframe with added negation information.
 \description{
 Processes and NLP annotation dataframe and tags negated words based on distance from negation item.
 }
+\keyword{internal}

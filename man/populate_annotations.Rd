@@ -22,3 +22,4 @@ populate_annotations(uri_fun, user, password, host, port, database)
 \description{
 Creates 'ANNOTATIONS' and 'PATIENTS' collections, assuming main DB collection and notes were already set up.This is necessary before launching the NLP annotation process.
 }
+\keyword{internal}

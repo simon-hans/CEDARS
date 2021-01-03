@@ -41,3 +41,4 @@ If sentence matches query, returns sentences with marked tokens/CUI's, otherwise
 \description{
 Assesses if one sentence matches the search query and marks positive tokens/concept unique identifiers (CUI's).
 }
+\keyword{internal}

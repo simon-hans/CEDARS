@@ -19,3 +19,4 @@ Dataframe with added negation information.
 \description{
 Annotates EHR text for negation, based on Negex, as simple medical negation lexicon. Tokens are labelled by proximity. The original paper went up to 6 tokens before or after negation.
 }
+\keyword{internal}

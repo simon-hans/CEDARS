@@ -7,3 +7,4 @@
 ^.gitbook.yaml$
 ^.gitbook$
 ^assets$
+^build_seq.R$

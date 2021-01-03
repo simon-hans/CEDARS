@@ -35,3 +35,4 @@ db_upload(
 \description{
 Uploads NLP annotations for one patient.
 }
+\keyword{internal}

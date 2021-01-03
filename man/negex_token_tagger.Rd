@@ -19,3 +19,4 @@ Series of token positions within the working dataframe.
 \description{
 Computes negated token series as a function of index, i.e. position of negation item.
 }
+\keyword{internal}

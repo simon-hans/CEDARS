@@ -22,3 +22,4 @@ populate_notes(uri_fun, user, password, host, port, database)
 \description{
 Sets up the 'NOTES' collection which will hold original EHR documents. Those notes can exist as complete documents (one doc per note) or in atomized form (several docs, each a subsection of one note).
 }
+\keyword{internal}

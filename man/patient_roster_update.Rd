@@ -22,3 +22,4 @@ patient_roster_update(uri_fun, user, password, host, port, database)
 \description{
 Updates the 'PATIENTS' collection with new entries. Used after NLP annotations have been uploaded.
 }
+\keyword{internal}

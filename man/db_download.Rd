@@ -27,3 +27,4 @@ Dataframe of full notes and/or note parts with associated metadata.
 \description{
 Downloads the notes for one patient. If there are missing fields, those are created with NA values inserted.
 }
+\keyword{internal}

@@ -47,3 +47,4 @@ post_data(
 \description{
 Saves sentence review status and event time about an individual for whom the electronic health record text was reviewed. Main way for end user to enter data into CEDARS.
 }
+\keyword{internal}

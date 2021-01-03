@@ -35,3 +35,4 @@ lock_records(
 \description{
 Locks record for selected patient. The first available unreviewed, unlocked record is locked for the CEDARS end user.
 }
+\keyword{internal}

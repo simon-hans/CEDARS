@@ -24,3 +24,4 @@ unlock_records_admin(uri_fun, user, password, host, port, database, patient_id)
 \description{
 Once the CEDARS server has completed work on a given patient, admin lock is removed so end users can lock and access the record.
 }
+\keyword{internal}

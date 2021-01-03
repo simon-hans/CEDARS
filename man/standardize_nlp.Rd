@@ -17,3 +17,4 @@ A dataframe with NLP annotations.
 \description{
 Converts output of NLP engine to a dataframe with entries recognized by CEDARS.
 }
+\keyword{internal}

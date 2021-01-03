@@ -24,3 +24,4 @@ complete_case(uri_fun, user, password, host, port, database, selected_patient)
 \description{
 Once all sentences before a recorded event have been annotated by the end user, this functions marks patient record as 'reviewed'.
 }
+\keyword{internal}

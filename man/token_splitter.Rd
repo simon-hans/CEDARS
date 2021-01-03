@@ -19,3 +19,4 @@ A list which includes the original data for one UMLS concept unique identifier (
 \description{
 Splits a token in its different grams and outputs. Processes one row from the UMLS MRCONSO file at a time.
 }
+\keyword{internal}

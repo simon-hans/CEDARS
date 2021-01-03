@@ -12,6 +12,7 @@
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @return All sentences matching the query.
+#' @keywords internal
 
 sentence_search <- function(parse_result, annotations, use_negation, hide_duplicates) {
 
@@ -82,6 +83,7 @@ sentence_search <- function(parse_result, annotations, use_negation, hide_duplic
 #' @param annotations Patient-specific NLP annotations.
 #' @param keyword_elements Keywords with Regex syntax.
 #' @return Annotations dataframe with one extra column.
+#' @keywords internal
 
 lemma_match <- function(annotations, keyword_elements) {
 
@@ -107,6 +109,7 @@ lemma_match <- function(annotations, keyword_elements) {
 #' @param cui_elements Vector of search query CUI's.
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @return If sentence matches query, returns sentences with marked tokens/CUI's, otherwise NA.
+#' @keywords internal
 
 sentence_eval <- function(unique_id, unique_sentences, annotations, query_vect, keyword_mask, keyword_elements,
     cui_mask, cui_elements, use_negation) {
@@ -171,6 +174,7 @@ sentence_eval <- function(unique_id, unique_sentences, annotations, query_vect, 
 #' @param annotations NLP annotation dataframe.
 #' @param cui_elements Vector of search query CUI's.
 #' @return Full sentence with marked tokens.
+#' @keywords internal
 
 mark <- function(annotations, cui_elements) {
 
@@ -200,6 +204,7 @@ mark <- function(annotations, cui_elements) {
 #' Extracts pertinent elements from search query.
 #' @param search_query Medical corpus query containg keywords/CUI's, boolean elements and other operators ('AND', 'OR', '!', '(', or ')').
 #' @return List containing the query vector, operator mask, CUI mask, keyword mask, keyword elements and CUI elements.
+#' @keywords internal
 
 parse_query <- function(search_query) {
 

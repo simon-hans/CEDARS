@@ -21,3 +21,4 @@ Tokens matched with a CUI.
 \description{
 Fast implementation of matching process to find UMLS concept unique identifiers (CUI's) corresponding to tokens from EHR documents.
 }
+\keyword{internal}

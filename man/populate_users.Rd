@@ -22,3 +22,4 @@ populate_users(uri_fun, user, password, host, port, database)
 \description{
 Sets up 'USERS' collection where CEDARS end user names and passwords will be retained.
 }
+\keyword{internal}

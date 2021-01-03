@@ -15,3 +15,4 @@ Formatted keywords.
 \description{
 Prepares keyword element vector, converting wildcards to Regex syntax. Wildcards include '?' for any single character and '*' for any number of characters including zero.
 }
+\keyword{internal}

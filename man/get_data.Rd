@@ -50,3 +50,4 @@ A list with patient-specific information and a dataframe with selected sentences
 \description{
 Gets one sentence, one note and date of note for one patient. Main way for an end user to query CEDARS.
 }
+\keyword{internal}

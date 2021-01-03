@@ -20,3 +20,4 @@ Aggregated note in one text string.
 When using atomized notes, this function 'pastes' back the different sections together in the intended order. Preselected lemmas are marked, along with those for which thr CUI is
 in the list of interest.
 }
+\keyword{internal}

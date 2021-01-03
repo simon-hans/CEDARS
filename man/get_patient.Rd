@@ -44,3 +44,4 @@ get_patient(
 \description{
 Retrieves annotated electronic health record sentences for one patient. Returns basic info, along with a dataframe containing sentences and corresponding notes.
 }
+\keyword{internal}

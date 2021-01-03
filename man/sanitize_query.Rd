@@ -15,3 +15,4 @@ Cleaned query.
 \description{
 Removes non-ASCII characters from search query and attempts to correct formulation errors.
 }
+\keyword{internal}

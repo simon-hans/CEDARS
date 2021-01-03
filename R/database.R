@@ -44,6 +44,7 @@ mongo_uri_standard <- function(user, password, host, port = NA) {
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param mongo_collection MongoDB collection; if NA, will connect to DB itself.
+#' @keywords internal
 
 mongo_connect <- function(uri_fun, user, password, host, port, database, mongo_collection) {
 
@@ -71,6 +72,7 @@ mongo_connect <- function(uri_fun, user, password, host, port, database, mongo_c
 #' @param database MongoDB database name.
 #' @param patient_id Patient ID for which notes are being requested.
 #' @return Dataframe of full notes and/or note parts with associated metadata.
+#' @keywords internal
 
 db_download <- function(uri_fun, user, password, host, port, database, patient_id) {
 
@@ -106,6 +108,7 @@ db_download <- function(uri_fun, user, password, host, port, database, patient_i
 #' @param database MongoDB database name.
 #' @param patient_id Patient ID.
 #' @param annotations NLP annotations.
+#' @keywords internal
 
 db_upload <- function(uri_fun, user, password, host, port, database, patient_id, annotations) {
 
@@ -137,6 +140,7 @@ db_upload <- function(uri_fun, user, password, host, port, database, patient_id,
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @keywords internal
 
 patient_roster_update <- function(uri_fun, user, password, host, port, database) {
 
@@ -165,6 +169,7 @@ patient_roster_update <- function(uri_fun, user, password, host, port, database)
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @keywords internal
 
 populate_annotations <- function(uri_fun, user, password, host, port, database) {
 
@@ -196,6 +201,7 @@ populate_annotations <- function(uri_fun, user, password, host, port, database) 
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @keywords internal
 
 populate_notes <- function(uri_fun, user, password, host, port, database) {
 
@@ -223,6 +229,7 @@ populate_notes <- function(uri_fun, user, password, host, port, database) {
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @keywords internal
 
 populate_users <- function(uri_fun, user, password, host, port, database) {
 
@@ -243,6 +250,7 @@ populate_users <- function(uri_fun, user, password, host, port, database) {
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @keywords internal
 
 populate_dictionaries <- function(uri_fun, user, password, host, port, database) {
 
@@ -272,6 +280,7 @@ populate_dictionaries <- function(uri_fun, user, password, host, port, database)
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @keywords internal
 
 populate_query <- function(uri_fun, user, password, host, port, database) {
 

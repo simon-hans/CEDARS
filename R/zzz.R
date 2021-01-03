@@ -5,6 +5,7 @@
 #' Disables scientific notation which can be a problem for large ID's.
 #' @param libname Library name.
 #' @param pkgname Package name.
+#' @keywords internal
 
 .onLoad <- function(libname, pkgname) {
 

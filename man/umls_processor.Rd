@@ -19,3 +19,4 @@ Dataframe of NLP annotations with added UMLS tags.
 \description{
 Main processor for matching to UMLS concepts.
 }
+\keyword{internal}

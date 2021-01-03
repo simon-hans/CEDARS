@@ -17,3 +17,4 @@ Vector of pasted sections.
 \description{
 Pastes the notes sections within a list.
 }
+\keyword{internal}

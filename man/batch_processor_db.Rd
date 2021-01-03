@@ -56,3 +56,4 @@ batch_processor_db(
 \description{
 NLP annotates documents for a cohort of patients, in parallel. Locks each record before proceeding with NLP annotations.
 }
+\keyword{internal}

@@ -38,3 +38,4 @@ TRUE for correct credentials, FALSE for incorrect.
 \description{
 Verifies CEDARS end user name and password against information stored in MongoDB. Each CEDARS project is independent and occupies a different DB with its own user credentials collection.
 }
+\keyword{internal}

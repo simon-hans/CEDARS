@@ -15,3 +15,4 @@ Cleaned text in ASCII format stripped of '*' characters.
 \description{
 Removes non-ASCII characters and '*' from clinical corpora or user input.
 }
+\keyword{internal}

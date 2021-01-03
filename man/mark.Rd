@@ -17,3 +17,4 @@ Full sentence with marked tokens.
 \description{
 Marks tokens corresponding to keywords/CUI's so that they can be highlighted later.
 }
+\keyword{internal}

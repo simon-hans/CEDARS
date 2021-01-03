@@ -15,3 +15,4 @@ List containing the query vector, operator mask, CUI mask, keyword mask, keyword
 \description{
 Extracts pertinent elements from search query.
 }
+\keyword{internal}
