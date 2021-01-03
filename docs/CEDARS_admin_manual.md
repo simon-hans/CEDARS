@@ -210,6 +210,19 @@ automatic_NLP_processor(NA, txt_format, nlp_type, udmodel_path, uri_fun, db_user
 
 #### Event Pre-Loading
 
+Sometimes a cohort of patients will already have been assessed with other methods and CEDARS is used as a redundant method to pick up any previously missed events. In this use case, a list of known clinical events with their dates will exist. This information can be loaded on CEDARS as a "starting point", so as to avoid re-discovering already documented events. The function upload_events() can be used to insert these data:
+
+```r
+# event_dates is dataframe with patient unique ID's and event dates
+uri_fun <- mongo_uri_standard
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
+db_host <- "myserver"
+db_port <- 27017
+db_name <- "MyDB"
+
+upload_events(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, event_dates$patient_id, event_dates$event_date)
+```
 
 #### Search Query Definition
 
@@ -229,16 +242,60 @@ Lastly, the "(" and ")" operators can be used to further develop logic within a 
 
 #### Pre-Search
 
+Once NLP annotations are complete and the search query has been defined, if an end user logs into CEDARS the system will automatically start parsing the annotations for matches. However, depending on the frequency (density) of hits, it can takes several seconds to find a sentence to present the end user with. This can impact user experience, especially in multi-user settings. Because of this aspect, ideally records should be pre-searched:
+
+```r
+uri_fun <- mongo_uri_standard
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
+db_host <- "myserver"
+db_port <- 27017
+db_name <- "MyDB"
+
+# All patient records will undergo a pre-search
+record_vect <- NA
+
+pre_search(record_vect, uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+```
+
+The result is a shorter interface reaction time and more efficient data entry.
+
 ### Assessment of Clinical Events
 
 The process by which human abstractors annotate patient records for events is described in the [End User Manual](CEDARS_end_user_manual.md).
 
 ### Dataset Download
 
+Once there are no sentences left to review, event data can be obtained from the database with function download_events(). 
+
+```r
+uri_fun <- mongo_uri_standard
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
+db_host <- "myserver"
+db_port <- 27017
+db_name <- "MyDB"
+
+output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+```
+
+Detailed information is provided, including which sentences were reviewed.
 
 ### Audit
 
+CEDARS is by definition semi-automated, and depending on the specific use case and search query some events might be missed. This problem should be quantified by means of a systematic, old-fashion review of randomly selected patients. Typically, at least 200 patients would be selected and their corpora reviewed manually for events. Alternatively, a different method (e.g. billing codes) could be used. This audit dataset should be overlapped with the CEDARS events table to estimate sensitivity of the search query in the cohort at large. If this parameter falls below the previously established minimum acceptable value, the search query scope should be broadened, followed by a database reset, uploading of previously identified events and a new human annotation pass, followed by a repeat audit.
 
 ### Project Termination
 
+Once all events have been tallied and the audit results are satisfactory, if desired the CEDARS project database can be deleted from the MongoDB database. This is an irreversible operation:
 
+```r
+uri_fun <- mongo_uri_standard
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
+db_host <- "myserver"
+db_port <- 27017
+db_name <- "MyDB
+
+terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+```
