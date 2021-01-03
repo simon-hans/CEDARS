@@ -299,3 +299,7 @@ db_name <- "MyDB
 
 terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
 ```
+
+## Function Reference
+
+The full function reference can be found [here](reference/index.html) or obtained as a [PDF document](CEDARS_0.1.pdf). 
