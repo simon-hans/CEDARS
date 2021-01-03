@@ -1,25 +1,26 @@
 Package: CEDARS
+Type: Package
 Title: Simple and Efficient Pipeline for Electronic Health Record Annotation
-Version: 0.1
-Authors@R: 
-    person(given = "Simon",
-           family = "Mantha",
-           role = c("aut", "cre"),
-           email = "smantha@cedars.io",
-           comment = c(ORCID = "0000-0003-4277-5261"))
-Description: Search EHR documents for keywords and UMLS concept ID's.
-Depends: R (>= 3.5.0)
+Description:  Streamlined annotation pipeline for collection and aggregation of time-to-event data in retrospective clinical studies. CEDARS aims to systematize and accelerate the review of electronic health record (EHR) corpora. It accomplishes those goals by deploying natural language processing as a tool to assist detection and characterization of clinical events by human abstractors. The online user manual presents the necessary steps to install CEDARS, process EHR corpora and obtain clinical event dates: <https://docs.cedars.io>.
+Version: 1.0
+Author: Simon Mantha <smantha@cedars.io> [aut, cre] (<https://orcid.org/0000-0003-4277-5261>)
+Imports:
+    fastmatch,
+    jsonlite,
+    mongolite,
+    parallel,
+    readr,
+    shiny,
+    udpipe,
+    utils
 License: GPL-3
-Encoding: UTF-8
-LazyData: true
+URL: https://cedars.io (main)
+    https://github.com/simon-hans/CEDARS (devel)
+    https://docs.cedars.io (user manual)
+BugReports: https://github.com/simon-hans/CEDARS/issues
+Depends: R (>= 3.5.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
-Imports:
-  fastmatch,
-  jsonlite,
-  mongolite,
-  parallel,
-  readr,
-  shiny,
-  udpipe,
-  utils
+Language: en-US
+Encoding: UTF-8
+LazyData: true
