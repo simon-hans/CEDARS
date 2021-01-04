@@ -1,8 +1,11 @@
-# Background
+# **Overview**
+<br/>
+
+## Background
 
 CEDARS \(Clinical Event Detection and Recording System\) is a computational paradigm for collection and aggregation of time-to-event data in retrospective clinical studies. Developed out of a practical need for a more efficient way to conduct medical research, it aims to systematize and accelerate the review of electronic health record \(EHR\) corpora. It accomplishes those goals by deploying natural language processing \(NLP\) as a tool to assist detection and characterization of clinical events by human abstractors. In its current iteration, CEDARS is available as an open-source R package under [GPL-3 license](https://www.gnu.org/licenses/gpl-3.0.en.html) and can be downloaded from [GitHub](https://github.com/simon-hans/CEDARS). Full documentation is available [here](https://docs.cedars.io).
 
-# Requirements
+## Requirements
 
 R 3.5.0 or above and package dependencies  
  RStudio  
@@ -13,7 +16,7 @@ CEDARS can be installed locally or on a server. In the latter case, Shiny Server
 
 The [UMLS](https://www.nlm.nih.gov/research/umls/index.html) is a rich compendium of biomedical lexicons. It is maintained by the National Institutes of Health \(NIH\) and requires establishing an account in order to access the associated files. Those files are not included with the CEDARS R package, but CEDARS is designed to use them natively so individual users can easily include them in their annotation pipeline. NegEx \([Chapman _et al_, Stud Health Technol Inform. 2013; 192: 677–681.](https://pubmed.ncbi.nlm.nih.gov/23920642/)\) is included with CEDARS.
 
-# Basic Concepts
+## Basic Concepts
 
 ![CEDARS Workflow](docs/pics/GitHub%20Schema%202%20C.png)
 
@@ -21,7 +24,7 @@ Sentences with keywords or concepts of interest are presented to the end user on
 
 In order for CEDARS to be sufficiently sensitive and not miss and unacceptable number of clinical events, the keyword/concept search query must be well thought and exhaustive. The performance of CEDARS will vary by medical area, since the extent of medical lexicon will vary substantially between event types.
 
-# Operational Schema
+## Operational Schema
 
 ![CEDARS Operational Schema](docs/pics/GitHub%20Schema%201%20C%20blue.png)
 
@@ -29,7 +32,7 @@ CEDARS is modular and all information for any given annotation project is stored
 
 Multiple users can load the web GUI and annotate records at the same time. Once accessed, a given patient record is locked for the user.
 
-# Sample Code
+## Sample Code
 
 The R CEDARS package includes a small simulated clinical notes corpus. This corpus is fictitious and does not contain information from real patients. Once access to MongoDB has been achieved, you can install and test drive CEDARS with the following code:
 
@@ -92,7 +95,7 @@ terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
 
-# Future Development
+## Future Development
 
 We are currently documenting the performance of CEDARS with a focus on oncology clinical research. At the present time, we wish to solidify the CEDARS user interface and ensure a smooth experience in multi-user settings. In the longer term, plug-in modules featuring enhanced query generation and adaptive learning will be integrated into the R workflow. Support for other NLP engines and extensive parallel processing are also desirable.
 
