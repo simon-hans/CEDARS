@@ -3,7 +3,12 @@
 library(CEDARS)
 
 
-if (file.exists("db_credentials.Rdata")) load("db_credentials.Rdata", envir = cedars.env)
+if (file.exists("db_credentials.Rdata")) {
+
+    cedars.env <- new.env(parent = emptyenv())
+    load("db_credentials.Rdata", envir = cedars.env)
+
+}
 
 # Can be edited to use custom function. New app.R file should be copied to Shiny Server app folder!
 # START EDIT
