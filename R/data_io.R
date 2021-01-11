@@ -23,7 +23,7 @@
 
 get_wrapper <- function(database, end_user, end_user_password, html = TRUE, position, patient_id = NA, ldap = FALSE) {
 
-    get_data(g_mongodb_uri_fun, g_user, g_password, g_host, g_port, database, end_user, end_user_password, html, position,
+    get_data(cedars.env$g_mongodb_uri_fun, cedars.env$g_user, cedars.env$g_password, cedars.env$g_host, cedars.env$g_port, database, end_user, end_user_password, html, position,
         patient_id, ldap)
 
 }
@@ -48,7 +48,7 @@ get_wrapper <- function(database, end_user, end_user_password, html = TRUE, posi
 
 post_wrapper <- function(database, end_user, end_user_password, position, event_date, pt_comments, ldap = FALSE) {
 
-    post_data(g_mongodb_uri_fun, g_user, g_password, g_host, g_port, database, end_user, end_user_password, position, event_date,
+    post_data(cedars.env$g_mongodb_uri_fun, cedars.env$g_user, cedars.env$g_password, cedars.env$g_host, cedars.env$g_port, database, end_user, end_user_password, position, event_date,
         pt_comments, ldap)
 
 }

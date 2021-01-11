@@ -3,11 +3,11 @@
 library(CEDARS)
 
 
-if (file.exists("db_credentials.Rdata")) load("db_credentials.Rdata", envir = .GlobalEnv)
+if (file.exists("db_credentials.Rdata")) load("db_credentials.Rdata", envir = cedars.env)
 
 # Can be edited to use custom function. New app.R file should be copied to Shiny Server app folder!
 # START EDIT
-assign("g_mongodb_uri_fun", CEDARS::mongo_uri_standard, envir = .GlobalEnv)
+assign("g_mongodb_uri_fun", CEDARS::mongo_uri_standard, envir = cedars.env)
 # END EDIT
 
 
@@ -162,19 +162,19 @@ server <- function(input, output, session) {
         # Will not post if the "SEARCH" button was pressed
         if (is.na(id_for_search) & (!is.na(position) & (!is.na(new_event_date) | adjudicated == TRUE))) {
 
-            if (g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
-            post_wrapper(g_database, end_user_id, input$end_user_pw, position, new_event_date, input$input_comments, ldap = g_ldap)
+            if (cedars.env$g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
+            post_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, position, new_event_date, input$input_comments, ldap = cedars.env$g_ldap)
 
         }
 
         updateDateInput(session = session, inputId = "event_date", value = NA)
         updateDateInput(session = session, inputId = "search_patient_id", value = NA)
 
-        if (input$user_id != "" | g_ldap == TRUE) {
+        if (input$user_id != "" | cedars.env$g_ldap == TRUE) {
 
-            if (g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
+            if (cedars.env$g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
 
-            output <- get_wrapper(g_database, end_user_id, input$end_user_pw, TRUE, get_position, id_for_search, ldap = g_ldap)
+            output <- get_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, TRUE, get_position, id_for_search, ldap = cedars.env$g_ldap)
             id_for_search <<- NA
 
             if (!(output[1] %in% c("error_0", "error_1", "error_2", "error_3", "error_4"))){
@@ -267,7 +267,7 @@ server <- function(input, output, session) {
 
         output$session_user <- renderText({session$user})
 
-        output$display_logon <- renderText({!g_ldap})
+        output$display_logon <- renderText({!cedars.env$g_ldap})
         outputOptions(output, "display_logon", suspendWhenHidden = FALSE)
 
 }
