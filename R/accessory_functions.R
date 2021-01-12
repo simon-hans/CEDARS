@@ -121,7 +121,8 @@ colorize <- function(get_output) {
 
 start_local <- function(user, password, host, port, database) {
 
-    cedars.env <<- new.env(parent = emptyenv())
+    # cedars.env <<- new.env(parent = emptyenv())
+    assign('cedars.env', new.env(parent=emptyenv()), envir=parent.env(environment()))
 
     assign("g_user", user, cedars.env)
     assign("g_password", password, cedars.env)
@@ -129,13 +130,6 @@ start_local <- function(user, password, host, port, database) {
     assign("g_port", port, cedars.env)
     assign("g_database", database, cedars.env)
     assign("g_ldap", FALSE, cedars.env)
-
-    #g_user <<- g_user
-    #g_password <<- g_password
-    #g_host <<- g_host
-    #g_port <<- g_port
-    #g_database <<- g_database
-    #g_ldap <<- g_ldap
 
     shiny::runApp(appDir = paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny", sep = ""))
 
