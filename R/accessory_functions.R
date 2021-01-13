@@ -121,9 +121,6 @@ colorize <- function(get_output) {
 
 start_local <- function(user, password, host, port, database) {
 
-    # cedars.env <<- new.env(parent = emptyenv())
-    # assign('cedars.env', new.env(parent=emptyenv()), envir=parent.env(environment()))
-
     assign("g_user", user, cedars.env)
     assign("g_password", password, cedars.env)
     assign("g_host", host, cedars.env)
