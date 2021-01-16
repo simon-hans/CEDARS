@@ -695,6 +695,7 @@ create_project <- function(uri_fun, user, password, host, port, database, projec
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @param fast If TRUE, delete everything without asking security questions.
 #' @examples
 #' \dontrun{
 #' terminate_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -702,21 +703,23 @@ create_project <- function(uri_fun, user, password, host, port, database, projec
 #' }
 #' @export
 
-terminate_project <- function(uri_fun, user, password, host, port, database) {
+terminate_project <- function(uri_fun, user, password, host, port, database, fast=FALSE) {
 
-    first_answer <- readline(paste("Are you sure you want to proceed? All contents of database ", database, " will be irreversibly deleted. (yes/no) ",
+    if (fast==FALSE) {
+
+        first_answer <- readline(paste("Are you sure you want to proceed? All contents of database ", database, " will be irreversibly deleted. (yes/no) ",
         sep = ""))
 
-    if (first_answer != "yes")
-        stop("Database deletion cancelled") else {
+        if (first_answer != "yes") stop("Database deletion cancelled") else {
 
-        second_answer <- readline(paste("Are you absolutely positive you want to permanently delete ", database,
-            "? (yes/no) ", sep = ""))
+            second_answer <- readline(paste("Are you absolutely positive you want to permanently delete ", database, "? (yes/no) ", sep = ""))
+
+        }
 
     }
 
-    if (second_answer != "yes")
-        stop("Database deletion cancelled") else {
+
+    if (fast==FALSE & (!is.na(second_answer) & second_answer != "yes")) stop("Database deletion cancelled") else {
 
         # Dropping all collections Since there are no collections left the database is deleted Direct deletion of
         # database is not allowed, maybe because it should be done from admin DB?
@@ -752,8 +755,7 @@ terminate_project <- function(uri_fun, user, password, host, port, database) {
 
         mongo_con <- mongo_connect(uri_fun, user, password, host, port, "admin", NA)
         databases <- mongo_con$run("{\"listDatabases\": 1}")[[1]]
-        if (database %in% databases$name)
-            print("Deletion failed!") else print("Deletion successful!")
+        if (database %in% databases$name) print("Deletion failed!") else print("Deletion successful!")
 
     }
 

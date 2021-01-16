@@ -4,7 +4,7 @@
 \alias{terminate_project}
 \title{Terminate CEDARS Project}
 \usage{
-terminate_project(uri_fun, user, password, host, port, database)
+terminate_project(uri_fun, user, password, host, port, database, fast = FALSE)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -18,6 +18,8 @@ terminate_project(uri_fun, user, password, host, port, database)
 \item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
+
+\item{fast}{If TRUE, delete everything without asking security questions.}
 }
 \description{
 Everything is removed, including dictionaries. MongoDB account used must have sufficient privileges.
