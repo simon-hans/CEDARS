@@ -718,8 +718,7 @@ terminate_project <- function(uri_fun, user, password, host, port, database, fas
 
     }
 
-
-    if (fast==FALSE & (!is.na(second_answer) & second_answer != "yes")) stop("Database deletion cancelled") else {
+    if (fast==FALSE & (exists("second_answer") && second_answer != "yes")) stop("Database deletion cancelled") else {
 
         # Dropping all collections Since there are no collections left the database is deleted Direct deletion of
         # database is not allowed, maybe because it should be done from admin DB?
