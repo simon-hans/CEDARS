@@ -169,3 +169,36 @@ save_credentials <- function(user, password, host, port, database, LDAP, destina
 }
 
 
+#' Generate unique test project name (i.e. DB name) on MongoDB CEDARS testing cluster
+#'
+#' Parses existing DB names and randomly generates a unique test project name on MongoDB CEDARS testing cluster. This is used for convenience purposes when the R user does not have an existing MongoDB connection. The corresponding database and collections are PUBLIC so no patient information or any other privileged/confidential data should be used! This is for testing on simulated records only.
+#' @examples
+#' \dontrun{
+#' find_project_name()
+#' }
+#' @export
+
+find_project_name <- function(){
+
+    base_url <- "mongodb+srv://testUser:testPW@cedars.yvjp6.mongodb.net/"
+    con <- mongo(db="admin", url=base_url)
+    databases <- con$run('{ "listDatabases": 1 }')$databases$name
+
+    # Find a test DB name not presently in use
+
+    project_name_recurse <- function(databases){
+
+        project_name <- paste("example", round(1e13*runif(1)), sep="")
+
+        if (project_name %in% databases) project_name <- project_name_recurse(databases)
+
+        project_name
+
+    }
+
+    project_name <- project_name_recurse(databases)
+
+    project_name
+
+}
+
