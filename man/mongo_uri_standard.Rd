@@ -2,7 +2,7 @@
 % Please edit documentation in R/database.R
 \name{mongo_uri_standard}
 \alias{mongo_uri_standard}
-\title{Prepare MongoDB URI string}
+\title{Prepare MongoDB URI string, most commonly used format}
 \usage{
 mongo_uri_standard(user, password, host, port = NA)
 }
@@ -19,7 +19,7 @@ mongo_uri_standard(user, password, host, port = NA)
 URI string.
 }
 \description{
-Formats the MongoDB URI string for use by package mongolite. In this case the 'standard' URI format is used. If a different format is to be used, the end user will have to write their own formatting function.
+Formats the MongoDB URI string for use by package mongolite. In this case the 'standard' URI format is used.
 }
 \examples{
 \dontrun{

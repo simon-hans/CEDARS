@@ -180,15 +180,16 @@ save_credentials <- function(user, password, host, port, database, LDAP, destina
 
 find_project_name <- function(){
 
-    base_url <- "mongodb+srv://testUser:testPW@cedars.yvjp6.mongodb.net/"
-    con <- mongo(db="admin", url=base_url)
+    # base_url <- "mongodb+srv://testUser:testPW@cedars.yvjp6.mongodb.net/"
+    # con <- mongolite::mongo(db="admin", url=base_url)
+    con <- mongo_connect("testUser", "testPW", "cedars.yvjp6.mongodb.net")
     databases <- con$run('{ "listDatabases": 1 }')$databases$name
 
     # Find a test DB name not presently in use
 
     project_name_recurse <- function(databases){
 
-        project_name <- paste("example", round(1e13*runif(1)), sep="")
+        project_name <- paste("example", round(1e13*stats::runif(1)), sep="")
 
         if (project_name %in% databases) project_name <- project_name_recurse(databases)
 
