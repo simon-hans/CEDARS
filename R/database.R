@@ -3,9 +3,9 @@
 # Functions to access MongoDB database.
 
 
-#' Prepare MongoDB URI string
+#' Prepare MongoDB URI string, most commonly used format
 #'
-#' Formats the MongoDB URI string for use by package mongolite. In this case the 'standard' URI format is used. If a different format is to be used, the end user will have to write their own formatting function.
+#' Formats the MongoDB URI string for use by package mongolite. In this case the 'standard' URI format is used.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
@@ -21,7 +21,16 @@ mongo_uri_standard <- function(user, password, host, port = NA) {
 
     if (is.na(port)) {
 
-        URI = sprintf("mongodb://%s:%s@%s/", user, password, host)
+        if (substr(host, nchar(host)-10, nchar(host))!="mongodb.net") {
+
+            URI = sprintf("mongodb://%s:%s@%s/", user, password, host)
+
+        } else {
+
+            # Using DNS seed list format if host on mongodb.net
+            URI = sprintf("mongodb+srv://%s:%s@%s/", user, password, host)
+
+        }
 
     } else {
 
