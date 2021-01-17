@@ -28,3 +28,4 @@ terminate_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_pa
 host = 'server1234', port = NA, database = 'TEST_PROJECT')
 }
 }
+\keyword{internal}

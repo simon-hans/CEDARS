@@ -36,9 +36,57 @@ create_project(
 Creates a new MongoDB database and collections needed for a CEDARS annotation project. The MongoDB account used must have sufficient privileges.
 }
 \examples{
+# The code below creates an instance of CEDARS project on a public test MongoDB cluster, populated
+# with fictitious EHR corpora.
+
+# MongoDB credentials
+db_user_name <- "testUser"
+db_user_pw <- "testPW"
+db_host <- "cedars.yvjp6.mongodb.net"
+db_port <- NA
+
+# Using standard MongoDB URL format
+uri_fun <- mongo_uri_standard
+
+# Name for MongoDB database which will contain the CEDARS project
+# In this case we generate a random name
+mongo_database <- find_project_name()
+
+# We create the database and all required collections
+create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
+"CEDARS Example Project", "Dr Smith")
+
+# Uploading the small simulated collection of EHR corpora
+upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
+simulated_patients)
+
+# This is a simple query which will report all sentences with a word starting in
+# "bleed" or "hem", or an exact match for "bled"
+search_query <- "bleed* OR hem* OR bled"
+use_negation <- TRUE
+hide_duplicates <- TRUE
+skip_after_event <- TRUE
+save_query(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, search_query,
+use_negation, hide_duplicates, skip_after_event)
+
 \dontrun{
-create_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-host = 'server1234', port = NA, database = 'TEST_PROJECT', project_name = 'Test project',
-investigator_name = 'Dr Smith')
+
+# Substitute your path to the UDPipe NLP model file
+# This file can be obtained from a central repository through the UDPipe package, or you can
+#train your own model
+# CEDARS was tested on the generic file
+udmodel_path <- "Models/english-ewt-ud-2.4-190531.udpipe"
+
+# Running the NLP annotations on EHR corpora
+# We are only using one core, for large datasets parallel processing is faster
+automatic_NLP_processor(NA, "latin1", "udpipe", udmodel_path, uri_fun, db_user_name, db_user_pw,
+db_host, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
+
+# Starts the CEDARS GUI locally
+# Your user name is "John", password is "strongpassword"
+start_local(db_user_name, db_user_pw, db_host, db_port, mongo_database)
 }
+
+# Remove project from MongoDB
+terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, fast=TRUE)
 }
