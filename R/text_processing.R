@@ -282,14 +282,15 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     # If several present, by default we use the first one by alphabetical order
     if (is.na(URL)) {
 
-        models <- list.files(path = "inst/models")
+        models_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/inst/models", sep = "")
+        models <- list.files(path = models_path)
         models <- models[order(models, decreasing = FALSE, method = "radix")]
-        if (!is.na(models[1])) URL <- paste("inst/models/", models[1], sep = "") else {
+        if (!is.na(models[1])) URL <- paste(models_path, "/", models[1], sep = "") else {
 
             print("No model found, dowloading default \"english-ewt\"")
             get_model()
-            models <- list.files(path = "inst/models")
-            URL <- paste("inst/models/", models[1], sep = "")
+            models <- list.files(path = models_path)
+            URL <- paste(models_path, "/", models[1], sep = "")
 
         }
 

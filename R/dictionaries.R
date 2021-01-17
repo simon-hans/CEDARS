@@ -221,9 +221,11 @@ token_splitter <- function(i, df, max_grams) {
 
 get_model <- function(model_name = "english-ewt", platform = "udpipe") {
 
+    models_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/inst/models", sep = "")
+
     if (platform == "udpipe") {
 
-        udpipe::udpipe_download_model(language = model_name, model_dir = "inst/models")
+        udpipe::udpipe_download_model(language = model_name, model_dir = models_path)
 
         } else print("Only UDPipe is supported at this time, exiting.")
 
