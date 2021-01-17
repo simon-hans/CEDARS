@@ -667,7 +667,7 @@ delete_end_user <- function(uri_fun, user, password, host, port, database, end_u
 #' # In this case we generate a random name
 #' mongo_database <- find_project_name()
 #'
-#' # We create the database and all required collections
+#' # We create the database and all required collections on a test cluster
 #' create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
 #' "CEDARS Example Project", "Dr Smith")
 #'
@@ -684,18 +684,12 @@ delete_end_user <- function(uri_fun, user, password, host, port, database, end_u
 #' save_query(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, search_query,
 #' use_negation, hide_duplicates, skip_after_event)
 #'
-#' \dontrun{
-#'
-#' # Substitute your path to the UDPipe NLP model file
-#' # This file can be obtained from a central repository through the UDPipe package, or you can
-#' #train your own model
-#' # CEDARS was tested on the generic file
-#' udmodel_path <- "Models/english-ewt-ud-2.4-190531.udpipe"
-#'
 #' # Running the NLP annotations on EHR corpora
 #' # We are only using one core, for large datasets parallel processing is faster
-#' automatic_NLP_processor(NA, "latin1", "udpipe", udmodel_path, uri_fun, db_user_name, db_user_pw,
+#' automatic_NLP_processor(NA, "latin1", "udpipe", uri_fun, db_user_name, db_user_pw,
 #' db_host, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
+#'
+#' \dontrun{
 #'
 #' # Starts the CEDARS GUI locally
 #' # Your user name is "John", password is "strongpassword"

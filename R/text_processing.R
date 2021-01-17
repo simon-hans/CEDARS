@@ -274,8 +274,26 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' }
 #' @export
 
-automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", URL, uri_fun = mongo_uri_standard,
-    user, password, host, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA) {
+automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", uri_fun = mongo_uri_standard,
+    user, password, host, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
+
+    # Finding NLP model to use, if not specified
+    # If no model present, we download the default
+    # If several present, by default we use the first one by alphabetical order
+    if (is.na(URL)) {
+
+        models <- list.files(path = "inst/models")
+        models <- models[order(models, decreasing = FALSE, method = "radix")]
+        if (!is.na(models[1])) URL <- paste("inst/models/", models[1], sep = "") else {
+
+            print("No model found, dowloading default \"english-ewt\"")
+            get_model()
+            models <- list.files(path = "inst/models")
+            URL <- paste("inst/models/", models[1], sep = "")
+
+        }
+
+    }
 
     annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
     notes_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")

@@ -209,3 +209,22 @@ token_splitter <- function(i, df, max_grams) {
     out
 
 }
+
+
+#' Get a NLP Model
+#'
+#' Downloads a NLP model, presently only UDPipe models supported.
+#' @param model_name
+#' @param platform
+#' @return Saves model in inst/models.
+#' @export
+
+get_model <- function(model_name = "english-ewt", platform = "udpipe") {
+
+    if (platform == "udpipe") {
+
+        udpipe::udpipe_download_model(language = model_name, model_dir = "inst/models")
+
+        } else print("Only UDPipe is supported at this time, exiting.")
+
+}
