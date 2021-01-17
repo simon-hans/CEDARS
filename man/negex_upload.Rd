@@ -4,11 +4,17 @@
 \alias{negex_upload}
 \title{Upload NegEx}
 \usage{
-negex_upload(udmodel_path, uri_fun, user, password, host, port, database)
+negex_upload(
+  uri_fun,
+  user,
+  password,
+  host,
+  port,
+  database,
+  selected_model_path = NA
+)
 }
 \arguments{
-\item{udmodel_path}{Path to NLP model file.}
-
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
 
 \item{user}{MongoDB user name.}
@@ -20,14 +26,15 @@ negex_upload(udmodel_path, uri_fun, user, password, host, port, database)
 \item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
+
+\item{selected_model_path}{Path to NLP model file.}
 }
 \description{
 Prepares and uploads NegEx negation lexicon. It is not absolutely required for CEDARS to function but in practice will improve search accuracy for most applications.
 }
 \examples{
 \dontrun{
-negex_upload(udmodel_path = 'models/english-ewt-ud-2.4-190531.udpipe',
-uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234', host = 'server1234',
-port = NA, database = 'TEST_PROJECT')
+negex_upload(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
+host = 'server1234', port = NA, database = 'TEST_PROJECT', NA)
 }
 }

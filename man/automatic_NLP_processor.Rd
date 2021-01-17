@@ -8,7 +8,6 @@ automatic_NLP_processor(
   patient_vect = NA,
   text_format = "latin1",
   nlp_engine = "udpipe",
-  URL,
   uri_fun = mongo_uri_standard,
   user,
   password,
@@ -17,7 +16,8 @@ automatic_NLP_processor(
   database,
   max_n_grams_length = 7,
   negex_depth = 6,
-  select_cores = NA
+  select_cores = NA,
+  URL = NA
 )
 }
 \arguments{
@@ -26,8 +26,6 @@ automatic_NLP_processor(
 \item{text_format}{Text format for NLP engine.}
 
 \item{nlp_engine}{Which NLP engine should be used? UDPipe is the only one supported for now.}
-
-\item{URL}{UDPipe model URL.}
 
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
 
@@ -46,6 +44,8 @@ automatic_NLP_processor(
 \item{negex_depth}{Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.}
 
 \item{select_cores}{How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.}
+
+\item{URL}{UDPipe model URL.}
 }
 \description{
 Accepts a list of patient ID's or alternatively can perform NLP annotations on all available patients in the database.

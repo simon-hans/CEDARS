@@ -124,24 +124,42 @@ mrrel_upload <- function(path, uri_fun, user, password, host, port, database) {
 #' Upload NegEx
 #'
 #' Prepares and uploads NegEx negation lexicon. It is not absolutely required for CEDARS to function but in practice will improve search accuracy for most applications.
-#' @param udmodel_path Path to NLP model file.
 #' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @param selected_model_path Path to NLP model file.
 #' @examples
 #' \dontrun{
-#' negex_upload(udmodel_path = 'models/english-ewt-ud-2.4-190531.udpipe',
-#' uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234', host = 'server1234',
-#' port = NA, database = 'TEST_PROJECT')
+#' negex_upload(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', NA)
 #' }
 #' @export
 
-negex_upload <- function(udmodel_path, uri_fun, user, password, host, port, database) {
+negex_upload <- function(uri_fun, user, password, host, port, database, selected_model_path = NA) {
 
-    udmodel <- udpipe::udpipe_load_model(udmodel_path)
+    # Finding NLP model to use, if not specified
+    # If no model present, we download the default
+    # If several present, by default we use the first one by alphabetical order
+    if (is.na(selected_model_path)) {
+
+        models_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/inst/models", sep = "")
+        models <- list.files(path = models_path)
+        models <- models[order(models, decreasing = FALSE, method = "radix")]
+        if (!is.na(models[1])) selected_model_path <- paste(models_path, "/", models[1], sep = "") else {
+
+            print("No model found, dowloading default \"english-ewt\"")
+            get_model()
+            models <- list.files(path = models_path)
+            selected_model_path <- paste(models_path, "/", models[1], sep = "")
+
+        }
+
+    }
+
+    udmodel <- udpipe::udpipe_load_model(selected_model_path)
 
     negex_original <- negex
 
@@ -214,8 +232,8 @@ token_splitter <- function(i, df, max_grams) {
 #' Get a NLP Model
 #'
 #' Downloads a NLP model, presently only UDPipe models supported.
-#' @param model_name
-#' @param platform
+#' @param model_name Name of models to download.
+#' @param platform Name of NLP platform, currently only UDPipe is supported.
 #' @return Saves model in inst/models.
 #' @export
 

@@ -671,6 +671,12 @@ delete_end_user <- function(uri_fun, user, password, host, port, database, end_u
 #' create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
 #' "CEDARS Example Project", "Dr Smith")
 #'
+#'# Adding one CEDARS end user
+#' add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, "John",
+#' "strongpassword")
+#' # Negex is included with CEDARS and required for assessment of negation
+#' negex_upload(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
+#'
 #' # Uploading the small simulated collection of EHR corpora
 #' upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
 #' simulated_patients)
