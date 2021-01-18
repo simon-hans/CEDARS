@@ -88,9 +88,13 @@ pre_search(patient_vect = NA, uri_fun, db_user_name, db_user_pw, db_host, db_por
 
 # Starts the CEDARS GUI locally
 # Your user name is "John", password is "strongpassword"
+# Once you have entered those credentials, click on button "ENTER NEW DATE" and CEDARS will seek the first record to annotate
+# Try out the interface, adjudicating sentences, entering event dates, comments, moving between sentences and searching for records
+# Once you have entered some data, close the GUI
 start_local(db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
-# Obtainig events and info associated with data entry
+# Obtaining events and info associated with data entry
+# The annotations entered in the GUI are now available in this dataframe
 event_output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
 # Remove project from MongoDB
