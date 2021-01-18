@@ -86,7 +86,7 @@ automatic_NLP_processor(NA, "latin1", "udpipe", uri_fun, db_user_name, db_user_p
 # This is optional but will speed-up the interface
 pre_search(patient_vect = NA, uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
-# Starts the CEDARS GUI locally
+# Start the CEDARS GUI locally
 # Your user name is "John", password is "strongpassword"
 # Once you have entered those credentials, click on button "ENTER NEW DATE" and CEDARS will seek the first record to annotate
 # Try out the interface, adjudicating sentences, entering event dates, comments, moving between sentences and searching for records
