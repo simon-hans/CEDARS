@@ -302,4 +302,4 @@ terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
 
 ## Function Reference
 
-The full function reference can be found [here](https://cedars.io/docs/CEDARS_1.0.pdf). 
+The full function reference can be found [here](https://cedars.io/docs/CEDARS.pdf). 
