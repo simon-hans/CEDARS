@@ -82,9 +82,16 @@ save_query(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, 
 automatic_NLP_processor(NA, "latin1", "udpipe", uri_fun, db_user_name, db_user_pw,
   db_host, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
 
+# Pre-searching based on query
+# This is optional but will speed-up the interface
+pre_search(patient_vect = NA, uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
+
 # Starts the CEDARS GUI locally
 # Your user name is "John", password is "strongpassword"
 start_local(db_user_name, db_user_pw, db_host, db_port, mongo_database)
+
+# Obtainig events and info associated with data entry
+event_output <- download events(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
 # Remove project from MongoDB
 terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, fast=TRUE)
