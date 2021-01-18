@@ -91,7 +91,7 @@ pre_search(patient_vect = NA, uri_fun, db_user_name, db_user_pw, db_host, db_por
 start_local(db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
 # Obtainig events and info associated with data entry
-event_output <- download events(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
+event_output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
 # Remove project from MongoDB
 terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, fast=TRUE)
