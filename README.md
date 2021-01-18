@@ -34,60 +34,60 @@ Multiple users can load the web GUI and annotate records at the same time. Once 
 The R CEDARS package includes a small simulated clinical notes corpus. This corpus is fictitious and does not contain information from real patients. Once access to MongoDB has been achieved, you can install and test drive CEDARS with the following code:
 
 ```r
-# The code below creates an instance of CEDARS project, populated with fictitious EHR corpora.
-# It runs in a local R session and requires credentials to a MongoDB database system, which can be run locally but usually on a separate server.
-
 devtools::install_github("simon-hans/CEDARS", upgrade="never")
 library(CEDARS)
 
-# Substitute your MongoDB credentials
-db_user_name <- "myname"
-db_user_pw <- "mypassword"
-db_host <- "myserver"
-db_port <- 27017
+# The code below creates an instance of CEDARS project on a public test MongoDB cluster, populated
+# with fictitious EHR corpora.
 
-# Substitute path to the UDPipe NLP model file
-# This file can be obtained from a central repository through the UDPipe package, or you can train your own model
-# CEDARS was tested on the generic file
-udmodel_path <- "C:/R/NLP_models/latestversion.udpipe"
+# MongoDB credentials
+db_user_name <- "testUser"
+db_user_pw <- "testPW"
+db_host <- "cedars.yvjp6.mongodb.net"
+db_port <- NA
 
-# Everything else can be ran as is!
-
-# Name for MongoDB database which will contain the CEDARS project
-db_name <- "MyDB"
-
-# The 'standard' MongoDB URI format is used
+# Using standard MongoDB URL format
 uri_fun <- mongo_uri_standard
 
-# We create the database and all required collections
-create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, "CEDARS Example Project", "Dr Smith")
+# Name for MongoDB database which will contain the CEDARS project
+# In this case we generate a random name
+mongo_database <- find_project_name()
+
+# We create the database and all required collections on a test cluster
+create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
+  "CEDARS Example Project", "Dr Smith")
 
 # Adding one CEDARS end user
-add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, "John", "strongpassword")
+add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, "John",
+  "strongpassword")
 
 # Negex is included with CEDARS and required for assessment of negation
-negex_upload(udmodel_path, uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+negex_upload(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
 # Uploading the small simulated collection of EHR corpora
-upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, simulated_patients)
+upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
+  simulated_patients)
 
-# Running the NLP annotations on EHR corpora
-# We are only using one core, for large datasets parallel processing is faster
-automatic_NLP_processor(NA, "latin1", "udpipe", udmodel_path, uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
-
-# This is a simple query which will report all sentences with a word starting in "bleed" or "hem", or an exact match for "bled"
+# This is a simple query which will report all sentences with a word starting in
+# "bleed" or "hem", or an exact match for "bled"
 search_query <- "bleed* OR hem* OR bled"
 use_negation <- TRUE
 hide_duplicates <- TRUE
 skip_after_event <- TRUE
-save_query(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, search_query, use_negation, hide_duplicates, skip_after_event)
+save_query(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, search_query,
+  use_negation, hide_duplicates, skip_after_event)
+
+# Running the NLP annotations on EHR corpora
+# We are only using one core, for large datasets parallel processing is faster
+automatic_NLP_processor(NA, "latin1", "udpipe", uri_fun, db_user_name, db_user_pw,
+  db_host, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
 
 # Starts the CEDARS GUI locally
 # Your user name is "John", password is "strongpassword"
-start_local(db_user_name, db_user_pw, db_host, db_port, db_name)
+start_local(db_user_name, db_user_pw, db_host, db_port, mongo_database)
 
 # Remove project from MongoDB
-terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, fast=TRUE)
 ```
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
