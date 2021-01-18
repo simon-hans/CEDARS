@@ -278,23 +278,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     user, password, host, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
 
     # Finding NLP model to use, if not specified
-    # If no model present, we download the default
-    # If several present, by default we use the first one by alphabetical order
-    if (is.na(URL)) {
-
-        models_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/inst/models", sep = "")
-        models <- list.files(path = models_path)
-        models <- models[order(models, decreasing = FALSE, method = "radix")]
-        if (!is.na(models[1])) URL <- paste(models_path, "/", models[1], sep = "") else {
-
-            print("No model found, dowloading default \"english-ewt\"")
-            get_model()
-            models <- list.files(path = models_path)
-            URL <- paste(models_path, "/", models[1], sep = "")
-
-        }
-
-    }
+    URL <- find_model(URL)
 
     annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
     notes_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")

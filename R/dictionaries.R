@@ -141,23 +141,7 @@ mrrel_upload <- function(path, uri_fun, user, password, host, port, database) {
 negex_upload <- function(uri_fun, user, password, host, port, database, selected_model_path = NA) {
 
     # Finding NLP model to use, if not specified
-    # If no model present, we download the default
-    # If several present, by default we use the first one by alphabetical order
-    if (is.na(selected_model_path)) {
-
-        models_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/inst/models", sep = "")
-        models <- list.files(path = models_path)
-        models <- models[order(models, decreasing = FALSE, method = "radix")]
-        if (!is.na(models[1])) selected_model_path <- paste(models_path, "/", models[1], sep = "") else {
-
-            print("No model found, dowloading default \"english-ewt\"")
-            get_model()
-            models <- list.files(path = models_path)
-            selected_model_path <- paste(models_path, "/", models[1], sep = "")
-
-        }
-
-    }
+    selected_model_path <- find_model(selected_model_path)
 
     udmodel <- udpipe::udpipe_load_model(selected_model_path)
 

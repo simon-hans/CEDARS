@@ -674,9 +674,13 @@ delete_end_user <- function(uri_fun, user, password, host, port, database, end_u
 #'# Adding one CEDARS end user
 #' add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, "John",
 #' "strongpassword")
+#'
+#' \dontrun{
+#'
 #' # Negex is included with CEDARS and required for assessment of negation
 #' negex_upload(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
 #'
+#' }
 #' # Uploading the small simulated collection of EHR corpora
 #' upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
 #' simulated_patients)
@@ -690,18 +694,18 @@ delete_end_user <- function(uri_fun, user, password, host, port, database, end_u
 #' save_query(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, search_query,
 #' use_negation, hide_duplicates, skip_after_event)
 #'
+#' \dontrun{
+#'
 #' # Running the NLP annotations on EHR corpora
 #' # We are only using one core, for large datasets parallel processing is faster
 #' automatic_NLP_processor(NA, "latin1", "udpipe", uri_fun, db_user_name, db_user_pw,
 #' db_host, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
 #'
-#' \dontrun{
-#'
 #' # Starts the CEDARS GUI locally
 #' # Your user name is "John", password is "strongpassword"
 #' start_local(db_user_name, db_user_pw, db_host, db_port, mongo_database)
-#' }
 #'
+#' }
 #' # Remove project from MongoDB
 #' terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, fast=TRUE)
 #' @export

@@ -202,3 +202,38 @@ find_project_name <- function(){
 
 }
 
+
+#' Find NLP Model
+#'
+#' Finds NLP model to use, if not specified. If no model present, we download the default.
+#' If several present, by default we use the first one by alphabetical order.
+#'
+#' @param selected_model_path Initial selected model path, if NA we find one.
+#' @examples
+#' \dontrun{
+#' find_model(NA)
+#' }
+#' @return Model path.
+#' @keywords internal
+
+find_model <- function(selected_model_path){
+
+    if (is.na(selected_model_path)) {
+
+        models_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/inst/models", sep = "")
+        models <- list.files(path = models_path)
+        models <- models[order(models, decreasing = FALSE, method = "radix")]
+        if (!is.na(models[1])) selected_model_path <- paste(models_path, "/", models[1], sep = "") else {
+
+            print("No model found, dowloading default english-ewt...")
+            get_model()
+            models <- list.files(path = models_path)
+            selected_model_path <- paste(models_path, "/", models[1], sep = "")
+
+        }
+
+    }
+
+    selected_model_path
+
+}
