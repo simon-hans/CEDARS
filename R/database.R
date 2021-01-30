@@ -899,9 +899,13 @@ download_events <- function(uri_fun, user, password, host, port, database) {
 
     # Counting sentences
 
-    out$event_date <- as.Date(out$event_date)
-
     len_out <- length(out[,1])
+
+    if (!("event_date" %in% colnames(out))) out$event_date <- rep(NA, len_out)
+    if (!("end_user" %in% colnames(out))) out$end_user <- rep(NA, len_out)
+    if (!("time_locked" %in% colnames(out))) out$time_locked <- rep(NA, len_out)
+
+    out$event_date <- as.Date(out$event_date)
 
     out$sentences_total <- rep(NA, len_out)
     out$sentences_reviewed <- rep(NA, len_out)
