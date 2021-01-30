@@ -9,7 +9,7 @@
 
 .onLoad <- function(libname, pkgname) {
 
-    op <- options(scipen = 999)
+    # op <- options(scipen = 999)
 
     cedars.env <<- new.env(parent=emptyenv())
 

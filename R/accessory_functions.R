@@ -209,10 +209,6 @@ find_project_name <- function(){
 #' If several present, by default we use the first one by alphabetical order.
 #'
 #' @param selected_model_path Initial selected model path, if NA we find one.
-#' @examples
-#' \dontrun{
-#' find_model(NA)
-#' }
 #' @return Model path.
 #' @keywords internal
 
