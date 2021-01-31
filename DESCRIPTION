@@ -1,7 +1,7 @@
 Package: CEDARS
 Type: Package
 Title: Simple and Efficient Pipeline for Electronic Health Record Annotation
-Description:  Streamlined annotation pipeline for collection and aggregation of time-to-event data in retrospective clinical studies. 'CEDARS' aims to systematize and accelerate the review of electronic health record (EHR) corpora. It accomplishes those goals by deploying natural language processing as a tool to assist detection and characterization of clinical events by human abstractors. The online user manual presents the necessary steps to install 'CEDARS', process EHR corpora and obtain clinical event dates: <https://cedars.io>.
+Description: Streamlined annotation pipeline for collection and aggregation of time-to-event data in retrospective clinical studies. 'CEDARS' aims to systematize and accelerate the review of electronic health record (EHR) corpora. It accomplishes those goals by deploying natural language processing as a tool to assist detection and characterization of clinical events by human abstractors. The online user manual presents the necessary steps to install 'CEDARS', process EHR corpora and obtain clinical event dates: <https://cedars.io>.
 Version: 1.82
 Authors@R: person("Simon", "Mantha", email = "smantha@cedars.io", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4277-5261"))
 Imports:
@@ -19,7 +19,7 @@ URL: https://cedars.io (main)
 BugReports: https://github.com/simon-hans/CEDARS/issues
 Depends: R (>= 3.5.0)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Language: en-US
 Encoding: UTF-8
 LazyData: true

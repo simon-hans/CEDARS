@@ -16,9 +16,4 @@ Model path.
 Finds NLP model to use, if not specified. If no model present, we download the default.
 If several present, by default we use the first one by alphabetical order.
 }
-\examples{
-\dontrun{
-find_model(NA)
-}
-}
 \keyword{internal}
