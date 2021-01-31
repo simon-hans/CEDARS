@@ -2,6 +2,10 @@
 
 library(CEDARS)
 
+# Accessing the custom package environment
+
+cedars.env <- CEDARS:::cedars.env
+
 
 if (file.exists("db_credentials.Rdata")) load("db_credentials.Rdata", envir = cedars.env)
 
