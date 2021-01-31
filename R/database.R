@@ -342,7 +342,7 @@ save_query <- function(uri_fun, user, password, host, port, database, search_que
 
     query_out <- query_con$replace(query = "{}", update = update_value, upsert = TRUE)
 
-    if (query_out$modifiedCount > 0) print("Query saved successfully.") else print("Query upload failed!")
+    if (query_out$upsertedCount > 0 | query_out$modifiedCount > 0) print("Query saved successfully.") else print("Query upload failed!")
 
 }
 
