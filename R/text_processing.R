@@ -198,12 +198,6 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
         })
 
-        # parallel::clusterCall(cl, function() {
-        #    nlp_model <- udpipe::udpipe_load_model(URL)
-        #    nlp_model <<- nlp_model
-
-        # })
-
         single_core_model <- NA
 
     } else single_core_model <- udpipe::udpipe_load_model(URL)
@@ -276,7 +270,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' automatic_NLP_processor(patient_vect = NA, text_format = 'latin1', nlp_engine = 'udpipe',
 #' URL = 'models/english-ewt-ud-2.4-190531.udpipe', uri_fun = mongo_uri_standard, user = 'John',
 #' password = 'db_password_1234', host = 'server1234', port = NA, database = 'TEST_PROJECT',
-#' max_n_grams_length = 7, negex_depth = 6, select_cores = NA)
+#' max_n_grams_length = 7, negex_depth = 6, select_cores = 1)
 #' }
 #' @export
 
