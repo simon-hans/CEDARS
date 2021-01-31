@@ -92,8 +92,8 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
-    if (!exists("position")) position <- NA
-    if (!exists("get_position")) get_position <- NA
+    if (!exists("cedars.env$position")) cedars.env$position <- NA
+    if (!exists("cedars.env$get_position")) cedars.env$get_position <- NA
     if (!exists("max_position")) max_position <- NA
     if (!exists("cedars.env$new_event_date")) cedars.env$new_event_date <- NA
     if (!exists("adjudicated")) adjudicated <- FALSE
@@ -104,7 +104,7 @@ server <- function(input, output, session) {
 
         if (length(input$event_date) > 0) cedars.env$new_event_date <- as.character(as.Date(input$event_date), origin = "1970-01-01") else cedars.env$new_event_date <- NA
 
-        if (!is.na(cedars.env$new_event_date)) get_position <<- NA else get_position <<- position
+        if (!is.na(cedars.env$new_event_date)) cedars.env$get_position <- NA else cedars.env$get_position <- cedars.env$position
 
         updated(Sys.time())
 
@@ -115,7 +115,7 @@ server <- function(input, output, session) {
 
         adjudicated <<- TRUE
         cedars.env$new_event_date <- NA
-        get_position <<- NA
+        cedars.env$get_position <- NA
 
         updated(Sys.time())
 
@@ -125,7 +125,7 @@ server <- function(input, output, session) {
 
         adjudicated <<- FALSE
         cedars.env$new_event_date <- NA
-        if (!is.na(position) & position>1) get_position <<- position-1 else get_position <<- position
+        if (!is.na(cedars.env$position) & cedars.env$position>1) cedars.env$get_position <- cedars.env$position-1 else cedars.env$get_position <- cedars.env$position
 
         updated(Sys.time())
 
@@ -135,7 +135,7 @@ server <- function(input, output, session) {
 
         adjudicated <<- FALSE
         cedars.env$new_event_date <- NA
-        if (!is.na(position) & max_position-position>0) get_position <<- position+1 else get_position <<- position
+        if (!is.na(cedars.env$position) & max_position-cedars.env$position>0) cedars.env$get_position <- cedars.env$position+1 else cedars.env$get_position <- cedars.env$position
 
         updated(Sys.time())
 
@@ -145,7 +145,7 @@ server <- function(input, output, session) {
 
         adjudicated <<- FALSE
         cedars.env$new_event_date <- "DELETE"
-        get_position <<- position
+        cedars.env$get_position <- cedars.env$position
 
         updated(Sys.time())
 
@@ -155,7 +155,6 @@ server <- function(input, output, session) {
 
         id_for_search <<- input$search_patient_id
         if (id_for_search == "") id_for_search <<- 0
-        # position <<- 1
 
         updated(Sys.time())
 
@@ -164,10 +163,10 @@ server <- function(input, output, session) {
     data <- eventReactive(eventExpr = updated(), {
 
         # Will not post if the "SEARCH" button was pressed
-        if (is.na(id_for_search) & (!is.na(position) & (!is.na(cedars.env$new_event_date) | adjudicated == TRUE))) {
+        if (is.na(id_for_search) & (!is.na(cedars.env$position) & (!is.na(cedars.env$new_event_date) | adjudicated == TRUE))) {
 
             if (cedars.env$g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
-            post_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, position, cedars.env$new_event_date, input$input_comments, ldap = cedars.env$g_ldap)
+            post_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, cedars.env$position, cedars.env$new_event_date, input$input_comments, ldap = cedars.env$g_ldap)
 
         }
 
@@ -178,7 +177,7 @@ server <- function(input, output, session) {
 
             if (cedars.env$g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
 
-            output <- get_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, TRUE, get_position, id_for_search, ldap = cedars.env$g_ldap)
+            output <- get_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, TRUE, cedars.env$get_position, id_for_search, ldap = cedars.env$g_ldap)
             id_for_search <<- NA
 
             if (!(output[1] %in% c("error_0", "error_1", "error_2", "error_3", "error_4"))){
@@ -197,7 +196,7 @@ server <- function(input, output, session) {
 
                 }
 
-                position <<- output$unique_id
+                cedars.env$position <- output$unique_id
                 max_position <<- output$max_unique_id
                 adjudicated <<- FALSE
                 if (length(output$event_date) == 0) output$event_date <- "none"
