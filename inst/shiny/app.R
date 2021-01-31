@@ -95,16 +95,16 @@ server <- function(input, output, session) {
     if (!exists("position")) position <- NA
     if (!exists("get_position")) get_position <- NA
     if (!exists("max_position")) max_position <- NA
-    if (!exists("new_event_date")) new_event_date <- NA
+    if (!exists("cedars.env$new_event_date")) cedars.env$new_event_date <- NA
     if (!exists("adjudicated")) adjudicated <- FALSE
     if (!exists("id_for_search")) id_for_search <- NA
     if (!exists("updated")) updated <- reactiveVal(Sys.time())
 
     observeEvent(eventExpr = input$enter_date, {
 
-        if (length(input$event_date) > 0) new_event_date <<- as.character(as.Date(input$event_date), origin = "1970-01-01") else new_event_date <<- NA
+        if (length(input$event_date) > 0) cedars.env$new_event_date <- as.character(as.Date(input$event_date), origin = "1970-01-01") else cedars.env$new_event_date <- NA
 
-        if (!is.na(new_event_date)) get_position <<- NA else get_position <<- position
+        if (!is.na(cedars.env$new_event_date)) get_position <<- NA else get_position <<- position
 
         updated(Sys.time())
 
@@ -114,7 +114,7 @@ server <- function(input, output, session) {
     observeEvent(eventExpr = input$adjudicate_sentence, {
 
         adjudicated <<- TRUE
-        new_event_date <<- NA
+        cedars.env$new_event_date <- NA
         get_position <<- NA
 
         updated(Sys.time())
@@ -124,7 +124,7 @@ server <- function(input, output, session) {
     observeEvent(eventExpr = input$previous_sentence, {
 
         adjudicated <<- FALSE
-        new_event_date <<- NA
+        cedars.env$new_event_date <- NA
         if (!is.na(position) & position>1) get_position <<- position-1 else get_position <<- position
 
         updated(Sys.time())
@@ -134,7 +134,7 @@ server <- function(input, output, session) {
     observeEvent(eventExpr = input$next_sentence, {
 
         adjudicated <<- FALSE
-        new_event_date <<- NA
+        cedars.env$new_event_date <- NA
         if (!is.na(position) & max_position-position>0) get_position <<- position+1 else get_position <<- position
 
         updated(Sys.time())
@@ -144,7 +144,7 @@ server <- function(input, output, session) {
     observeEvent(eventExpr = input$delete_date, {
 
         adjudicated <<- FALSE
-        new_event_date <<- "DELETE"
+        cedars.env$new_event_date <- "DELETE"
         get_position <<- position
 
         updated(Sys.time())
@@ -164,10 +164,10 @@ server <- function(input, output, session) {
     data <- eventReactive(eventExpr = updated(), {
 
         # Will not post if the "SEARCH" button was pressed
-        if (is.na(id_for_search) & (!is.na(position) & (!is.na(new_event_date) | adjudicated == TRUE))) {
+        if (is.na(id_for_search) & (!is.na(position) & (!is.na(cedars.env$new_event_date) | adjudicated == TRUE))) {
 
             if (cedars.env$g_ldap == TRUE) end_user_id <- session$user else end_user_id <- input$user_id
-            post_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, position, new_event_date, input$input_comments, ldap = cedars.env$g_ldap)
+            post_wrapper(cedars.env$g_database, end_user_id, input$end_user_pw, position, cedars.env$new_event_date, input$input_comments, ldap = cedars.env$g_ldap)
 
         }
 

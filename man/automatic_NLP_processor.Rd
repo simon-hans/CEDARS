@@ -55,6 +55,6 @@ Accepts a list of patient ID's or alternatively can perform NLP annotations on a
 automatic_NLP_processor(patient_vect = NA, text_format = 'latin1', nlp_engine = 'udpipe',
 URL = 'models/english-ewt-ud-2.4-190531.udpipe', uri_fun = mongo_uri_standard, user = 'John',
 password = 'db_password_1234', host = 'server1234', port = NA, database = 'TEST_PROJECT',
-max_n_grams_length = 7, negex_depth = 6, select_cores = NA)
+max_n_grams_length = 7, negex_depth = 6, select_cores = 1)
 }
 }
