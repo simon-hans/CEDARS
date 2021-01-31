@@ -983,7 +983,19 @@ download_events <- function(uri_fun, user, password, host, port, database) {
                 sent_dates <- sentence_df$text_date
                 out$sentences_bef_event_list[i] <- paste(paste("\"", clean_sentences, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
 
-            } else out$sentences_bef_event[i] <- length(subset(sentence_df, text_date < out$event_date[i])[,1])
+            } else {
+
+                sentences_bef_event <- subset(sentence_df, text_date < out$event_date[i])
+                out$sentences_bef_event[i] <- length(sentences_bef_event[,1])
+
+                if (out$sentences_bef_event[i] != 0) {
+                    clean_sentences <- gsub("\\*START\\*", "", sentences_bef_event$selected)
+                    clean_sentences <- gsub("\\*END\\*", "", clean_sentences)
+                    sent_dates <- sentences_bef_event$text_date
+                    out$sentences_bef_event_list[i] <- paste(paste("\"", clean_sentences, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
+                }
+
+            }
 
             print(paste("assessed patient record", i, "of", len_out))
 
