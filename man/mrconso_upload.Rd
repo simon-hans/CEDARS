@@ -38,6 +38,11 @@ mrconso_upload(
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+Progress report of dictionary processing and upload.
+}
+}
 \description{
 Prepares and uploads UMLS MRCONSO.RRF file. This file is not included in the CEDARS package and can be obtained on the NIH web site at https://www.nlm.nih.gov/research/umls/index.html.
 }

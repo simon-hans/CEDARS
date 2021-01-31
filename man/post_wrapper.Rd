@@ -29,6 +29,11 @@ post_wrapper(
 
 \item{ldap}{Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.}
 }
+\value{
+{
+No return value, called to post data.
+}
+}
 \description{
 Posts results of human reviewer annotation to MongoDB. Uses DB credentials pre-loaded in the main environment. For use with Shiny or REST POST (latter yet to be implemented).
 }

@@ -38,6 +38,11 @@ save_query(
 
 \item{skip_after_event}{Should sentences occurring after recorded clinical event be skipped?}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Saves the search query. The query consists of keywords/UMLS concept unique identifiers (CUI's), boolean elements and other operators ('AND', 'OR', '!', '(', or ')').
 }

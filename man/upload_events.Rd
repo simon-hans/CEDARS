@@ -32,6 +32,11 @@ upload_events(
 
 \item{event_dates}{Vector of clinical event dates.}
 }
+\value{
+{
+Objects of class character, reporting on completed event uploads.
+}
+}
 \description{
 Uploads event dates for patients already in the patient list. Useful when some events have already been documented before runnning CEDARS, for example as a second-line method to catch events missed with a different approach. Only event dates for existing records are altered, missing patient records are not added!
 }

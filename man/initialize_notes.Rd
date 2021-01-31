@@ -19,6 +19,11 @@ initialize_notes(uri_fun, user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Deletes all patient notes from the database.
 }

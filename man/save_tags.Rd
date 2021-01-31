@@ -21,6 +21,11 @@ save_tags(uri_fun, user, password, host, port, database, tag_vect)
 
 \item{tag_vect}{Character vector of 10 tag names.}
 }
+\value{
+{
+MongoDB operation results.
+}
+}
 \description{
 Save name of EHR document metadata tags. Individual notes or parts of notes can be labelled with up to 10 tags, typically the patient's name at the time, the type of note, the note section, the author, etc. Tags are not mandatory.
 }

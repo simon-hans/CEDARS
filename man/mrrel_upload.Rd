@@ -21,6 +21,11 @@ mrrel_upload(path, uri_fun, user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+Progress report of UMLS processing and upload.
+}
+}
 \description{
 Prepares and uploads UMLS MRREL.RRF file. This file is not included in the CEDARS package and can be obtained on the NIH web site at https://www.nlm.nih.gov/research/umls/index.html. It is very large and not currently used by CEDARS.
 }

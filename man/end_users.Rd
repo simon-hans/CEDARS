@@ -19,6 +19,13 @@ end_users(uri_fun, user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+An object of class data.frame, listing all project users along with their associated password.
+This information is not available if using Active Directory feature because in this case
+the value pairs would be stored outside of the CEDARS project database.
+}
+}
 \description{
 Downloads list of CEDARS end users along with their passwords.
 }

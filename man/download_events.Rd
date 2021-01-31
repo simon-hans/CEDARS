@@ -19,6 +19,12 @@ download_events(uri_fun, user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+Object of class data.frame containing patient ID for all cohort members, date of recorded event if any,
+abstractor comments, sentences reviewed along with statistics about review process.
+}
+}
 \description{
 Downloads patient event data. Typically done after all records have been annotated and the project is complete.
 }

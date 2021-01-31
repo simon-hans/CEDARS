@@ -32,6 +32,11 @@ create_project(
 
 \item{investigator_name}{Investigator name.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Creates a new MongoDB database and collections needed for a CEDARS annotation project. The MongoDB account used must have sufficient privileges.
 }

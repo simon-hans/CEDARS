@@ -39,6 +39,9 @@ get_wrapper <- function(database, end_user, end_user_password, html = TRUE, posi
 #' @param event_date Date of clinical event as determined by human reviewer.
 #' @param pt_comments Patient-specific comments from the reviewer.
 #' @param ldap Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.
+#' @return {
+#' No return value, called to post data.
+#' }
 #' @examples
 #' \dontrun{
 #' post_wrapper(database = 'TEST_PROJECT', end_user = 'John', end_user_password = 'db_password_1234',
@@ -831,6 +834,9 @@ unlock_records <- function(uri_fun, user, password, host, port, database) {
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user.
+#' @return {
+#' No return value, unlocks alls records for a specific user in the database.
+#' }
 #' @examples
 #' \dontrun{
 #' unlock_user(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',

@@ -265,6 +265,9 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If 0 is chosen, UMLS CUI tags will not be provided.
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' automatic_NLP_processor(patient_vect = NA, text_format = 'latin1', nlp_engine = 'udpipe',
@@ -347,6 +350,9 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param notes Dataframe of EHR documents with metadata. The documents can consist of full notes or note subsections.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' upload_notes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',

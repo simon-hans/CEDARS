@@ -21,6 +21,11 @@ terminate_project(uri_fun, user, password, host, port, database, fast = FALSE)
 
 \item{fast}{If TRUE, delete everything without asking security questions.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Everything is removed, including dictionaries. MongoDB account used must have sufficient privileges.
 }

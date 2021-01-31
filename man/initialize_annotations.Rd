@@ -20,6 +20,11 @@ initialize_annotations(uri_fun, user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Initialize Annotations
 Deletes all NLP annotations and patient-specific information, including clinical event dates.New, empty 'ANNOTATIONS' and 'PATIENTS' collections are created. Dictionaries and original patient notes are preserved.

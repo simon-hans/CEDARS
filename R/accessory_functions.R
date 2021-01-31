@@ -112,6 +112,9 @@ colorize <- function(get_output) {
 #' @param host Host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Launches the CEDARS Shiny app locally (on the desktop computer).
+#' }
 #' @examples
 #' \dontrun{
 #' start_local(user = 'John', password = 'db_password_1234', host = 'server1234', port = NA,
@@ -143,6 +146,9 @@ start_local <- function(user, password, host, port, database) {
 #' @param database MongoDB database name.
 #' @param destination_path Folder where the files should be saved. Default is working directory.
 #' @param LDAP is LDAP being used? In this case, CEDARS will not prompt for user ID/password and a check will NOT be made on the users table. Access will be granted, relying on LDAP authentication. Annotations will be stamped with LDAP user name.
+#' @return {
+#' No return value, saves DB administrator credentials in local folder.
+#' }
 #' @examples
 #' \dontrun{
 #' save_credentials(user = 'John', password = 'db_password_1234', host = 'server1234',
@@ -172,6 +178,13 @@ save_credentials <- function(user, password, host, port, database, LDAP, destina
 #' Generate unique test project name (i.e. DB name) on MongoDB CEDARS testing cluster
 #'
 #' Parses existing DB names and randomly generates a unique test project name on MongoDB CEDARS testing cluster. This is used for convenience purposes when the R user does not have an existing MongoDB connection. The corresponding database and collections are PUBLIC so no patient information or any other privileged/confidential data should be used! This is for testing on simulated records only.
+#'
+#' @details {
+#' No parameter; the operation is performed on a preset server with no user input.
+#' }
+#' @return {
+#' An object of class character, the randomly generated name of a test CEDARS project.
+#' }
 #' @examples
 #' \dontrun{
 #' find_project_name()

@@ -313,6 +313,9 @@ populate_query <- function(uri_fun, user, password, host, port, database) {
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param skip_after_event Should sentences occurring after recorded clinical event be skipped?
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' save_query(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -337,7 +340,9 @@ save_query <- function(uri_fun, user, password, host, port, database, search_que
     update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation, " , \"hide_duplicates\" : ",
         converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, "}", sep = "")
 
-    query_con$replace(query = "{}", update = update_value, upsert = TRUE)
+    query_out <- query_con$replace(query = "{}", update = update_value, upsert = TRUE)
+
+    if (query_out$modifiedCount > 0) print("Query saved successfully.") else print("Query upload failed!")
 
 }
 
@@ -350,6 +355,9 @@ save_query <- function(uri_fun, user, password, host, port, database, search_que
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' initialize_annotations(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -404,6 +412,9 @@ initialize_annotations <- function(uri_fun, user, password, host, port, database
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' initialize_patients(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -456,6 +467,9 @@ initialize_patients <- function(uri_fun, user, password, host, port, database) {
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' initialize_users(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -508,6 +522,9 @@ initialize_users <- function(uri_fun, user, password, host, port, database) {
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' initialize_notes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -562,6 +579,9 @@ initialize_notes <- function(uri_fun, user, password, host, port, database) {
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
 #' @param end_user_password CEDARS end user password.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' add_end_user(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -607,6 +627,9 @@ add_end_user <- function(uri_fun, user, password, host, port, database, end_user
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' delete_end_user(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -650,6 +673,9 @@ delete_end_user <- function(uri_fun, user, password, host, port, database, end_u
 #' @param database MongoDB database name.
 #' @param project_name Research or QA project name.
 #' @param investigator_name Investigator name.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' # The code below creates an instance of CEDARS project on a public test MongoDB cluster, populated
 #' # with fictitious EHR corpora.
@@ -761,6 +787,9 @@ create_project <- function(uri_fun, user, password, host, port, database, projec
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param fast If TRUE, delete everything without asking security questions.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
 #' @examples
 #' \dontrun{
 #' terminate_project(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -884,6 +913,10 @@ terminate_project_new <- function(uri_fun, user, password, host, port, database)
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Object of class data.frame containing patient ID for all cohort members, date of recorded event if any,
+#' abstractor comments, sentences reviewed along with statistics about review process.
+#' }
 #' @examples
 #' \dontrun{
 #' download_events(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -982,6 +1015,9 @@ download_events <- function(uri_fun, user, password, host, port, database) {
 #' @param database MongoDB database name.
 #' @param patient_ids Vector of patient ID's.
 #' @param event_dates Vector of clinical event dates.
+#' @return {
+#' Objects of class character, reporting on completed event uploads.
+#' }
 #' @examples
 #' \dontrun{
 #' upload_events(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -1036,6 +1072,11 @@ upload_events <- function(uri_fun, user, password, host, port, database, patient
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' An object of class data.frame, listing all project users along with their associated password.
+#' This information is not available if using Active Directory feature because in this case
+#' the value pairs would be stored outside of the CEDARS project database.
+#' }
 #' @examples
 #' \dontrun{
 #' end_users(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
@@ -1064,6 +1105,9 @@ end_users <- function(uri_fun, user, password, host, port, database) {
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param tag_vect Character vector of 10 tag names.
+#' @return {
+#' MongoDB operation results.
+#' }
 #' @examples
 #' \dontrun{
 #' save_tags(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',

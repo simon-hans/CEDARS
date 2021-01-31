@@ -22,6 +22,11 @@ unlock_user(uri_fun, user, password, host, port, database, end_user)
 
 \item{end_user}{CEDARS end user.}
 }
+\value{
+{
+No return value, unlocks alls records for a specific user in the database.
+}
+}
 \description{
 Unlock User-Specific Records
 Removes any pending lock(s) for a specific user. Normally there should not be more than one record locked per user at any given time, but if there were more than one, i.e. DB corruption, all locks would be lifted at once.

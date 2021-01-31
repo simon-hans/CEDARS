@@ -19,6 +19,11 @@ initialize_patients(uri_fun, user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 All patient-specific information is deleted, including clinical event dates. Original notes and NLP annotations are preserved.
 }

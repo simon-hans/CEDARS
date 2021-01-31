@@ -21,6 +21,11 @@ delete_end_user(uri_fun, user, password, host, port, database, end_user)
 
 \item{end_user}{CEDARS end user name.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Deletes one end user and associated password.
 }

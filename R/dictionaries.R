@@ -16,6 +16,9 @@
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Progress report of dictionary processing and upload.
+#' }
 #' @examples
 #' \dontrun{
 #' mrconso_upload(path = 'dictionaries/MRCONSO.RRF', language = 'ENG', subsets = c('SNOMEDCT_US',
@@ -86,6 +89,9 @@ mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_f
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' Progress report of UMLS processing and upload.
+#' }
 #' @examples
 #' \dontrun{
 #' mrrel_upload(path = 'dictionaries/MRREL.RRF', uri_fun = mongo_uri_standard, user = 'John',
@@ -131,6 +137,9 @@ mrrel_upload <- function(path, uri_fun, user, password, host, port, database) {
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param selected_model_path Path to NLP model file.
+#' @return {
+#' Confirmation of upload.
+#' }
 #' @examples
 #' \dontrun{
 #' negex_upload(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',

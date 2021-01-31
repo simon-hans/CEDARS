@@ -21,6 +21,11 @@ pre_search(patient_vect = NA, uri_fun, user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+No return value, called to execute a query in the database.
+}
+}
 \description{
 Batches a keyword/CUI search for a cohort of patients. Useful to speed up the process by end users, since search results will be pre-populated. Locks each record before proceeding with search on existing NLP annotations. Patient records with no matching sentences or a known event date at or before the earliest matching sentence will be marked as reviewed. The latter assumes the query orders to skip sentences after events.
 }

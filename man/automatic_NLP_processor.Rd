@@ -47,6 +47,11 @@ automatic_NLP_processor(
 
 \item{URL}{UDPipe model URL.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Accepts a list of patient ID's or alternatively can perform NLP annotations on all available patients in the database.
 }

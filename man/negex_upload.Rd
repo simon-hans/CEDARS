@@ -29,6 +29,11 @@ negex_upload(
 
 \item{selected_model_path}{Path to NLP model file.}
 }
+\value{
+{
+Confirmation of upload.
+}
+}
 \description{
 Prepares and uploads NegEx negation lexicon. It is not absolutely required for CEDARS to function but in practice will improve search accuracy for most applications.
 }

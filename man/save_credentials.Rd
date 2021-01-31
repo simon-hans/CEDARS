@@ -29,6 +29,11 @@ save_credentials(
 
 \item{destination_path}{Folder where the files should be saved. Default is working directory.}
 }
+\value{
+{
+No return value, saves DB administrator credentials in local folder.
+}
+}
 \description{
 Saves MongoDB credentials as 'db_credentials.Rdata' and Shiny app file as 'app.R'. Those two files should be copied to the Shiny Server app directory. Needed only if using Shiny Server; credentials are entered in the command line for local app use.
 }

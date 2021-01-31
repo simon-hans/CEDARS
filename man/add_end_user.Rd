@@ -32,6 +32,11 @@ add_end_user(
 
 \item{end_user_password}{CEDARS end user password.}
 }
+\value{
+{
+Confirmation that requested operation was completed, or error message if attempt failed.
+}
+}
 \description{
 Adds an end user. Password must be at least 8 characters in length.
 }

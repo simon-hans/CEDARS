@@ -242,6 +242,9 @@ parse_query <- function(search_query) {
 #' @param host MongoDB host server.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @return {
+#' No return value, called to execute a query in the database.
+#' }
 #' @examples
 #' \dontrun{
 #' pre_search(patient_vect = NA, uri_fun = mongo_uri_standard, user = 'John',

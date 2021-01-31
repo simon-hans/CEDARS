@@ -17,6 +17,11 @@ start_local(user, password, host, port, database)
 
 \item{database}{MongoDB database name.}
 }
+\value{
+{
+Launches the CEDARS Shiny app locally (on the desktop computer).
+}
+}
 \description{
 Starts CEDARS locally from RStudio. This is a functional approach and is easier to implement than a full-fledged Shiny Server. Multiple users can access the same CEDARS project on the MongoDB server using separate local R sessions, however in that case MongoDB credentials would have to be shared to all. The best option for multi-user implementations is to use Shiny Server.
 }
