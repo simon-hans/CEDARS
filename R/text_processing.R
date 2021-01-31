@@ -192,11 +192,17 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
         parallel::clusterExport(cl, c("sanitize", "standardize_nlp", "negation_tagger", "negex_token_tagger", "id_expander",
             "negex_processor", "negex_simp", "negex_depth", "URL"), envir = environment())
 
-        parallel::clusterCall(cl, function() {
+        parallel::clusterEvalQ(cl, {
+
             nlp_model <- udpipe::udpipe_load_model(URL)
-            nlp_model <<- nlp_model
 
         })
+
+        # parallel::clusterCall(cl, function() {
+        #    nlp_model <- udpipe::udpipe_load_model(URL)
+        #    nlp_model <<- nlp_model
+
+        # })
 
         single_core_model <- NA
 
