@@ -1,6 +1,6 @@
 
 
-assign("cedars.env", new.env())
+cedars.env <- new.env(parent=emptyenv())
 
 
 #' Load Options on Startup
