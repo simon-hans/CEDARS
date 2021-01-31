@@ -2,6 +2,7 @@
 
 cedars.env <- new.env(parent=emptyenv())
 
+test <- 5
 
 #' Load Options on Startup
 #'
