@@ -8,3 +8,4 @@
 ^.gitbook$
 ^assets$
 ^build_seq.R$
+^CODE_OF_CONDUCT.md$
