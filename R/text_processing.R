@@ -303,30 +303,42 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     if (max_n_grams_length > 0)
         umls_selected <- umls_con$find("{}") else umls_selected <- NA
 
+    print("Finding all patients with notes...")
+
+    all_patients <- notes_con$aggregate('[{ \"$group\" : {\"_id\" : \"$patient_id\"} }]', options = '{"allowDiskUse":true}')
+    all_patients <- all_patients[,1]
+    all_patients <- all_patients[order(all_patients, decreasing = FALSE, method = "radix")]
+    l_all_patients <- length(all_patients)
+
     print("Finding patients with missing annotations...")
 
-    # We are using simple code to find which text segments need to be annotated Does all of one patient, not
-    # efficient, should go with text_id's Ideally this would be replaced by a MongoDB query (faster)
+    unique_missing <- list()
 
-    # All text_id's with an existing annotation
-    all_annotated <- unlist(annotations_con$find(query = "{}", fields = "{ \"text_id\" : 1, \"_id\" : 0 }"))
+    for (i in 1:l_all_patients){
 
-    # All text_id's available for annotation
-    all_notes <- notes_con$find(query = "{}", fields = "{ \"text_id\" : 1, \"patient_id\" : 1, \"_id\" : 0 }")
+        print(paste("checking patient #", i, "of", l_all_patients))
 
-    # text_id's missing an annotation
-    missing <- all_notes[!(all_notes$text_id %in% all_annotated), ]
-    if (!is.null(missing))
-        unique_missing <- unique(missing$patient_id) else unique_missing <- NA
+        # All text_id's available for annotation
+        all_notes <- notes_con$find(query = paste("{\"patient_id\" :", all_patients[i] , "}"), fields = "{ \"text_id\" : 1, \"_id\" : 0 }")
+        all_notes <- all_notes$text_id
+
+        # All text_id's with an existing annotation
+        all_annotated <- annotations_con$find(query = paste("{\"patient_id\" :", all_patients[i] , "}"), fields = "{ \"text_id\" : 1, \"_id\" : 0 }")
+        all_annotated <- unique(all_annotated$text_id)
+
+        missing_text <- all_notes[!(all_notes %in% all_annotated)]
+
+        if (length(missing_text) > 0) unique_missing[[i]] <- all_patients[i] else unique_missing[[i]] <- NA
+
+    }
+
+    unique_missing <- unlist(unique_missing)
+    unique_missing <- unique_missing[!is.na(unique_missing)]
 
     if (is.na(patient_vect[1]))
         patient_vect <- unique_missing else patient_vect <- patient_vect[patient_vect %in% unique_missing]
 
     patient_vect <- patient_vect[order(patient_vect, decreasing = FALSE, method = "radix")]
-
-    rm(all_annotated)
-    rm(all_notes)
-    rm(missing)
 
     if (!is.na(patient_vect[1])) {
 
