@@ -309,7 +309,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     all_patients <- all_patients[,1]
 
     # Need to add step to stop everything if there are no patients left to process!
-    if (is.na(patient_vect[1])) all_patients <- all_patients[all_patients %in% patient_vect]
+    if (!is.na(patient_vect[1])) all_patients <- all_patients[all_patients %in% patient_vect]
 
     all_patients <- all_patients[order(all_patients, decreasing = FALSE, method = "radix")]
     l_all_patients <- length(all_patients)
