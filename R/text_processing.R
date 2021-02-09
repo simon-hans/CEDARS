@@ -307,6 +307,10 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 
     all_patients <- notes_con$aggregate('[{ \"$group\" : {\"_id\" : \"$patient_id\"} }]', options = '{"allowDiskUse":true}')
     all_patients <- all_patients[,1]
+
+    # Need to add step to stop everything if there are no patients left to process!
+    if (is.na(patient_vect[1])) all_patients <- all_patients[all_patients %in% patient_vect]
+
     all_patients <- all_patients[order(all_patients, decreasing = FALSE, method = "radix")]
     l_all_patients <- length(all_patients)
 
@@ -320,10 +324,14 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 
         # All text_id's available for annotation
         all_notes <- notes_con$find(query = paste("{\"patient_id\" :", all_patients[i] , "}"), fields = "{ \"text_id\" : 1, \"_id\" : 0 }")
+
+        # This will have to be removed once we convert everything to numeric!
         all_notes <- trimws(all_notes$text_id)
 
         # All text_id's with an existing annotation
         all_annotated <- annotations_con$find(query = paste("{\"patient_id\" :", all_patients[i] , "}"), fields = "{ \"text_id\" : 1, \"_id\" : 0 }")
+
+        # This will have to be removed once we convert everything to numeric!
         all_annotated <- trimws(unique(all_annotated$text_id))
 
         missing_text <- all_notes[!(all_notes %in% all_annotated)]
