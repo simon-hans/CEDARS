@@ -323,13 +323,13 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
         print(paste("checking patient #", i, "of", l_all_patients))
 
         # All note_id's available for annotation
-        all_notes <- notes_con$find(query = paste("{\"note_id\" :", all_patients[i] , "}"), fields = "{ \"note_id\" : 1, \"_id\" : 0 }")
+        all_notes <- notes_con$find(query = paste("{\"patient_id\" :", all_patients[i] , "}"), fields = "{ \"note_id\" : 1, \"_id\" : 0 }")
 
         # This will have to be removed once we convert everything to numeric!
         all_notes <- trimws(all_notes$note_id)
 
         # All note_id's with an existing annotation
-        all_annotated <- annotations_con$find(query = paste("{\"note_id\" :", all_patients[i] , "}"), fields = "{ \"note_id\" : 1, \"_id\" : 0 }")
+        all_annotated <- annotations_con$find(query = paste("{\"patient_id\" :", all_patients[i] , "}"), fields = "{ \"note_id\" : 1, \"_id\" : 0 }")
 
         # This will have to be removed once we convert everything to numeric!
         all_annotated <- trimws(unique(all_annotated$note_id))
