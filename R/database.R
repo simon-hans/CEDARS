@@ -753,7 +753,7 @@ create_project <- function(uri_fun, user, password, host, port, database, projec
 
     mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "INFO")
 
-    info <- data.frame(creation_time = Sys.time(), project = project_name, investigator = investigator_name, CEDAR_version = as.character(packageVersion("CEDARS")))
+    info <- data.frame(creation_time = Sys.time(), project = project_name, investigator = investigator_name, CEDARS_version = as.character(packageVersion("CEDARS")))
 
     mongo_con$insert(info)
 
