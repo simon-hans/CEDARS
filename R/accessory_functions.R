@@ -128,6 +128,7 @@ start_local <- function(user, password, host, replica_set, port, database) {
     assign("g_user", user, cedars.env)
     assign("g_password", password, cedars.env)
     assign("g_host", host, cedars.env)
+    assign("g_replica_set", replica_set, cedars.env)
     assign("g_port", port, cedars.env)
     assign("g_database", database, cedars.env)
     assign("g_ldap", FALSE, cedars.env)
