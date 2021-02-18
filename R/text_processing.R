@@ -155,6 +155,7 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
@@ -163,7 +164,7 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 #' @keywords internal
 
 batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
-    user, password, host, port, database, max_n_grams_length, negex_depth, select_cores) {
+    user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores) {
 
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
@@ -210,11 +211,11 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
         # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked
         # A record is considered open for annotation if 1) the patient is not in the roster yet or 2) admin lock was
         # successful
-        unlock_records(uri_fun, user, password, host, port, database)
-        open <- lock_records_admin(uri_fun, user, password, host, port, database, patient_vect[i])
+        unlock_records(uri_fun, user, password, host, replica_set, port, database)
+        open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
         if (open == TRUE) {
 
-            sub_corpus <- db_download(uri_fun, user, password, host, port, database, patient_vect[i])
+            sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
             if (length(sub_corpus[, 1]) > 0) {
                 annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
                   max_n_grams_length, negex_depth, single_core_model)
@@ -222,13 +223,13 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
                 if (is.data.frame(annotations)) {
 
                   row.names(annotations) <- NULL
-                  db_upload(uri_fun, user, password, host, port, database, patient_vect[i], annotations)
+                  db_upload(uri_fun, user, password, host, replica_set, port, database, patient_vect[i], annotations)
 
                 }
 
             }
 
-            unlock_records_admin(uri_fun, user, password, host, port, database, patient_vect[i])
+            unlock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
 
             cat(paste(c("Completed annotations for patient ID ", patient_vect[i], ", # ", i, " of ", length_list,
                 ".\n"), sep = "", collapse = ""))
@@ -244,7 +245,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
     print(paste("There were ", j, " locked cases encountered.", sep = ""))
 
-    patient_roster_update(uri_fun, user, password, host, port, database)
+    patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
 
 }
 
@@ -260,6 +261,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If 0 is chosen, UMLS CUI tags will not be provided.
@@ -278,26 +280,26 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @export
 
 automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", uri_fun = mongo_uri_standard,
-    user, password, host, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
+    user, password, host, replica_set, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
 
     # Finding NLP model to use, if not specified
     URL <- find_model(URL)
 
-    annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
-    notes_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")
-    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    annotations_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "ANNOTATIONS")
+    notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
+    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     print("Downloading dictionaries...")
 
     # We do not use NeGex if it has not been installed or if NegEx depth is < 1
-    negex_con <- mongo_connect(uri_fun, user, password, host, port, database, "NEGEX")
+    negex_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NEGEX")
     if (negex_con$count() == 0)
         negex_depth <- 0
     if (negex_depth > 0)
         negex_simp <- negex_con$find("{}") else negex_simp <- NA
 
     # We do not use UMLS if it has not been installed or if max ngram length is < 1
-    umls_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRCONSO")
+    umls_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "UMLS_MRCONSO")
     if (umls_con$count() == 0)
         max_n_grams_length <- 0
     if (max_n_grams_length > 0)
@@ -368,6 +370,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param notes Dataframe of EHR documents with metadata. The documents can consist of full notes or note subsections.
@@ -381,9 +384,9 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 #' }
 #' @export
 
-upload_notes <- function(uri_fun, user, password, host, port, database, notes) {
+upload_notes <- function(uri_fun, user, password, host, replica_set, port, database, notes) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "NOTES")
+    mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
 
     if (anyNA(match(c("patient_id", "text_id", "text", "text_date", "doc_id"), colnames(notes))))
         print("Error: missing field.") else {

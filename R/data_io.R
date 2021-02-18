@@ -23,7 +23,7 @@
 
 get_wrapper <- function(database, end_user, end_user_password, html = TRUE, position, patient_id = NA, ldap = FALSE) {
 
-    get_data(cedars.env$g_mongodb_uri_fun, cedars.env$g_user, cedars.env$g_password, cedars.env$g_host, cedars.env$g_port, database, end_user, end_user_password, html, position,
+    get_data(cedars.env$g_mongodb_uri_fun, cedars.env$g_user, cedars.env$g_password, cedars.env$g_host, cedars.env$g_replica_set, cedars.env$g_port, database, end_user, end_user_password, html, position,
         patient_id, ldap)
 
 }
@@ -51,7 +51,7 @@ get_wrapper <- function(database, end_user, end_user_password, html = TRUE, posi
 
 post_wrapper <- function(database, end_user, end_user_password, position, event_date, pt_comments, ldap = FALSE) {
 
-    post_data(cedars.env$g_mongodb_uri_fun, cedars.env$g_user, cedars.env$g_password, cedars.env$g_host, cedars.env$g_port, database, end_user, end_user_password, position, event_date,
+    post_data(cedars.env$g_mongodb_uri_fun, cedars.env$g_user, cedars.env$g_password, cedars.env$g_host, cedars.env$g_replica_set, cedars.env$g_port, database, end_user, end_user_password, position, event_date,
         pt_comments, ldap)
 
 }
@@ -64,6 +64,7 @@ post_wrapper <- function(database, end_user, end_user_password, position, event_
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB server host.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
@@ -75,18 +76,18 @@ post_wrapper <- function(database, end_user, end_user_password, position, event_
 #' @return A list with patient-specific information and a dataframe with selected sentences along with sentence-specific data.
 #' @keywords internal
 
-get_data <- function(uri_fun, user, password, host, port, database, end_user, end_user_password, html = TRUE, position,
+get_data <- function(uri_fun, user, password, host, replica_set, port, database, end_user, end_user_password, html = TRUE, position,
     patient_id = NA, ldap = FALSE) {
 
-    if (ldap == TRUE | password_verification(uri_fun, user, password, host, port, database, end_user, end_user_password) ==
+    if (ldap == TRUE | password_verification(uri_fun, user, password, host, replica_set, port, database, end_user, end_user_password) ==
         TRUE) {
 
-        patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+        patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
         # If user clicked SEARCH patient_id will be 0, in which case we unlock user which will trigger search for next available patient
         if (!is.na(patient_id) & patient_id == 0) {
 
-            unlock_user(uri_fun, user, password, host, port, database, end_user)
+            unlock_user(uri_fun, user, password, host, replica_set, port, database, end_user)
             patient_id <- NA
 
         }
@@ -97,7 +98,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
         if (!is.na(patient_id)) {
 
             # Finding previously saved keyword/CUI search query and option for use of negation
-            query_con <- mongo_connect(uri_fun, user, password, host, port, database, "QUERY")
+            query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
             db_results <- query_con$find("{}")
             search_query <- db_results$query[1]
             use_negation <- db_results$exclude_negated[1]
@@ -110,7 +111,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
 
             if (dim(patient)[1] > 0) {
 
-                commit_result <- commit_patient(uri_fun, user, password, host, port, database, end_user, search_query,
+                commit_result <- commit_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query,
                   use_negation, hide_duplicates, patient_id)
                 committed <- commit_result$committed
 
@@ -136,7 +137,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
                 # prior accessed record is unlocked
             } else {
 
-                unlock_user(uri_fun, user, password, host, port, database, end_user)
+                unlock_user(uri_fun, user, password, host, replica_set, port, database, end_user)
                 out <- "error_2"
 
                 }
@@ -154,7 +155,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
                 previous_exists <- FALSE
 
                 # Finding previously saved keyword/CUI search query and option for use of negation
-                query_con <- mongo_connect(uri_fun, user, password, host, port, database, "QUERY")
+                query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
                 db_results <- query_con$find("{}")
                 search_query <- db_results$query[1]
                 use_negation <- db_results$exclude_negated[1]
@@ -164,7 +165,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
                 committed <- FALSE
                 no_patient_left <- FALSE
                 while (committed == FALSE & no_patient_left == FALSE) {
-                  commit_result <- commit_patient(uri_fun, user, password, host, port, database, end_user, search_query,
+                  commit_result <- commit_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query,
                     use_negation, hide_duplicates)
                   committed <- commit_result$committed
                   no_patient_left <- commit_result$no_patient_left
@@ -222,6 +223,7 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
@@ -232,19 +234,19 @@ get_data <- function(uri_fun, user, password, host, port, database, end_user, en
 #' @param ldap Is LDAP authentication being used? If so, password will not be checked and access will be granted automatically.
 #' @keywords internal
 
-post_data <- function(uri_fun, user, password, host, port, database, end_user, end_user_password, position, event_date,
+post_data <- function(uri_fun, user, password, host, replica_set, port, database, end_user, end_user_password, position, event_date,
     pt_comments, ldap = FALSE) {
 
-    if (ldap == TRUE | password_verification(uri_fun, user, password, host, port, database, end_user, end_user_password) ==
+    if (ldap == TRUE | password_verification(uri_fun, user, password, host, replica_set, port, database, end_user, end_user_password) ==
         TRUE) {
 
         pt_comments <- sanitize(pt_comments)
 
-        query_con <- mongo_connect(uri_fun, user, password, host, port, database, "QUERY")
+        query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
         db_results <- query_con$find("{}")
         skip_after_event <- db_results$skip_after_event[1]
 
-        patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+        patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
         # Finding patient ID locked by user CEDARS will only post information on a record already locked by the user
 
@@ -306,7 +308,7 @@ post_data <- function(uri_fun, user, password, host, port, database, end_user, e
                 sentences <- subset(sentences, reviewed == FALSE) else sentences <- subset(sentences, text_date < event_date & reviewed == FALSE)
 
             if (length(sentences[, 1]) == 0)
-                complete_case(uri_fun, user, password, host, port, database, selected_patient)
+                complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
 
         }
 
@@ -322,6 +324,7 @@ post_data <- function(uri_fun, user, password, host, port, database, end_user, e
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
@@ -329,9 +332,9 @@ post_data <- function(uri_fun, user, password, host, port, database, end_user, e
 #' @return TRUE for correct credentials, FALSE for incorrect.
 #' @keywords internal
 
-password_verification <- function(uri_fun, user, password, host, port, database, end_user, end_user_password) {
+password_verification <- function(uri_fun, user, password, host, replica_set, port, database, end_user, end_user_password) {
 
-    users_con <- mongo_connect(uri_fun, user, password, host, port, database, "USERS")
+    users_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "USERS")
 
     query_value <- paste("{ \"user\" : ", "\"", end_user, "\" , \"password\" : ", "\"", end_user_password, "\" }",
         sep = "")
@@ -352,6 +355,7 @@ password_verification <- function(uri_fun, user, password, host, port, database,
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
@@ -361,14 +365,14 @@ password_verification <- function(uri_fun, user, password, host, port, database,
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
 #' @keywords internal
 
-commit_patient <- function(uri_fun, user, password, host, port, database, end_user, search_query, use_negation, hide_duplicates,
+commit_patient <- function(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation, hide_duplicates,
     patient_id = NA) {
 
     committed <- TRUE
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
-    sentences_result <- get_patient(uri_fun, user, password, host, port, database, end_user, search_query, use_negation,
+    sentences_result <- get_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation,
         hide_duplicates, patient_id)
     sentences <- sentences_result$sentences
     no_patient_left <- sentences_result$no_patient_left
@@ -381,7 +385,7 @@ commit_patient <- function(uri_fun, user, password, host, port, database, end_us
         while (if (!is.null(dim(sentences)))
             (length(sentences[, 1])) == 0 else FALSE) {
 
-            sentences <- get_patient(uri_fun, user, password, host, port, database, end_user, search_query, use_negation,
+            sentences <- get_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation,
                 hide_duplicates)
 
         }
@@ -434,7 +438,7 @@ commit_patient <- function(uri_fun, user, password, host, port, database, end_us
 
                 if (length(sentences_to_eval[, 1]) == 0) {
 
-                  complete_case(uri_fun, user, password, host, port, database, new_patient_id)
+                  complete_case(uri_fun, user, password, host, replica_set, port, database, new_patient_id)
 
                   committed <- FALSE
 
@@ -444,7 +448,7 @@ commit_patient <- function(uri_fun, user, password, host, port, database, end_us
 
         } else {
 
-            complete_case(uri_fun, user, password, host, port, database, patient_id)
+            complete_case(uri_fun, user, password, host, replica_set, port, database, patient_id)
 
             committed <- FALSE
 
@@ -468,6 +472,7 @@ commit_patient <- function(uri_fun, user, password, host, port, database, end_us
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
@@ -477,20 +482,20 @@ commit_patient <- function(uri_fun, user, password, host, port, database, end_us
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
 #' @keywords internal
 
-get_patient <- function(uri_fun, user, password, host, port, database, end_user, search_query, use_negation, hide_duplicates,
+get_patient <- function(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation, hide_duplicates,
     patient_id = NA) {
 
-    selection_result <- select_patient(uri_fun, user, password, host, port, database, end_user, patient_id)
+    selection_result <- select_patient(uri_fun, user, password, host, replica_set, port, database, end_user, patient_id)
     selected_patient <- selection_result$selected_patient
     no_patient_left <- selection_result$no_patient_left
 
     if (is.na(selected_patient))
         sentences <- NA else {
 
-        annotations_con <- mongo_connect(uri_fun, user, password, host, port, database, "ANNOTATIONS")
+        annotations_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "ANNOTATIONS")
         query <- paste("{ \"patient_id\" : ", selected_patient, "}", sep = "")
 
-        patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+        patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
         # If there are no prior sentences, we compute them; else, if NLP annotations were not updated and there are
         # already sentences, we use them If NLP annotations were updated and there are prior sentences, we get the old
@@ -508,7 +513,7 @@ get_patient <- function(uri_fun, user, password, host, port, database, end_user,
             # If still no sentences, we close
             if (length(sentences[, 1]) > 0)
                 sentences$note_text <- sapply(sentences$doc_id, aggregate_note, annotations, parse_result$cui_elements) else {
-                complete_case(uri_fun, user, password, host, port, database, selected_patient)
+                complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
             }
 
         } else {
@@ -643,6 +648,7 @@ paste_sections <- function(section_index, note_list) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
@@ -650,16 +656,16 @@ paste_sections <- function(section_index, note_list) {
 #' @return Selected patient_id.
 #' @keywords internal
 
-select_patient <- function(uri_fun, user, password, host, port, database, end_user, patient_id = NA) {
+select_patient <- function(uri_fun, user, password, host, replica_set, port, database, end_user, patient_id = NA) {
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     # If specific patient ID is provided, we unlock any other prior locked record and attempt to lock the desired
     # record
     if (!is.na(patient_id)) {
 
-        unlock_user(uri_fun, user, password, host, port, database, end_user)
-        lock_records(uri_fun, user, password, host, port, database, end_user, patient_id)
+        unlock_user(uri_fun, user, password, host, replica_set, port, database, end_user)
+        lock_records(uri_fun, user, password, host, replica_set, port, database, end_user, patient_id)
         query <- paste("{ \"end_user\" : ", "\"", end_user, "\", ", " \"locked\" : true}", sep = "")
         previously_selected <- patients_con$find(query)
         if (nrow(previously_selected) > 0)
@@ -681,9 +687,9 @@ select_patient <- function(uri_fun, user, password, host, port, database, end_us
             selected_patient <- previously_selected$patient_id[1] else {
 
             # Unlock records as needed
-            unlock_records(uri_fun, user, password, host, port, database)
+            unlock_records(uri_fun, user, password, host, replica_set, port, database)
 
-            lock_records(uri_fun, user, password, host, port, database, end_user)
+            lock_records(uri_fun, user, password, host, replica_set, port, database, end_user)
 
             # Find which patient was selected
             query <- paste("{ \"end_user\" : ", "\"", end_user, "\"", " , \"locked\" : true }", sep = "")
@@ -716,15 +722,16 @@ select_patient <- function(uri_fun, user, password, host, port, database, end_us
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user name.
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
 #' @keywords internal
 
-lock_records <- function(uri_fun, user, password, host, port, database, end_user, patient_id = NA) {
+lock_records <- function(uri_fun, user, password, host, replica_set, port, database, end_user, patient_id = NA) {
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     if (is.na(patient_id))
         query <- paste("{ \"$and\": [ {\"$or\": [{ \"reviewed\" : false }, { \"updated\" : true }] } , {\"locked\" : false }, {\"admin_locked\" : false }] }",
@@ -746,14 +753,15 @@ lock_records <- function(uri_fun, user, password, host, port, database, end_user
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param patient_id Patient ID being locked.
 #' @keywords internal
 
-lock_records_admin <- function(uri_fun, user, password, host, port, database, patient_id) {
+lock_records_admin <- function(uri_fun, user, password, host, replica_set, port, database, patient_id) {
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     query_value <- paste("{ \"locked\" : false , \"patient_id\" : ", patient_id, "}", sep = "")
 
@@ -785,14 +793,15 @@ lock_records_admin <- function(uri_fun, user, password, host, port, database, pa
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param patient_id ID of patient record being unlocked.
 #' @keywords internal
 
-unlock_records_admin <- function(uri_fun, user, password, host, port, database, patient_id) {
+unlock_records_admin <- function(uri_fun, user, password, host, replica_set, port, database, patient_id) {
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     query_value <- paste("{ \"admin_locked\" : true, \"patient_id\" : ", patient_id, "}", sep = "")
 
@@ -810,13 +819,14 @@ unlock_records_admin <- function(uri_fun, user, password, host, port, database, 
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @keywords internal
 
-unlock_records <- function(uri_fun, user, password, host, port, database) {
+unlock_records <- function(uri_fun, user, password, host, replica_set, port, database) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     query <- paste("{ \"time_locked\" : { \"$lt\" : { \"$date\" : ", "\"", strftime(Sys.time() - 86400, "%Y-%m-%dT%H:%M:%SZ",
         "UTC"), "\"", "}}}", sep = "")
@@ -831,6 +841,7 @@ unlock_records <- function(uri_fun, user, password, host, port, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param end_user CEDARS end user.
@@ -844,9 +855,9 @@ unlock_records <- function(uri_fun, user, password, host, port, database) {
 #' }
 #' @export
 
-unlock_user <- function(uri_fun, user, password, host, port, database, end_user) {
+unlock_user <- function(uri_fun, user, password, host, replica_set, port, database, end_user) {
 
-    patients_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     query <- paste("{ \"end_user\" : ", "\"", end_user, "\" }", sep = "")
     patients_con$update(query, "{\"$set\":{\"locked\": false}}", multiple = TRUE)
@@ -860,14 +871,15 @@ unlock_user <- function(uri_fun, user, password, host, port, database, end_user)
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param selected_patient Selected patient.
 #' @keywords internal
 
-complete_case <- function(uri_fun, user, password, host, port, database, selected_patient) {
+complete_case <- function(uri_fun, user, password, host, replica_set, port, database, selected_patient) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "PATIENTS")
+    mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     query <- paste("{ \"patient_id\" : ", selected_patient, "}", sep = "")
 

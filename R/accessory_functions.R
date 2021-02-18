@@ -110,6 +110,7 @@ colorize <- function(get_output) {
 #' @param user DB user name.
 #' @param password DB password.
 #' @param host Host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @return {
@@ -122,7 +123,7 @@ colorize <- function(get_output) {
 #' }
 #' @export
 
-start_local <- function(user, password, host, port, database) {
+start_local <- function(user, password, host, replica_set, port, database) {
 
     assign("g_user", user, cedars.env)
     assign("g_password", password, cedars.env)
@@ -142,6 +143,7 @@ start_local <- function(user, password, host, port, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB server host.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param destination_path Folder where the files should be saved. Default is working directory.
@@ -156,20 +158,21 @@ start_local <- function(user, password, host, port, database) {
 #' }
 #' @export
 
-save_credentials <- function(user, password, host, port, database, LDAP, destination_path = getwd()) {
+save_credentials <- function(user, password, host, replica_set, port, database, LDAP, destination_path = getwd()) {
 
     app_path <- paste(find.package("CEDARS", lib.loc = NULL, quiet = TRUE), "/shiny/app.R", sep = "")
 
     g_user <- user
     g_password <- password
     g_host <- host
+    g_replica_set <- replica_set
     g_port <- port
     g_database <- database
     g_ldap <- LDAP
 
     file.copy(from = app_path, to = paste(destination_path, "/app.R", sep = ""))
 
-    save(g_user, g_password, g_host, g_port, g_database, g_ldap, file = paste(destination_path, "/db_credentials.Rdata",
+    save(g_user, g_password, g_host, g_replica_set, g_port, g_database, g_ldap, file = paste(destination_path, "/db_credentials.Rdata",
         sep = ""))
 
 }

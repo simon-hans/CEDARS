@@ -14,6 +14,7 @@
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @return {
@@ -28,7 +29,7 @@
 #' }
 #' @export
 
-mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_fun, user, password, host, port, database) {
+mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_fun, user, password, host, replica_set, port, database) {
 
     print("Reading file...")
 
@@ -72,7 +73,7 @@ mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_f
 
     print("Uploading to DB...")
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRCONSO")
+    mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "UMLS_MRCONSO")
 
     mongo_con$insert(mrconso)
 
@@ -87,6 +88,7 @@ mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_f
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @return {
@@ -99,7 +101,7 @@ mrconso_upload <- function(path, language = "ENG", subsets, max_grams = 7, uri_f
 #' }
 #' @export
 
-mrrel_upload <- function(path, uri_fun, user, password, host, port, database) {
+mrrel_upload <- function(path, uri_fun, user, password, host, replica_set, port, database) {
 
     print("Reading file...")
 
@@ -113,14 +115,14 @@ mrrel_upload <- function(path, uri_fun, user, password, host, port, database) {
 
     print("Keeping relationships for concepts of interest...")
 
-    mrconso_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRCONSO")
+    mrconso_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "UMLS_MRCONSO")
     selected_cuis <- mrconso_con$distinct("CUI")
 
     mrrel <- subset(mrrel, CUI1 %in% selected_cuis & CUI2 %in% selected_cuis)
 
     print("Uploading to DB...")
 
-    mrrel_con <- mongo_connect(uri_fun, user, password, host, port, database, "UMLS_MRREL")
+    mrrel_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "UMLS_MRREL")
 
     mrrel_con$insert(mrrel)
 
@@ -134,6 +136,7 @@ mrrel_upload <- function(path, uri_fun, user, password, host, port, database) {
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
 #' @param selected_model_path Path to NLP model file.
@@ -147,7 +150,7 @@ mrrel_upload <- function(path, uri_fun, user, password, host, port, database) {
 #' }
 #' @export
 
-negex_upload <- function(uri_fun, user, password, host, port, database, selected_model_path = NA) {
+negex_upload <- function(uri_fun, user, password, host, replica_set, port, database, selected_model_path = NA) {
 
     # Finding NLP model to use, if not specified
     selected_model_path <- find_model(selected_model_path)
@@ -185,7 +188,7 @@ negex_upload <- function(uri_fun, user, password, host, port, database, selected
 
     print("Uploading to DB...")
 
-    negex_con <- mongo_connect(uri_fun, user, password, host, port, database, "NEGEX")
+    negex_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NEGEX")
 
     # mongolite still does not support creation of unique indexes
     negex_con$run("{\"createIndexes\": \"NEGEX\", \"indexes\" : [{ \"key\" : { \"item\" : 1}, \"name\": \"item\", \"unique\": true}]}")
