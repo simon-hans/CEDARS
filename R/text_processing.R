@@ -356,7 +356,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
         print("Annotating...")
 
         batch_processor_db(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user,
-            password, host, port, database, max_n_grams_length, negex_depth, select_cores)
+            password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores)
 
     } else print("No records to annotate!")
 
