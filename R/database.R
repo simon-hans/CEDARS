@@ -98,7 +98,7 @@ db_download <- function(uri_fun, user, password, host, replica_set, port, databa
     fields <- c("text", "text_id", "text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", "text_tag_2",
         "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES", replica_set)
+    mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
     query <- paste("{\"patient_id\" :", patient_id, "}", sep = " ")
     notes <- mongo_con$find(query)
 
@@ -777,7 +777,7 @@ create_project <- function(uri_fun, user, password, host, replica_set, port, dat
 
     mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "INFO")
 
-    info <- data.frame(creation_time = Sys.time(), project = project_name, investigator = investigator_name, CEDARS_version = as.character(packageVersion("CEDARS")))
+    info <- data.frame(creation_time = Sys.time(), project = project_name, investigator = investigator_name, CEDARS_version = as.character(utils::packageVersion("CEDARS")))
 
     mongo_con$insert(info)
 

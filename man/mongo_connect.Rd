@@ -4,7 +4,16 @@
 \alias{mongo_connect}
 \title{Connect to MongoDB}
 \usage{
-mongo_connect(uri_fun, user, password, host, port, database, mongo_collection)
+mongo_connect(
+  uri_fun,
+  user,
+  password,
+  host,
+  replica_set,
+  port,
+  database,
+  mongo_collection
+)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +23,8 @@ mongo_connect(uri_fun, user, password, host, port, database, mongo_collection)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

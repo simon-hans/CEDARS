@@ -4,7 +4,16 @@
 \alias{terminate_project}
 \title{Terminate CEDARS Project}
 \usage{
-terminate_project(uri_fun, user, password, host, port, database, fast = FALSE)
+terminate_project(
+  uri_fun,
+  user,
+  password,
+  host,
+  replica_set,
+  port,
+  database,
+  fast = FALSE
+)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +23,8 @@ terminate_project(uri_fun, user, password, host, port, database, fast = FALSE)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

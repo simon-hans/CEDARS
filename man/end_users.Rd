@@ -4,7 +4,7 @@
 \alias{end_users}
 \title{Download End User List}
 \usage{
-end_users(uri_fun, user, password, host, port, database)
+end_users(uri_fun, user, password, host, replica_set, port, database)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ end_users(uri_fun, user, password, host, port, database)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

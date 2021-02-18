@@ -8,6 +8,7 @@ save_credentials(
   user,
   password,
   host,
+  replica_set,
   port,
   database,
   LDAP,
@@ -20,6 +21,8 @@ save_credentials(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB server host.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

@@ -4,7 +4,16 @@
 \alias{delete_end_user}
 \title{Delete a CEDARS End USer}
 \usage{
-delete_end_user(uri_fun, user, password, host, port, database, end_user)
+delete_end_user(
+  uri_fun,
+  user,
+  password,
+  host,
+  replica_set,
+  port,
+  database,
+  end_user
+)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +23,8 @@ delete_end_user(uri_fun, user, password, host, port, database, end_user)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

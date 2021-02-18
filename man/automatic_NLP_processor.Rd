@@ -12,6 +12,7 @@ automatic_NLP_processor(
   user,
   password,
   host,
+  replica_set,
   port,
   database,
   max_n_grams_length = 7,
@@ -34,6 +35,8 @@ automatic_NLP_processor(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

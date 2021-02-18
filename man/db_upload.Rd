@@ -9,6 +9,7 @@ db_upload(
   user,
   password,
   host,
+  replica_set,
   port,
   database,
   patient_id,
@@ -23,6 +24,8 @@ db_upload(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

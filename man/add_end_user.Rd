@@ -9,6 +9,7 @@ add_end_user(
   user,
   password,
   host,
+  replica_set,
   port,
   database,
   end_user,
@@ -23,6 +24,8 @@ add_end_user(
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

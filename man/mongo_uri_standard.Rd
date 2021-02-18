@@ -4,7 +4,7 @@
 \alias{mongo_uri_standard}
 \title{Prepare MongoDB URI string, most commonly used format}
 \usage{
-mongo_uri_standard(user, password, host, port = NA)
+mongo_uri_standard(user, password, host, replica_set = NA, port = NA)
 }
 \arguments{
 \item{user}{MongoDB user name.}
@@ -12,6 +12,8 @@ mongo_uri_standard(user, password, host, port = NA)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 }

@@ -4,7 +4,7 @@
 \alias{start_local}
 \title{Start CEDARS Locally}
 \usage{
-start_local(user, password, host, port, database)
+start_local(user, password, host, replica_set, port, database)
 }
 \arguments{
 \item{user}{DB user name.}
@@ -12,6 +12,8 @@ start_local(user, password, host, port, database)
 \item{password}{DB password.}
 
 \item{host}{Host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

@@ -4,7 +4,7 @@
 \alias{save_tags}
 \title{Save Document Tags}
 \usage{
-save_tags(uri_fun, user, password, host, port, database, tag_vect)
+save_tags(uri_fun, user, password, host, replica_set, port, database, tag_vect)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ save_tags(uri_fun, user, password, host, port, database, tag_vect)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

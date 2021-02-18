@@ -4,7 +4,16 @@
 \alias{pre_search}
 \title{Execute Search on a Set of Records}
 \usage{
-pre_search(patient_vect = NA, uri_fun, user, password, host, port, database)
+pre_search(
+  patient_vect = NA,
+  uri_fun,
+  user,
+  password,
+  host,
+  replica_set,
+  port,
+  database
+)
 }
 \arguments{
 \item{patient_vect}{Vector of patient ID's. Default is NA, in which case all unlocked records will be searched.}
@@ -16,6 +25,8 @@ pre_search(patient_vect = NA, uri_fun, user, password, host, port, database)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

@@ -4,7 +4,7 @@
 \alias{upload_notes}
 \title{Upload Notes to Database}
 \usage{
-upload_notes(uri_fun, user, password, host, port, database, notes)
+upload_notes(uri_fun, user, password, host, replica_set, port, database, notes)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +14,8 @@ upload_notes(uri_fun, user, password, host, port, database, notes)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 

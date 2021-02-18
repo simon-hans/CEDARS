@@ -4,7 +4,15 @@
 \alias{patient_roster_update}
 \title{Update Patient List}
 \usage{
-patient_roster_update(uri_fun, user, password, host, port, database)
+patient_roster_update(
+  uri_fun,
+  user,
+  password,
+  host,
+  replica_set,
+  port,
+  database
+)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -14,6 +22,8 @@ patient_roster_update(uri_fun, user, password, host, port, database)
 \item{password}{MongoDB user password.}
 
 \item{host}{MongoDB host server.}
+
+\item{replica_set}{MongoDB replica set, if indicated.}
 
 \item{port}{MongoDB port.}
 
