@@ -44,6 +44,7 @@ library(CEDARS)
 db_user_name <- "testUser"
 db_user_pw <- "testPW"
 db_host <- "cedars.yvjp6.mongodb.net"
+db_replica_set <- NA
 db_port <- NA
 
 # Using standard MongoDB URL format
@@ -54,18 +55,18 @@ uri_fun <- mongo_uri_standard
 mongo_database <- find_project_name()
 
 # We create the database and all required collections on a test cluster
-create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
+create_project(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database,
   "CEDARS Example Project", "Dr Smith")
 
 # Adding one CEDARS end user
-add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, "John",
+add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database, "John",
   "strongpassword")
 
 # Negex is included with CEDARS and required for assessment of negation
-negex_upload(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
+negex_upload(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
 
 # Uploading the small simulated collection of EHR corpora
-upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database,
+upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database,
   simulated_patients)
 
 # This is a simple query which will report all sentences with a word starting in
@@ -74,31 +75,31 @@ search_query <- "bleed* OR hem* OR bled"
 use_negation <- TRUE
 hide_duplicates <- TRUE
 skip_after_event <- TRUE
-save_query(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, search_query,
+save_query(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database, search_query,
   use_negation, hide_duplicates, skip_after_event)
 
 # Running the NLP annotations on EHR corpora
 # We are only using one core, for large datasets parallel processing is faster
 automatic_NLP_processor(NA, "latin1", "udpipe", uri_fun, db_user_name, db_user_pw,
-  db_host, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
+  db_host, db_replica_set, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
 
 # Pre-searching based on query
 # This is optional but will speed-up the interface
-pre_search(patient_vect = NA, uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
+pre_search(patient_vect = NA, uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
 
 # Start the CEDARS GUI locally
 # Your user name is "John", password is "strongpassword"
 # Once you have entered those credentials, click on button "ENTER NEW DATE" and CEDARS will seek the first record to annotate
 # Try out the interface, adjudicating sentences, entering event dates, comments, moving between sentences and searching for records
 # Once you have entered some data, close the GUI
-start_local(db_user_name, db_user_pw, db_host, db_port, mongo_database)
+start_local(db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
 
 # Obtaining events and info associated with data entry
 # The annotations entered in the GUI are now available in this dataframe
-event_output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database)
+event_output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
 
 # Remove project from MongoDB
-terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, mongo_database, fast=TRUE)
+terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database, fast=TRUE)
 ```
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
