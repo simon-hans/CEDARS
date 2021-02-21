@@ -87,7 +87,7 @@ sentence_search <- function(parse_result, annotations, use_negation, hide_duplic
 
 lemma_match <- function(annotations, keyword_elements) {
 
-    result <- as.vector(apply(sapply(keyword_elements, grepl, annotations$lemma), 1, any))
+    result <- as.vector(apply(sapply(keyword_elements, grepl, annotations$lemma, ignore.case = TRUE), 1, any))
 
     annotations$lemma_match <- result
 
@@ -128,10 +128,10 @@ sentence_eval <- function(unique_id, unique_sentences, annotations, query_vect, 
 
     if (length(selected_annotations[, 1]) > 1) {
 
-        query_construct[keyword_mask] <- as.vector(apply(sapply(keyword_elements, grepl, selected_annotations$lemma),
+        query_construct[keyword_mask] <- as.vector(apply(sapply(keyword_elements, grepl, selected_annotations$lemma, ignore.case = TRUE),
             2, any))
 
-    } else query_construct[keyword_mask] <- as.vector(sapply(keyword_elements, grepl, selected_annotations$lemma))
+    } else query_construct[keyword_mask] <- as.vector(sapply(keyword_elements, grepl, selected_annotations$lemma, ignore.case = TRUE))
 
     # If there is no CUI data then any CUI invoked in the search is considered absent
     if ("umls_CUI" %in% colnames(annotations))
