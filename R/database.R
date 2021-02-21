@@ -945,6 +945,8 @@ terminate_project_new <- function(uri_fun, user, password, host, replica_set, po
 #' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @param dates Provide dates of first and last note for each patient; this is needed to assess
+#' duration of follow-up, however can take a long time with large cohorts.
 #' @return {
 #' Object of class data.frame containing patient ID for all cohort members, date of recorded event if any,
 #' abstractor comments, sentences reviewed along with statistics about review process.
@@ -956,9 +958,10 @@ terminate_project_new <- function(uri_fun, user, password, host, replica_set, po
 #' }
 #' @export
 
-download_events <- function(uri_fun, user, password, host, replica_set, port, database) {
+download_events <- function(uri_fun, user, password, host, replica_set, port, database, dates = FALSE) {
 
     patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
+    notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
 
     out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1, \"time_locked\" : 1, \"pt_comments\" : 1, \"sentences\" : 1}")
 
@@ -977,6 +980,8 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
     out$sentences_bef_event <- rep(NA, len_out)
     out$case_time <- rep(NA, len_out)
     out$sentence_time <- rep(NA, len_out)
+    out$first_note_date <- rep(NA, len_out)
+    out$last_note_date <- rep(NA, len_out)
     out$sentences_bef_event_list <- rep(NA, len_out)
 
     # Computing approximate time spent per case per user
@@ -997,6 +1002,22 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
 
     for (i in 1:len_out){
 
+        # Finding note dates span for this patient
+
+        if (dates == TRUE){
+
+            patient_id <- out$patient_id[i]
+
+            note_dates <- notes_con$find(query = paste("{ \"patient_id\" : ", patient_id," }"), field = "{ \"_id\" : 0 , \"text_date\" : 1 }")
+            note_dates$text_date <- as.Date(as.character(note_dates$text_date))
+
+            out$first_note_date[i] <- as.character(min(note_dates$text_date))
+            out$last_note_date[i] <- as.character(max(note_dates$text_date))
+
+        }
+
+        # Getting sentences
+
         sentence_df <- out$sentences[[i]]
 
         if (!is.null(sentence_df)) {
@@ -1012,6 +1033,7 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
 
                 clean_sentences <- gsub("\\*START\\*", "", sentence_df$selected)
                 clean_sentences <- gsub("\\*END\\*", "", clean_sentences)
+
                 sent_dates <- sentence_df$text_date
                 out$sentences_bef_event_list[i] <- paste(paste("\"", clean_sentences, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
 
@@ -1040,6 +1062,9 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
     out$sentences_bef_event[is.na(out$sentences_bef_event)] <- 0
     out$sentences <- NULL
     out$sentence_time <- round(out$case_time/out$sentences_reviewed, digits=0)
+
+    # Capping cells at 32k characters, otherwise the CSV or TSV file can get corrupted
+    out$sentences_bef_event_list[!is.na(out$sentences_bef_event_list) & nchar(out$sentences_bef_event_list) > 32000] <- paste(substr(out$sentences_bef_event_list[!is.na(out$sentences_bef_event_list) & nchar(out$sentences_bef_event_list) > 32000], 1, 32000), "<TRUNCATED AT 32,000 CHARACTERS>")
 
     out <- out[order(out$patient_id, decreasing = FALSE, method = "radix"), ]
 

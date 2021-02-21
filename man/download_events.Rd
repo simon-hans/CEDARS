@@ -4,7 +4,16 @@
 \alias{download_events}
 \title{Download Event Data}
 \usage{
-download_events(uri_fun, user, password, host, replica_set, port, database)
+download_events(
+  uri_fun,
+  user,
+  password,
+  host,
+  replica_set,
+  port,
+  database,
+  dates = FALSE
+)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -20,6 +29,9 @@ download_events(uri_fun, user, password, host, replica_set, port, database)
 \item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
+
+\item{dates}{Provide dates of first and last note for each patient; this is needed to assess
+duration of follow-up, however can take a long time with large cohorts.}
 }
 \value{
 {
