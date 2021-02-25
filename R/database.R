@@ -110,6 +110,10 @@ db_download <- function(uri_fun, user, password, host, replica_set, port, databa
     colnames(missing_frame) <- missing_fields
     notes <- cbind(notes, missing_frame)
 
+    # Converting to date
+
+    notes$text_date <- as.Date(notes$text_date, tz = "UTC")
+
     notes
 
 }
