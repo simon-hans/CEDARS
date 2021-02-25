@@ -411,6 +411,10 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
                     fields_present <- colnames(notes)[colnames(notes) %in% standard_fields]
                     notes <- subset(notes, select = fields_present)
 
+                    # Converting dates to POSIX
+
+                    notes$text_date <- strptime(notes$text_date, "%Y-%m-%d", 'UTC')
+
                     suppressWarnings(upload_results <- mongo_con$insert(notes, stop_on_error = FALSE))
                     print(paste(upload_results$nInserted, " of ", length(notes[, 1]), " records inserted!", sep = ""))
 
