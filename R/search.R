@@ -293,6 +293,9 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
             annotations <- annotations_con$find(query)
 
+            # Maintaining POSIX format with UTC zone
+            annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
             # Getting event date
             patient_info <- patients_con$find(query)
             if (!is.null(patient_info$event_date)) event_date <- as.Date(patient_info$event_date) else event_date <- NA

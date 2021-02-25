@@ -506,6 +506,10 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
 
             # Ideally we would query DB directly with search terms, for now we download everything
             annotations <- annotations_con$find(query)
+
+            # Maintaining POSIX format with UTC zone
+            annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
             parse_result <- parse_query(search_query)
             search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
             sentences <- search_results$unique_sentences
@@ -528,6 +532,10 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                 # with different dates
 
                 annotations <- annotations_con$find(query)
+
+                # Maintaining POSIX format with UTC zone
+                annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
                 parse_result <- parse_query(search_query)
                 new_sentences <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
                 # Normally we would expect to have sentences here, not sure if any is new
