@@ -137,6 +137,10 @@ db_upload <- function(uri_fun, user, password, host, replica_set, port, database
 
     annotations <- cbind(rep(patient_id, length(annotations[, 1])), annotations)
     colnames(annotations)[1] <- "patient_id"
+
+    # Converting dates to POSIX
+    annotations$text_date <- strptime(annotations$text_date, "%Y-%m-%d", 'UTC')
+
     annotations <- annotations[order(annotations$text_id, annotations$paragraph_id, annotations$sentence_id, annotations$token_id,
         decreasing = FALSE, method = "radix"), ]
 

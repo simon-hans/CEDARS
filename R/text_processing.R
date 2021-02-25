@@ -226,8 +226,11 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
                 if (is.data.frame(annotations)) {
 
-                  row.names(annotations) <- NULL
-                  db_upload(uri_fun, user, password, host, replica_set, port, database, patient_vect[i], annotations)
+                    # Converting dates back to date
+                    annotations$text_date <- as.Date(annotations$text_date)
+
+                    row.names(annotations) <- NULL
+                    db_upload(uri_fun, user, password, host, replica_set, port, database, patient_vect[i], annotations)
 
                 }
 
