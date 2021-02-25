@@ -110,6 +110,10 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
     # Convert text to ASCII
     sub_corpus_short$text <- sanitize(sub_corpus_short$text)
 
+    # Convert dates to character, at least this is required for UDPipe
+
+    sub_corpus$text_date <- as.character(sub_corpus$text_date)
+
     # Only keeping rows with at least one non-white space character
     sub_corpus_short <- sub_corpus_short[grepl("\\S+", sub_corpus_short$text), ]
 
