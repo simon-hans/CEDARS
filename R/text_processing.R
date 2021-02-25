@@ -110,10 +110,6 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
     # Convert text to ASCII
     sub_corpus_short$text <- sanitize(sub_corpus_short$text)
 
-    # Convert dates to character, at least this is required for UDPipe
-
-    sub_corpus$text_date <- as.character(sub_corpus$text_date)
-
     # Only keeping rows with at least one non-white space character
     sub_corpus_short <- sub_corpus_short[grepl("\\S+", sub_corpus_short$text), ]
 
@@ -221,6 +217,10 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
             sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
             if (length(sub_corpus[, 1]) > 0) {
+
+                # Convert dates to character, at least this is required for UDPipe
+                sub_corpus$text_date <- as.character(sub_corpus$text_date)
+
                 annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
                   max_n_grams_length, negex_depth, single_core_model)
 
