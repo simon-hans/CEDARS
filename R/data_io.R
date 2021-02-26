@@ -417,8 +417,10 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
 
             # This inserts one table in JSON format, nested into the patient record Also turns off the 'updated' marker
             sentences <- sentences[order(sentences$unique_id, decreasing = FALSE, method = "radix"), ]
+            sentences_for_upload <- sentences
+            sentences_for_upload$text_date <- strptime(sentences_for_upload$text_date, "%Y-%m-%d", "UTC")
             query <- paste("{ \"patient_id\" : ", new_patient_id, "}", sep = "")
-            update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
+            update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences_for_upload, POSIXt = "mongo"), ", \"updated\" : false }}",
                 sep = "")
             patients_con$update(query, update_value)
 
