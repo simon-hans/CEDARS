@@ -242,6 +242,10 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
         pt_comments <- sanitize(pt_comments)
 
+        # Converting R date to POSIX
+
+        event_date <- strptime(event_date, "%Y-%m-%d", 'UTC')
+
         query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
         db_results <- query_con$find("{}")
         skip_after_event <- db_results$skip_after_event[1]
@@ -277,7 +281,7 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
                 if (event_date != "DELETE")
                   update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : ",
-                    "\"", event_date, "\"", " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
+                    "\"", toJSON(event_date, POSIXt = "mongo"), "\"", " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
 
                  # update_value <- paste("{\"$unset\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : null",
                   #  " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "")
