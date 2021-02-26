@@ -281,7 +281,7 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
                 if (event_date != "DELETE")
                   update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : ",
-                    "\"", toJSON(event_date, POSIXt = "mongo"), "\"", " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
+                    "\"", event_date, "\"", " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
 
                  # update_value <- paste("{\"$unset\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : null",
                   #  " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "")
