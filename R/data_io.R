@@ -272,14 +272,14 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
             }
 
             if (is.na(event_date))
-                update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences), " , \"pt_comments\" : ",
+                update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), " , \"pt_comments\" : ",
                   "\"", pt_comments, "\" }}", sep = "") else {
 
                 if (event_date != "DELETE")
-                  update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"event_date\" : ",
+                  update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : ",
                     "\"", event_date, "\"", " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
 
-                 # update_value <- paste("{\"$unset\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"event_date\" : null",
+                 # update_value <- paste("{\"$unset\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : null",
                   #  " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "")
 
                         update_value <- paste("{\"$unset\":{\"event_date\" : null }}", sep = "")
@@ -417,7 +417,7 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             # This inserts one table in JSON format, nested into the patient record Also turns off the 'updated' marker
             sentences <- sentences[order(sentences$unique_id, decreasing = FALSE, method = "radix"), ]
             query <- paste("{ \"patient_id\" : ", new_patient_id, "}", sep = "")
-            update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences), ", \"updated\" : false }}",
+            update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
                 sep = "")
             patients_con$update(query, update_value)
 
