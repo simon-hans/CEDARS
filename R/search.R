@@ -320,7 +320,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
                 unique_sentences$note_text <- sapply(unique_sentences$doc_id, aggregate_note, sentences$annotations, parse_result$cui_elements)
 
-                update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(unique_sentences), ", \"updated\" : false }}",
+                update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(unique_sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
                   sep = "")
 
                 patients_con$update(query, update_value)
