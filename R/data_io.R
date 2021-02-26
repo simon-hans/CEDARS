@@ -124,7 +124,8 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
 
                   out <- list()
                   out$patient_id <- selected$patient_id
-                  out$event_date <- strftime(selected$event_date, format = "%Y-%m-%d", tz = "UTC")
+                  out$event_date <- selected$event_date
+                  if (!is.null(out$event_date[1])) out$event_date <- strftime(out$event_date, format = "%Y-%m-%d", tz = "UTC")
                   out$max_unique_id <- max_unique_id
                   out$pt_comments <- selected$pt_comments
                   out <- append(out, as.list(sentences_df[1, ]))
@@ -187,7 +188,8 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
 
                 pre_out <- list()
                 pre_out$patient_id <- previously_selected$patient_id
-                pre_out$event_date <- strftime(previously_selected$event_date, format = "%Y-%m-%d", tz = "UTC")
+                pre_out$event_date <- previously_selected$event_date
+                if (!is.null(pre_out$event_date[1])) pre_out$event_date <- strftime(pre_out$event_date, format = "%Y-%m-%d", tz = "UTC")
                 pre_out$max_unique_id <- max_unique_id
                 pre_out$pt_comments <- previously_selected$pt_comments
 
