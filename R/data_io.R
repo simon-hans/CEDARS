@@ -244,7 +244,7 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
         # Converting R date to POSIX
 
-        event_date <- strptime(event_date, "%Y-%m-%d", 'UTC')
+        # event_date <- strptime(event_date, "%Y-%m-%d", 'UTC')
 
         query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
         db_results <- query_con$find("{}")
