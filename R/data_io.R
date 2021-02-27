@@ -391,6 +391,8 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
         hide_duplicates, patient_id)
     sentences <- sentences_result$sentences
     no_patient_left <- sentences_result$no_patient_left
+    # edit 2-27
+    found_patient_id <- sentences_result$patient_id
 
     # If there are no sentences after inital search, we keep looking.  This does not apply if patient ID for search
     # was specified.
@@ -414,12 +416,15 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
 
         if (length(sentences[, 1]) > 0) {
 
-            retained_fields <- c("patient_id", "doc_id", "text_sequence", "paragraph_id", "sentence_id", "text_date",
+            # edit 2-27
+            retained_fields <- c("doc_id", "text_sequence", "paragraph_id", "sentence_id", "text_date",
                 "selected", "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
                 "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
             retained_fields <- retained_fields[retained_fields %in% colnames(sentences)]
 
-            new_patient_id <- sentences$patient_id[1]
+            # edit 2-27
+            # new_patient_id <- sentences$patient_id[1]
+            new_patient_id <- found_patient_id
             if (!("reviewed" %in% colnames(sentences)))
                 sentences$reviewed <- rep(FALSE, length(sentences[, 1]))
             sentences$text_date <- as.Date(sentences$text_date)
@@ -436,7 +441,8 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
 
             # For consistency of data field type with results of annotations
             sentences_for_upload$text_sequence <- as.integer(as.character(sentences_for_upload$text_sequence))
-            sentences_for_upload$patient_id <- as.double(as.character(sentences_for_upload$patient_id))
+            # edit 2-27
+            # sentences_for_upload$patient_id <- as.double(as.character(sentences_for_upload$patient_id))
 
             query <- paste("{ \"patient_id\" : ", new_patient_id, "}", sep = "")
             update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences_for_upload, POSIXt = "mongo"), ", \"updated\" : false }}",
@@ -607,6 +613,8 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
     out <- list()
     out$sentences <- sentences
     out$no_patient_left <- no_patient_left
+    # edit 2-27
+    out$patient_id <- selected_patient
 
     out
 
