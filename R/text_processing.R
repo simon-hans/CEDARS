@@ -395,8 +395,10 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
     if (anyNA(match(c("patient_id", "text_id", "text", "text_date", "doc_id"), colnames(notes))))
         print("Error: missing field.") else {
 
-            if (is.numeric(notes$patient_id)) min_val <- min(notes$patient_id) else min_val <- 0
-            if (min_val <=0) print("Error: patient ID must be numeric and >0.") else {
+            if (is.numeric(notes$patient_id)) min_val_pt <- min(notes$patient_id) else min_val_pt <- 0
+            if (!is.na(notes$text_sequence) & is.numeric(notes$text_sequence)) min_val_seq <- min(notes$text_sequence)
+            if (!is.na(notes$text_sequence) & !is.numeric(notes$text_sequence)) min_val_seq <- 0
+            if (min_val_pt <=0 | min_val_seq <=0) print("Error: patient ID and text sequence values must be numeric and >0.") else {
 
                 date_check <- !(as.character(as.Date(notes$text_date, format = "%Y-%m-%d")) == notes$text_date)
 
@@ -410,6 +412,11 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
                         print("Text sequence missing, importing as is.")
 
                     }
+
+                    # Making sure text and doc ID's are in character form, no whitespace
+
+                    notes$text_id <- trimws(as.character(notes$text_id))
+                    notes$doc_id <- trimws(as.character(notes$doc_id))
 
                     standard_fields <- c("patient_id", "text_id", "text", "text_date", "doc_id", "text_sequence", "text_tag_1",
                         "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8",
