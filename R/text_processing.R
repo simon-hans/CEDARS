@@ -396,8 +396,8 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
         print("Error: missing field.") else {
 
             if (is.numeric(notes$patient_id)) min_val_pt <- min(notes$patient_id) else min_val_pt <- 0
-            if (!is.na(notes$text_sequence) & is.numeric(notes$text_sequence)) min_val_seq <- min(notes$text_sequence)
-            if (!is.na(notes$text_sequence) & !is.numeric(notes$text_sequence)) min_val_seq <- 0
+            if ("text_sequence" %in% colnames(notes) & is.numeric(notes$text_sequence)) min_val_seq <- min(notes$text_sequence)
+            if ("text_sequence" %in% colnames(notes) & !is.numeric(notes$text_sequence)) min_val_seq <- 0
             if (min_val_pt <=0 | min_val_seq <=0) print("Error: patient ID and text sequence values must be numeric and >0.") else {
 
                 date_check <- !(as.character(as.Date(notes$text_date, format = "%Y-%m-%d")) == notes$text_date)
