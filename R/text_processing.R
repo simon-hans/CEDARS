@@ -419,6 +419,7 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
 
                     # For consistency of data field type with results of annotations
                     notes$text_sequence <- as.integer(notes$text_sequence)
+                    notes$patient_id <- as.integer(notes$patient_id)
 
                     standard_fields <- c("patient_id", "text_id", "text", "text_date", "doc_id", "text_sequence", "text_tag_1",
                         "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8",
