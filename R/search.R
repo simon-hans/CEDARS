@@ -320,6 +320,10 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
                 unique_sentences$note_text <- sapply(unique_sentences$doc_id, aggregate_note, sentences$annotations, parse_result$cui_elements)
 
+                # For consistency of data field type with results of annotations
+                unique_sentences$text_sequence <- as.integer(as.character(unique_sentences$text_sequence))
+                unique_sentences$patient_id <- as.double(as.character(unique_sentences$patient_id))
+
                 update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(unique_sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
                   sep = "")
 
