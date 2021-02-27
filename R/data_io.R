@@ -276,7 +276,8 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
             # For consistency of data field type with results of annotations
             sentences$text_sequence <- as.integer(as.character(sentences$text_sequence))
-            sentences$patient_id <- as.double(as.character(sentences$patient_id))
+            # edit 2-27
+            # sentences$patient_id <- as.double(as.character(sentences$patient_id))
 
             old_event_date <- as.Date(data$event_date)
             if (is.na(event_date))
