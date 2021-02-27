@@ -1109,8 +1109,8 @@ upload_events <- function(uri_fun, user, password, host, replica_set, port, data
 
         event_dates <- data.frame(patient_id = patient_ids, event_date = event_dates)
         event_dates$event_date <- as.character(event_dates$event_date)
-        event_dates$event_date <- paste("\"", event_dates$event_date, "\"", sep = "")
-        event_dates$event_date[event_dates$event_date == "\"NA\""] <- "null"
+        # event_dates$event_date <- paste("\"", event_dates$event_date, "\"", sep = "")
+        event_dates$event_date[is.na(event_dates$event_date)] <- "null"
 
         patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
@@ -1128,7 +1128,7 @@ upload_events <- function(uri_fun, user, password, host, replica_set, port, data
 
                 pt_update <- paste("{ \"$unset\" : {\"event_date\" : ", current_outcomes$event_date[i], "}}", sep = "")
 
-            } else pt_update <- paste("{ \"$set\" : {\"event_date\" : ", current_outcomes$event_date[i], "}}", sep = "")
+            } else pt_update <- paste("{ \"$set\" : {\"event_date\" : { \"$date\" : ", as.numeric(strptime(current_outcomes$event_date[i], "%Y-%m-%d", 'UTC'))*1000, "}}}", sep = "")
 
             patients_con$update(pt_query, pt_update)
 
