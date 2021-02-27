@@ -282,15 +282,13 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
                 if (event_date != "DELETE")
                   update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : { \"$date\" : ", as.numeric(strptime(event_date, "%Y-%m-%d", 'UTC'))*1000, " }, \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
 
-                 # update_value <- paste("{\"$unset\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : null",
-                  #  " , \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "")
-
                         update_value <- paste("{\"$unset\":{\"event_date\" : null }}", sep = "")
 
                 }
 
             }
 
+            print(update_value)
             patients_con$update(query, update_value)
 
 
