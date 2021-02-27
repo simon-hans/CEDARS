@@ -209,7 +209,7 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
 
         }
 
-        # error_0 = end user ID/passowrd incorrect
+        # error_0 = end user ID/password incorrect
     } else out <- "error_0"
 
     if (!(out[1] %in% c("error_0", "error_1", "error_2", "error_3", "error_4")) & html == TRUE)
