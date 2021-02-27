@@ -275,7 +275,7 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
             sentences <- as.data.frame(data$sentences)
 
             # For consistency of data field type with results of annotations
-            sentences$text_sequence <- as.numeric(as.character(sentences$text_sequence))
+            sentences$text_sequence <- as.integer(as.character(sentences$text_sequence))
 
             old_event_date <- as.Date(data$event_date)
             if (is.na(event_date))
@@ -434,7 +434,7 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             sentences_for_upload$text_date <- strptime(sentences_for_upload$text_date, "%Y-%m-%d", "UTC")
 
             # For consistency of data field type with results of annotations
-            sentences_for_upload$text_sequence <- as.numeric(as.character(sentences_for_upload$text_sequence))
+            sentences_for_upload$text_sequence <- as.integer(as.character(sentences_for_upload$text_sequence))
 
             query <- paste("{ \"patient_id\" : ", new_patient_id, "}", sep = "")
             update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences_for_upload, POSIXt = "mongo"), ", \"updated\" : false }}",
