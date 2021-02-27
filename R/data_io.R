@@ -120,6 +120,7 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
                   query <- paste("{ \"end_user\" : ", "\"", end_user, "\", ", " \"locked\" : true}", sep = "")
                   selected <- patients_con$find(query)
                   sentences_df <- as.data.frame(selected$sentences[1])
+                  sentences_df$text_date <- as.character(as.Date(sentences_df$text_date))
                   max_unique_id <- max(sentences_df$unique_id)
 
                   out <- list()
@@ -182,6 +183,7 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
             if (length(previously_selected) != 0) {
 
                 sentences_df_ori <- as.data.frame(previously_selected$sentences[1])
+                sentences_df_ori$text_date <- as.character(as.Date(sentences_df_ori$text_date))
                 max_unique_id <- max(sentences_df_ori$unique_id)
                 sentences_df <- subset(sentences_df_ori, reviewed == FALSE)
                 sentences_df$reviewed <- NULL
