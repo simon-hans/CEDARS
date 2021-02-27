@@ -293,7 +293,6 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
             }
 
-            print(update_value)
             patients_con$update(query, update_value)
 
 
