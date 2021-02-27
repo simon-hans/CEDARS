@@ -147,7 +147,7 @@ db_upload <- function(uri_fun, user, password, host, replica_set, port, database
 
     # Making sure text sequence ID's and patient ID's are integers, for consistency
     annotations$text_sequence <- as.integer(as.character(annotations$text_sequence))
-    annotations$patient_id <- as.integer(as.character(annotations$patient_id))
+    annotations$patient_id <- as.double(as.character(annotations$patient_id))
 
     annotations <- annotations[order(annotations$text_id, annotations$paragraph_id, annotations$sentence_id, annotations$token_id,
         decreasing = FALSE, method = "radix"), ]
