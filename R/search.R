@@ -308,7 +308,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
                 # edit 2-27
                 # Removed patient_id from desired fields
-                retained_fields <- c("doc_id", "text_sequence", "paragraph_id", "sentence_id", "text_date",
+                retained_fields <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date",
                   "selected", "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
                   "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
                 retained_fields <- retained_fields[retained_fields %in% colnames(unique_sentences)]
