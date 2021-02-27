@@ -274,8 +274,9 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
             sentences <- as.data.frame(data$sentences)
 
+            # edit 2-27
             # For consistency of data field type with results of annotations
-            sentences$text_sequence <- as.integer(as.character(sentences$text_sequence))
+            sentences$text_id <- as.character(sentences$text_id)
             # edit 2-27
             # sentences$patient_id <- as.double(as.character(sentences$patient_id))
 
@@ -429,7 +430,8 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             if (!("reviewed" %in% colnames(sentences)))
                 sentences$reviewed <- rep(FALSE, length(sentences[, 1]))
             sentences$text_date <- as.Date(sentences$text_date)
-            sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_sequence, sentences$paragraph_id,
+            # edit 2-27
+            sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id, sentences$paragraph_id,
                 sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
             sentences$unique_id <- 1:length(sentences[, 1])
             sentences <- subset(sentences, select = c("unique_id", "reviewed", retained_fields))
@@ -440,8 +442,9 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             sentences_for_upload <- sentences
             sentences_for_upload$text_date <- strptime(sentences_for_upload$text_date, "%Y-%m-%d", "UTC")
 
+            # edit 2-27
             # For consistency of data field type with results of annotations
-            sentences_for_upload$text_sequence <- as.integer(as.character(sentences_for_upload$text_sequence))
+            sentences_for_upload$text_id <- as.character(sentences_for_upload$text_id)
             # edit 2-27
             # sentences_for_upload$patient_id <- as.double(as.character(sentences_for_upload$patient_id))
 
@@ -575,7 +578,8 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                   new_sentences$reviewed <- NULL
                   new_sentences$unique_id <- NULL
                   new_sentences$patient_id <- NULL
-                  sentences <- merge(new_sentences, sentences, by = c("doc_id", "text_sequence", "paragraph_id",
+                  # edit 2-27
+                  sentences <- merge(new_sentences, sentences, by = c("doc_id", "text_id", "paragraph_id",
                     "sentence_id", "text_date", "selected", "note_text"), all.x = TRUE, all.y = TRUE)
                   sentences$reviewed[is.na(sentences$reviewed)] <- FALSE
                   sentences$text_tag_1[!is.na(sentences$text_tag_1.x)] <- sentences$text_tag_1.x[!is.na(sentences$text_tag_1.x)]
@@ -599,7 +603,8 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                   sentences$text_tag_10[!is.na(sentences$text_tag_10.x)] <- sentences$text_tag_10.x[!is.na(sentences$text_tag_10.x)]
                   sentences$text_tag_10[!is.na(sentences$text_tag_10.y)] <- sentences$text_tag_10.y[!is.na(sentences$text_tag_10.y)]
                   sentences$text_date <- as.Date(sentences$text_date)
-                  sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_sequence,
+                  # edit 2-27
+                  sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id,
                     sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
                   sentences$unique_id <- 1:length(sentences[, 1])
 

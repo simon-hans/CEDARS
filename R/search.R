@@ -313,8 +313,9 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                   "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
                 retained_fields <- retained_fields[retained_fields %in% colnames(unique_sentences)]
 
+                # edit 2-27
                 unique_sentences <- unique_sentences[order(unique_sentences$text_date, unique_sentences$doc_id,
-                  unique_sentences$text_sequence, unique_sentences$paragraph_id, unique_sentences$sentence_id,
+                  unique_sentences$text_id, unique_sentences$paragraph_id, unique_sentences$sentence_id,
                   decreasing = FALSE, method = "radix"), ]
                 unique_sentences$unique_id <- 1:length(unique_sentences[, 1])
                 unique_sentences$reviewed <- rep(FALSE, length(unique_sentences[, 1]))
@@ -322,8 +323,9 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
                 unique_sentences$note_text <- sapply(unique_sentences$doc_id, aggregate_note, sentences$annotations, parse_result$cui_elements)
 
+                # edit 2-27
                 # For consistency of data field type with results of annotations
-                unique_sentences$text_sequence <- as.integer(as.character(unique_sentences$text_sequence))
+                unique_sentences$text_id <- as.character(unique_sentences$text_id)
                 # edit 2-27
                 # unique_sentences$patient_id <- as.double(as.character(unique_sentences$patient_id))
 
