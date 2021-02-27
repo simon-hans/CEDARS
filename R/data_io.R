@@ -241,6 +241,11 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
 post_data <- function(uri_fun, user, password, host, replica_set, port, database, end_user, end_user_password, position, event_date,
     pt_comments, ldap = FALSE) {
 
+    # Turning off scientific notation temporarily, otherwise JSON objects can be corrupted
+    sci_opt <- getOption("scipen")
+    on.exit(options(scipen = sci_opt))
+    options(scipen = 999)
+
     if (ldap == TRUE | password_verification(uri_fun, user, password, host, replica_set, port, database, end_user, end_user_password) ==
         TRUE) {
 
@@ -368,6 +373,11 @@ password_verification <- function(uri_fun, user, password, host, replica_set, po
 
 commit_patient <- function(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation, hide_duplicates,
     patient_id = NA) {
+
+    # Turning off scientific notation temporarily, otherwise JSON objects can be corrupted
+    sci_opt <- getOption("scipen")
+    on.exit(options(scipen = sci_opt))
+    options(scipen = 999)
 
     committed <- TRUE
 
