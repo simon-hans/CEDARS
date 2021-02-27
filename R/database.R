@@ -145,8 +145,8 @@ db_upload <- function(uri_fun, user, password, host, replica_set, port, database
     annotations$text_id <- trimws(as.character(annotations$text_id))
     annotations$doc_id <- trimws(as.character(annotations$doc_id))
 
-    # Making sure text sequence ID's are numeric
-    annotations$text_sequence <- as.numeric(as.character(annotations$text_sequence))
+    # Making sure text sequence ID's are integers, for consistency
+    annotations$text_sequence <- as.integer(as.character(annotations$text_sequence))
 
     annotations <- annotations[order(annotations$text_id, annotations$paragraph_id, annotations$sentence_id, annotations$token_id,
         decreasing = FALSE, method = "radix"), ]
