@@ -346,6 +346,7 @@ populate_query <- function(uri_fun, user, password, host, replica_set, port, dat
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param skip_after_event Should sentences occurring after recorded clinical event be skipped?
+#' @param tag_query List with 2 sublists, namely "include" and "exclude", indicating matching strings for metadata tag parameters.
 #' @return {
 #' Confirmation that requested operation was completed, or error message if attempt failed.
 #' }
@@ -353,11 +354,13 @@ populate_query <- function(uri_fun, user, password, host, replica_set, port, dat
 #' \dontrun{
 #' save_query(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
 #' host = 'server1234', port = NA, database = 'TEST_PROJECT', search_query = 'thrombosis AND venous',
-#' use_negation = TRUE, hide_duplicates = TRUE, skip_after_event = TRUE)
+#' use_negation = TRUE, hide_duplicates = TRUE, skip_after_event = TRUE,
+#' tag_query = list(include = list(text_tag_1 = c("admission"),
+#' text_tag_2 = c("impression", "plan")), exclude = NA))
 #' }
 #' @export
 
-save_query <- function(uri_fun, user, password, host, replica_set, port, database, search_query, use_negation, hide_duplicates, skip_after_event) {
+save_query <- function(uri_fun, user, password, host, replica_set, port, database, search_query, use_negation, hide_duplicates, skip_after_event, tag_query = NA) {
 
     search_query <- sanitize_query(search_query)
 
@@ -371,7 +374,7 @@ save_query <- function(uri_fun, user, password, host, replica_set, port, databas
         converted_skip_after_event <- "true" else converted_skip_after_event <- "false"
 
     update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation, " , \"hide_duplicates\" : ",
-        converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, "}", sep = "")
+                          converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, ", \"tag_query\" : ", jsonlite::toJSON(tag_query), "}", sep = "")
 
     query_out <- query_con$replace(query = "{}", update = update_value, upsert = TRUE)
 
@@ -1226,5 +1229,77 @@ save_tags <- function(uri_fun, user, password, host, replica_set, port, database
     info_con$update("{}", paste("{ \"$set\" : { \"tag_8\" : ", "\"", tag_vect[8], "\"", "}}", sep = ""), upsert = TRUE)
     info_con$update("{}", paste("{ \"$set\" : { \"tag_9\" : ", "\"", tag_vect[9], "\"", "}}", sep = ""), upsert = TRUE)
     info_con$update("{}", paste("{ \"$set\" : { \"tag_10\" : ", "\"", tag_vect[10], "\"", "}}", sep = ""), upsert = TRUE)
+
+}
+
+
+#' Download Notes Metadata Summary
+#'
+#' Downloads text_tag_x info for the tags with "include" and/or "exclude" criteria in the core CEDARS search query.
+#' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
+#' @param user MongoDB user name.
+#' @param password MongoDB user password.
+#' @param host MongoDB server host.
+#' @param replica_set MongoDB replica set, if indicated.
+#' @param port MongoDB port.
+#' @param database MongoDB database name.
+#' @return {
+#' List containing one dataframe per text_tag_x of interest, indicating selected status.
+#' Can take time to download for large datasets.
+#' }
+#' @examples
+#' \dontrun{
+#' download_filtered_tags(uri_fun = mongo_uri_standard, user = 'John',
+#' password = 'db_password_1234', host = 'server1234', replica_set = NA, port = NA,
+#' database = 'TEST_PROJECT')
+#' }
+#' @export
+
+download_filtered_tags <- function(uri_fun, user, password, host, replica_set, port, database){
+
+    query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
+    notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
+
+    # Getting query detailing text tag inclusions/exclusions
+
+    tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+    if (dim(tag_query)[2] > 0) {
+
+        tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+        tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
+
+        selected_tags <- unique(c(names(tag_query$include), names(tag_query$exclude)))
+
+        all_tag_uniques <- list()
+
+        for (i in 1:length(selected_tags)){
+
+            print(paste("Assessing tag ", i, " of ", length(selected_tags), "...", sep=""))
+
+            tag_uniques_dl <- notes_con$aggregate(paste('[{ \"$group\" : {\"_id\" : \"$', selected_tags[i] , '\" } }]', sep = ""), options = '{"allowDiskUse":true}')
+            tag_uniques <- tag_uniques_dl
+            colnames(tag_uniques)[1] <- selected_tags[i]
+
+            tag_uniques_filtered <- tag_filter(tag_uniques, tag_query)
+            tag_uniques_filtered$retained <- TRUE
+            tag_uniques <- merge(tag_uniques, tag_uniques_filtered, by = selected_tags[i], all.x = TRUE, all.y = TRUE)
+            tag_uniques$retained[is.na(tag_uniques$retained)] <- FALSE
+            tag_uniques <- tag_uniques[order(tag_uniques[,colnames(tag_uniques) == selected_tags[i]], decreasing = FALSE, method= "radix"),]
+
+            all_tag_uniques[[i]] <- tag_uniques
+
+            }
+
+        names(all_tag_uniques) <- selected_tags
+
+    } else {
+
+        all_tag_uniques <- NA
+
+        print("No metadata tag query on record.")
+
+    }
+
+    all_tag_uniques
 
 }

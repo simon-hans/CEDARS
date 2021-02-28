@@ -15,7 +15,8 @@ save_query(
   search_query,
   use_negation,
   hide_duplicates,
-  skip_after_event
+  skip_after_event,
+  tag_query = NA
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ save_query(
 \item{hide_duplicates}{Should duplicated sentences be removed for search results?}
 
 \item{skip_after_event}{Should sentences occurring after recorded clinical event be skipped?}
+
+\item{tag_query}{List with 2 sublists, namely "include" and "exclude", indicating matching strings for metadata tag parameters.}
 }
 \value{
 {
@@ -53,6 +56,8 @@ Saves the search query. The query consists of keywords/UMLS concept unique ident
 \dontrun{
 save_query(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
 host = 'server1234', port = NA, database = 'TEST_PROJECT', search_query = 'thrombosis AND venous',
-use_negation = TRUE, hide_duplicates = TRUE, skip_after_event = TRUE)
+use_negation = TRUE, hide_duplicates = TRUE, skip_after_event = TRUE,
+tag_query = list(include = list(text_tag_1 = c("admission"),
+text_tag_2 = c("impression", "plan")), exclude = NA))
 }
 }

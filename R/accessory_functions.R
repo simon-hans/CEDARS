@@ -250,3 +250,84 @@ find_model <- function(selected_model_path){
     selected_model_path
 
 }
+
+
+#' Filter Dataframe Based on Metadata Tags
+#'
+#' Parses a dataframe, looks for text tags and applies filter based on text_tag_x fields.
+#' @param tagged_df Input dataframe.
+#' @param tag_query List of "included" and "excluded" tags.
+#' @return Subset of input dataframe fitting metadata inclusion/exclusion criteria.
+#' @keywords internal
+
+tag_filter <- function(tagged_df, tag_query){
+
+    # Ordering tags in main dataframe
+    if (length(tagged_df[1,]) > 1) tagged_df <- tagged_df[,order(colnames(tagged_df), decreasing = FALSE, method = "radix")]
+
+    # Keeping only tags with filter info
+    if (!is.na(tag_query$include[1])) tag_query$include <- tag_query$include[order(names(tag_query$include), decreasing = FALSE, method = "radix")]
+    if (!is.na(tag_query$exclude[1])) tag_query$exclude <- tag_query$exclude[order(names(tag_query$exclude), decreasing = FALSE, method = "radix")]
+    if (!is.na(tag_query$include[1])) tagged_df_include <- subset(tagged_df, select = colnames(tagged_df)[colnames(tagged_df) %in% names(tag_query$include)]) else tagged_df_include <- NA
+    if (!is.na(tag_query$exclude[1])) tagged_df_exclude <- subset(tagged_df, select = colnames(tagged_df)[colnames(tagged_df) %in% names(tag_query$exclude)]) else tagged_df_exclude <- NA
+
+    # Matching
+    # If not data about inclusions, we include everything; if no data about exclusions, we exclude nothing
+
+    if (is.data.frame(tagged_df_include) && length(tagged_df_include[1,]) > 0) {
+
+        filter_mat_include <- matrix(nrow = length(tagged_df[,1]), ncol = length(tagged_df[1,]))
+        tag_query$include_sub <- tag_query$include[names(tag_query$include) %in% colnames(tagged_df)]
+
+        for (i in 1:length(filter_mat_include[1,])){
+
+            a <- lapply(unlist(tag_query$include_sub[i]), grepl, tagged_df_include[,i], ignore.case = TRUE)
+
+            b <- matrix(unlist(a), nrow = length(tagged_df[,1]))
+
+            filter_mat_include[,i] <- apply(b, 1, any)
+
+        }
+
+        match_vect_include <- apply(filter_mat_include, 1, any)
+
+    }  else match_vect_include <- rep(TRUE, length(tagged_df[,1]))
+
+
+    if (is.data.frame(tagged_df_exclude) && length(tagged_df_exclude[1,]) > 0) {
+
+        filter_mat_exclude <- matrix(nrow = length(tagged_df[,1]), ncol = length(tagged_df[1,]))
+        tag_query$exclude_sub <- tag_query$exclude[names(tag_query$exclude) %in% colnames(tagged_df)]
+
+        for (i in 1:length(filter_mat_exclude[1,])){
+
+            c <- lapply(unlist(tag_query$exclude_sub[i]), grepl, tagged_df_exclude[,i], ignore.case = TRUE)
+
+            d <- matrix(unlist(c), nrow = length(tagged_df[,1]))
+
+            filter_mat_exclude[,i] <- apply(d, 1, any)
+
+        }
+
+        match_vect_exclude <- apply(filter_mat_exclude, 1, any)
+
+    }  else match_vect_exclude <- rep(FALSE, length(tagged_df[,1]))
+
+    # Applying to original DF
+
+    match_vect_final <- match_vect_include & !match_vect_exclude
+
+    if (length(tagged_df[1,]) > 1) tagged_df <- tagged_df[match_vect_final,] else {
+
+        new_df <- data.frame(name = tagged_df[match_vect_final,])
+        colnames(new_df) <- colnames(tagged_df)
+        tagged_df <- new_df
+
+    }
+
+    # Returning only records with at least one match for inclusion criteria (if any) and no exclusion criterion
+
+    tagged_df
+
+}
+
