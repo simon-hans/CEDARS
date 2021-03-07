@@ -267,9 +267,33 @@ tag_filter <- function(tagged_df, tag_query){
 
     if (tag_query$exact == TRUE) {
 
-        if (!is.na(tag_query$include[1])) for (i in 1:length(tag_query$include)) tag_query$include[[i]] <- paste("^", tag_query$include[[i]], "$", sep = "")
+        if (!is.na(tag_query$include[1])) for (i in 1:length(tag_query$include)) {
 
-        if (!is.na(tag_query$exclude[1])) for (i in 1:length(tag_query$exclude)) tag_query$exclude[[i]] <- paste("^", tag_query$exclude[[i]], "$", sep = "")
+            tag_query$include[[i]] <- gsub("[^[:alnum:]]", " ", tag_query$include[[i]])
+            tag_query$include[[i]] <- paste("^", tag_query$include[[i]], "$", sep = "")
+
+        }
+
+        if (!is.na(tag_query$exclude[1])) for (i in 1:length(tag_query$exclude)) {
+
+            tag_query$exclude[[i]] <- gsub("[^[:alnum:]]", " ", tag_query$exclude[[i]])
+            tag_query$exclude[[i]] <- paste("^", tag_query$exclude[[i]], "$", sep = "")
+
+        }
+
+    } else {
+
+        if (!is.na(tag_query$include[1])) for (i in 1:length(tag_query$include)) {
+
+            tag_query$include[[i]] <- gsub("[^[:alnum:]]", " ", tag_query$include[[i]])
+
+        }
+
+        if (!is.na(tag_query$exclude[1])) for (i in 1:length(tag_query$exclude)) {
+
+            tag_query$exclude[[i]] <- gsub("[^[:alnum:]]", " ", tag_query$exclude[[i]])
+
+        }
 
     }
 
@@ -292,6 +316,8 @@ tag_filter <- function(tagged_df, tag_query){
 
         for (i in 1:length(filter_mat_include[1,])){
 
+            tagged_df_include[,i] <- gsub("[^[:alnum:]]", " ", tagged_df_include[,i])
+
             a <- lapply(unlist(tag_query$include_sub[i]), grepl, tagged_df_include[,i], ignore.case = TRUE)
 
             b <- matrix(unlist(a), nrow = length(tagged_df[,1]))
@@ -311,6 +337,8 @@ tag_filter <- function(tagged_df, tag_query){
         tag_query$exclude_sub <- tag_query$exclude[names(tag_query$exclude) %in% colnames(tagged_df)]
 
         for (i in 1:length(filter_mat_exclude[1,])){
+
+            tagged_df_exclude[,i] <- gsub("[^[:alnum:]]", " ", tagged_df_exclude[,i])
 
             c <- lapply(unlist(tag_query$exclude_sub[i]), grepl, tagged_df_exclude[,i], ignore.case = TRUE)
 
@@ -341,4 +369,3 @@ tag_filter <- function(tagged_df, tag_query){
     tagged_df
 
 }
-
