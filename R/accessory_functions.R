@@ -255,6 +255,7 @@ find_model <- function(selected_model_path){
 #' Filter Dataframe Based on Metadata Tags
 #'
 #' Parses a dataframe, looks for text tags and applies filter based on text_tag_x fields.
+#' If not "include" criterion specified, all rows kept unless tag listed in "exclude".
 #' @param tagged_df Input dataframe.
 #' @param tag_query List of "included" and "excluded" tags.
 #' @return Subset of input dataframe fitting metadata inclusion/exclusion criteria.
@@ -276,7 +277,7 @@ tag_filter <- function(tagged_df, tag_query){
 
     if (is.data.frame(tagged_df_include) && length(tagged_df_include[1,]) > 0) {
 
-        filter_mat_include <- matrix(nrow = length(tagged_df[,1]), ncol = length(tagged_df[1,]))
+        filter_mat_include <- matrix(nrow = length(tagged_df_include[,1]), ncol = length(tagged_df_include[1,]))
         tag_query$include_sub <- tag_query$include[names(tag_query$include) %in% colnames(tagged_df)]
 
         for (i in 1:length(filter_mat_include[1,])){
@@ -296,7 +297,7 @@ tag_filter <- function(tagged_df, tag_query){
 
     if (is.data.frame(tagged_df_exclude) && length(tagged_df_exclude[1,]) > 0) {
 
-        filter_mat_exclude <- matrix(nrow = length(tagged_df[,1]), ncol = length(tagged_df[1,]))
+        filter_mat_exclude <- matrix(nrow = length(tagged_df_exclude[,1]), ncol = length(tagged_df_exclude[1,]))
         tag_query$exclude_sub <- tag_query$exclude[names(tag_query$exclude) %in% colnames(tagged_df)]
 
         for (i in 1:length(filter_mat_exclude[1,])){

@@ -161,10 +161,11 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 #' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
+#' @param tag_query If desired, "include" and "exclude" criteria used to filter documents based on metadata tags.
 #' @keywords internal
 
 batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
-    user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores) {
+    user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query = NA) {
 
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
@@ -216,6 +217,9 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
         if (open == TRUE) {
 
             sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+            # Applying metadata tag filter
+            if (!is.na(tag_query)) sub_corpus <- tag_filter(sub_corpus, tag_query)
+
             if (length(sub_corpus[, 1]) > 0) {
 
                 # Convert dates to character, at least this is required for UDPipe
@@ -263,7 +267,6 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @param patient_vect Vector of patient ID's. Default is NA, in which case all available patient records will undergo NLP annotation.
 #' @param text_format Text format for NLP engine.
 #' @param nlp_engine Which NLP engine should be used? UDPipe is the only one supported for now.
-#' @param URL UDPipe model URL.
 #' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
@@ -274,6 +277,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If 0 is chosen, UMLS CUI tags will not be provided.
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
+#' @param URL UDPipe model URL.
+#' @param filter_tags Should metadata tag filter be used to select documents to process? If TRUE, stored query wil be used.
 #' @return {
 #' Confirmation that requested operation was completed, or error message if attempt failed.
 #' }
@@ -287,7 +292,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @export
 
 automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", uri_fun = mongo_uri_standard,
-    user, password, host, replica_set, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
+    user, password, host, replica_set, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA, filter_tags = FALSE) {
 
     # Finding NLP model to use, if not specified
     URL <- find_model(URL)
@@ -295,6 +300,20 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     annotations_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "ANNOTATIONS")
     notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
     patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
+
+    if (filter_tags == TRUE) {
+
+        query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
+        tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+        if (dim(tag_query)[2] > 0) {
+
+            tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+            tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
+            print("Using tag metadata filter for NLP. Only selected documents will be processed!")
+
+        } else tag_query <- NA
+
+    } else tag_query <- NA
 
     print("Downloading dictionaries...")
 
@@ -360,7 +379,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
         print("Annotating...")
 
         batch_processor_db(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user,
-            password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores)
+            password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query)
 
     } else print("No records to annotate!")
 
