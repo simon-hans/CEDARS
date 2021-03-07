@@ -218,7 +218,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
             sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
             # Applying metadata tag filter
-            if (!is.na(tag_query)) sub_corpus <- tag_filter(sub_corpus, tag_query)
+            if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query)
 
             if (length(sub_corpus[, 1]) > 0) {
 
