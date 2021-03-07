@@ -263,6 +263,16 @@ find_model <- function(selected_model_path){
 
 tag_filter <- function(tagged_df, tag_query){
 
+    # Prepping for grepl
+
+    if (tag_query$exact == TRUE) {
+
+        if (!is.na(tag_query$include[1])) for (i in 1:length(tag_query$include)) tag_query$include[[i]] <- paste("^", tag_query$include[[i]], "$", sep = "")
+
+        if (!is.na(tag_query$exclude[1])) for (i in 1:length(tag_query$exclude)) tag_query$exclude[[i]] <- paste("^", tag_query$exclude[[i]], "$", sep = "")
+
+    }
+
     # Ordering tags in main dataframe
     if (length(tagged_df[1,]) > 1) tagged_df <- tagged_df[,order(colnames(tagged_df), decreasing = FALSE, method = "radix")]
 
