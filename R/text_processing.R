@@ -222,6 +222,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
             if (length(sub_corpus[, 1]) > 0) {
 
+                print(paste("Annotating", length(sub_corpus[, 1]), "documents..."))
+
                 # Convert dates to character, at least this is required for UDPipe
                 sub_corpus$text_date <- as.character(sub_corpus$text_date)
 
