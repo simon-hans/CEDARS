@@ -307,7 +307,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     # Getting tag query, if it exists we determine if it should apply to NLP pipeline
     query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
     tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
-    if (!is.null(tag_query$exact)) {
+    if (!is.null(tag_query$tag_query$exact)) {
 
         tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
         tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
