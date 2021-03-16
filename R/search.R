@@ -263,7 +263,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
     # Getting tag query, if it exists
     tag_query <- db_results$tag_query
-    if (dim(tag_query)[2] > 0) {
+    if (!is.null(tag_query$exact)) {
 
         tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
         tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
