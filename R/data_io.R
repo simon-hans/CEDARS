@@ -106,7 +106,7 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
 
             # Getting tag query, if it exists
             tag_query <- db_results$tag_query
-            if (dim(tag_query)[2] > 0) {
+            if (!is.null(tag_query$exact)) {
 
                 tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
                 tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
@@ -176,7 +176,7 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
 
                 # Getting tag query, if it exists
                 tag_query <- db_results$tag_query
-                if (dim(tag_query)[2] > 0) {
+                if (!is.null(tag_query$exact)) {
 
                     tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
                     tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
