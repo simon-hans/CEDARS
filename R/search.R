@@ -261,6 +261,17 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
     use_negation <- db_results$exclude_negated[1]
     hide_duplicates <- db_results$hide_duplicates[1]
 
+    # Getting tag query, if it exists
+    tag_query <- db_results$tag_query
+    if (dim(tag_query)[2] > 0) {
+
+        tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+        tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
+        nlp_apply <- tag_query$nlp_apply
+        if (nlp_apply == FALSE) print("Using tag metadata filter for pre-search!") else tag_query <- NA
+
+    } else tag_query <- NA
+
     parse_result <- parse_query(search_query)
 
     # Making sure all patients with annotations are considered
@@ -295,6 +306,9 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
             # Maintaining POSIX format with UTC zone
             annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
+            # Filtering based on text metadata, if indicated
+            if (!is.na(tag_query)) annotations <- tag_filter(annotations, tag_query)
 
             # Getting event date
             patient_info <- patients_con$find(query)

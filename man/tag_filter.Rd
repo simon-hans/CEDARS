@@ -16,5 +16,6 @@ Subset of input dataframe fitting metadata inclusion/exclusion criteria.
 }
 \description{
 Parses a dataframe, looks for text tags and applies filter based on text_tag_x fields.
+If no "include" criterion specified, all rows kept unless tag listed in "exclude".
 }
 \keyword{internal}

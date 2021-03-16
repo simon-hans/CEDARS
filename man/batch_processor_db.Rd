@@ -20,7 +20,8 @@ batch_processor_db(
   database,
   max_n_grams_length,
   negex_depth,
-  select_cores
+  select_cores,
+  tag_query = NA
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ batch_processor_db(
 \item{negex_depth}{Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.}
 
 \item{select_cores}{How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.}
+
+\item{tag_query}{If desired, "include" and "exclude" criteria used to filter documents based on metadata tags.}
 }
 \description{
 NLP annotates documents for a cohort of patients, in parallel. Locks each record before proceeding with NLP annotations.

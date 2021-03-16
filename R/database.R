@@ -355,7 +355,7 @@ populate_query <- function(uri_fun, user, password, host, replica_set, port, dat
 #' save_query(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
 #' host = 'server1234', port = NA, database = 'TEST_PROJECT', search_query = 'thrombosis AND venous',
 #' use_negation = TRUE, hide_duplicates = TRUE, skip_after_event = TRUE,
-#' tag_query = list(include = list(text_tag_1 = c("admission"),
+#' tag_query = list(exact = FALSE, nlp_apply = FALSE, include = list(text_tag_1 = c("admission"),
 #' text_tag_2 = c("impression", "plan")), exclude = NA))
 #' }
 #' @export

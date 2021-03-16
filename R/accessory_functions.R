@@ -255,7 +255,7 @@ find_model <- function(selected_model_path){
 #' Filter Dataframe Based on Metadata Tags
 #'
 #' Parses a dataframe, looks for text tags and applies filter based on text_tag_x fields.
-#' If not "include" criterion specified, all rows kept unless tag listed in "exclude".
+#' If no "include" criterion specified, all rows kept unless tag listed in "exclude".
 #' @param tagged_df Input dataframe.
 #' @param tag_query List of "included" and "excluded" tags.
 #' @return Subset of input dataframe fitting metadata inclusion/exclusion criteria.

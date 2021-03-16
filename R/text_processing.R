@@ -280,7 +280,6 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
 #' @param URL UDPipe model URL.
-#' @param filter_tags Should metadata tag filter be used to select documents to process? If TRUE, stored query wil be used.
 #' @return {
 #' Confirmation that requested operation was completed, or error message if attempt failed.
 #' }
@@ -294,7 +293,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @export
 
 automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", uri_fun = mongo_uri_standard,
-    user, password, host, replica_set, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA, filter_tags = FALSE) {
+    user, password, host, replica_set, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
 
     # Finding NLP model to use, if not specified
     URL <- find_model(URL)
@@ -303,17 +302,15 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
     patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
-    if (filter_tags == TRUE) {
+    # Getting tag query, if it exists we determine if it should apply to NLP pipeline
+    query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
+    tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+    if (dim(tag_query)[2] > 0) {
 
-        query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
-        tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
-        if (dim(tag_query)[2] > 0) {
-
-            tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
-            tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
-            print("Using tag metadata filter for NLP. Only selected documents will be processed!")
-
-        } else tag_query <- NA
+        tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+        tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
+        nlp_apply <- tag_query$nlp_apply
+        if (nlp_apply == TRUE) print("Using tag metadata filter for NLP. Only selected documents will be processed!") else tag_query <- NA
 
     } else tag_query <- NA
 
