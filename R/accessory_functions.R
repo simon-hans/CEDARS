@@ -307,7 +307,7 @@ tag_filter <- function(tagged_df, tag_query){
     if (!is.na(tag_query$exclude[1])) tagged_df_exclude <- subset(tagged_df, select = colnames(tagged_df)[colnames(tagged_df) %in% names(tag_query$exclude)]) else tagged_df_exclude <- NA
 
     # Matching
-    # If not data about inclusions, we include everything; if no data about exclusions, we exclude nothing
+    # If no data about inclusions, we include everything; if no data about exclusions, we exclude nothing
 
     if (is.data.frame(tagged_df_include) && length(tagged_df_include[1,]) > 0) {
 

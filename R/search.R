@@ -308,7 +308,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
             annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
 
             # Filtering based on text metadata, if indicated
-            if (!is.na(tag_query)) annotations <- tag_filter(annotations, tag_query)
+            if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
 
             # Getting event date
             patient_info <- patients_con$find(query)

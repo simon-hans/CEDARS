@@ -104,6 +104,17 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
             use_negation <- db_results$exclude_negated[1]
             hide_duplicates <- db_results$hide_duplicates[1]
 
+            # Getting tag query, if it exists
+            tag_query <- db_results$tag_query
+            if (dim(tag_query)[2] > 0) {
+
+                tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+                tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
+                nlp_apply <- tag_query$nlp_apply
+                if (nlp_apply == FALSE) print("Using tag metadata filter for pre-search!") else tag_query <- NA
+
+            } else tag_query <- NA
+
             # Finding out if patient ID exists
             # Only numeric patient ID's are accepted, anything else will result in no patient found
             if (!is.na(as.numeric(patient_id))) patient <- patients_con$find(paste("{ \"patient_id\" : ", patient_id, "}", sep = "")) else patient <- data.frame(a=NULL, b=NULL)
@@ -112,7 +123,7 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
             if (dim(patient)[1] > 0) {
 
                 commit_result <- commit_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query,
-                  use_negation, hide_duplicates, patient_id)
+                  use_negation, hide_duplicates, patient_id, tag_query)
                 committed <- commit_result$committed
 
                 if (committed == TRUE) {
@@ -163,12 +174,23 @@ get_data <- function(uri_fun, user, password, host, replica_set, port, database,
                 use_negation <- db_results$exclude_negated[1]
                 hide_duplicates <- db_results$hide_duplicates[1]
 
+                # Getting tag query, if it exists
+                tag_query <- db_results$tag_query
+                if (dim(tag_query)[2] > 0) {
+
+                    tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+                    tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
+                    nlp_apply <- tag_query$nlp_apply
+                    if (nlp_apply == FALSE) print("Using tag metadata filter for pre-search!") else tag_query <- NA
+
+                } else tag_query <- NA
+
                 # We try to commit to a patient until we find one with sentences left to evaluate
                 committed <- FALSE
                 no_patient_left <- FALSE
                 while (committed == FALSE & no_patient_left == FALSE) {
                   commit_result <- commit_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query,
-                    use_negation, hide_duplicates)
+                    use_negation, hide_duplicates, NA, tag_query)
                   committed <- commit_result$committed
                   no_patient_left <- commit_result$no_patient_left
                 }
@@ -375,10 +397,11 @@ password_verification <- function(uri_fun, user, password, host, replica_set, po
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
+#' @param tag_query If desired, text metadata tags will be used for search.
 #' @keywords internal
 
 commit_patient <- function(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation, hide_duplicates,
-    patient_id = NA) {
+    patient_id = NA, tag_query = NA) {
 
     # Turning off scientific notation temporarily, otherwise JSON objects can be corrupted
     sci_opt <- getOption("scipen")
@@ -390,7 +413,7 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
     patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
 
     sentences_result <- get_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation,
-        hide_duplicates, patient_id)
+        hide_duplicates, patient_id, tag_query)
     sentences <- sentences_result$sentences
     no_patient_left <- sentences_result$no_patient_left
     # edit 2-27
@@ -405,7 +428,7 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             (length(sentences[, 1])) == 0 else FALSE) {
 
             sentences <- get_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation,
-                hide_duplicates)
+                hide_duplicates, tag_query)
 
         }
 
@@ -512,10 +535,11 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
 #' @param use_negation Should negated items be ignored in the keyword/concept search?
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param patient_id Used if a specific patient record is requested, instead of a search for next record to annotate.
+#' @param tag_query If desired, text metadata tags will be used for search.
 #' @keywords internal
 
 get_patient <- function(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation, hide_duplicates,
-    patient_id = NA) {
+    patient_id = NA, tag_query = NA) {
 
     selection_result <- select_patient(uri_fun, user, password, host, replica_set, port, database, end_user, patient_id)
     selected_patient <- selection_result$selected_patient
@@ -542,6 +566,9 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
             # Maintaining POSIX format with UTC zone
             annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
 
+            # Filtering based on text metadata, if indicated
+            if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+
             parse_result <- parse_query(search_query)
             search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
             sentences <- search_results$unique_sentences
@@ -567,6 +594,9 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
 
                 # Maintaining POSIX format with UTC zone
                 annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
+                # Filtering based on text metadata, if indicated
+                if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
 
                 parse_result <- parse_query(search_query)
                 new_sentences <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)

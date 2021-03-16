@@ -16,7 +16,8 @@ commit_patient(
   search_query,
   use_negation,
   hide_duplicates,
-  patient_id = NA
+  patient_id = NA,
+  tag_query = NA
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ commit_patient(
 \item{hide_duplicates}{Should duplicated sentences be removed for search results?}
 
 \item{patient_id}{Used if a specific patient record is requested, instead of a search for next record to annotate.}
+
+\item{tag_query}{If desired, text metadata tags will be used for search.}
 }
 \description{
 Selects yet to be assessed patient with at least one positive sentence and locks record in DB for the CEDARS end user.
