@@ -16,61 +16,72 @@
 
 sentence_search <- function(parse_result, annotations, use_negation, hide_duplicates) {
 
-    retained_fields <- c("patient_id", "doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "text_sequence",
-        "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8",
-        "text_tag_9", "text_tag_10")
-    retained_fields <- retained_fields[retained_fields %in% colnames(annotations)]
+    if (length(annotations[,1]) == 0) {
 
-    query_vect <- parse_result$query_vect
-    operator_mask <- parse_result$operator_mask
-    cui_mask <- parse_result$cui_mask
-    keyword_mask <- parse_result$keyword_mask
+        # If there are no annotations, we output an empty list
 
-    keyword_elements <- parse_result$keyword_elements
-    annotations <- lemma_match(annotations, keyword_elements)
-    if (use_negation == TRUE & "negated" %in% colnames(annotations))
-        keyword_sentences <- unique(subset(annotations, lemma_match == TRUE & negated == FALSE, select = retained_fields)) else keyword_sentences <- unique(subset(annotations, lemma_match == TRUE, select = retained_fields))
+        output <- list()
+        output$annotations <- annotations
+        output$unique_sentences <- data.frame(patient_id = numeric())
 
-    cui_elements <- parse_result$cui_elements
+    } else {
 
-    if ("umls_CUI" %in% colnames(annotations)) {
+        retained_fields <- c("patient_id", "doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "text_sequence",
+            "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8",
+            "text_tag_9", "text_tag_10")
+        retained_fields <- retained_fields[retained_fields %in% colnames(annotations)]
 
+        query_vect <- parse_result$query_vect
+        operator_mask <- parse_result$operator_mask
+        cui_mask <- parse_result$cui_mask
+        keyword_mask <- parse_result$keyword_mask
+
+        keyword_elements <- parse_result$keyword_elements
+        annotations <- lemma_match(annotations, keyword_elements)
         if (use_negation == TRUE & "negated" %in% colnames(annotations))
-            cui_sentences <- unique(subset(annotations, umls_CUI %in% cui_elements & negated == FALSE, select = retained_fields)) else cui_sentences <- unique(subset(annotations, umls_CUI %in% cui_elements, select = retained_fields))
+            keyword_sentences <- unique(subset(annotations, lemma_match == TRUE & negated == FALSE, select = retained_fields)) else keyword_sentences <- unique(subset(annotations, lemma_match == TRUE, select = retained_fields))
+
+        cui_elements <- parse_result$cui_elements
+
+        if ("umls_CUI" %in% colnames(annotations)) {
+
+            if (use_negation == TRUE & "negated" %in% colnames(annotations))
+                cui_sentences <- unique(subset(annotations, umls_CUI %in% cui_elements & negated == FALSE, select = retained_fields)) else cui_sentences <- unique(subset(annotations, umls_CUI %in% cui_elements, select = retained_fields))
+
+        }
+
+        # Getting unique sentences
+
+        if ("umls_CUI" %in% colnames(annotations))
+            unique_sentences <- unique(rbind(keyword_sentences, cui_sentences)) else unique_sentences <- keyword_sentences
+
+        if (length(unique_sentences[, 1]) > 0) {
+
+            unique_sentences$unique_id <- 1:length(unique_sentences[, 1])
+            unique_sentences$selected <- NA
+
+            # Iterating
+
+            unique_sentences$selected <- sapply(unique_sentences$unique_id, sentence_eval, unique_sentences, annotations,
+                query_vect, keyword_mask, keyword_elements, cui_mask, cui_elements, use_negation)
+
+            unique_sentences <- unique_sentences[!is.na(unique_sentences$selected), ]
+
+            unique_sentences <- unique_sentences[order(unique_sentences$text_date, decreasing = FALSE, method = "radix"),]
+
+            # Only first mention of any given unique sentence
+            if (hide_duplicates == TRUE)
+                unique_sentences <- unique_sentences[!duplicated(unique_sentences$selected), ]
+
+            unique_sentences <- subset(unique_sentences, select = c(retained_fields, "selected"))
+
+        }
+
+        output <- list()
+        output$annotations <- annotations
+        output$unique_sentences <- unique_sentences
 
     }
-
-    # Getting unique sentences
-
-    if ("umls_CUI" %in% colnames(annotations))
-        unique_sentences <- unique(rbind(keyword_sentences, cui_sentences)) else unique_sentences <- keyword_sentences
-
-    if (length(unique_sentences[, 1]) > 0) {
-
-        unique_sentences$unique_id <- 1:length(unique_sentences[, 1])
-        unique_sentences$selected <- NA
-
-        # Iterating
-
-        unique_sentences$selected <- sapply(unique_sentences$unique_id, sentence_eval, unique_sentences, annotations,
-            query_vect, keyword_mask, keyword_elements, cui_mask, cui_elements, use_negation)
-
-        unique_sentences <- unique_sentences[!is.na(unique_sentences$selected), ]
-
-        unique_sentences <- unique_sentences[order(unique_sentences$text_date, decreasing = FALSE, method = "radix"),
-            ]
-
-        # Only first mention of any given unique sentence
-        if (hide_duplicates == TRUE)
-            unique_sentences <- unique_sentences[!duplicated(unique_sentences$selected), ]
-
-        unique_sentences <- subset(unique_sentences, select = c(retained_fields, "selected"))
-
-    }
-
-    output <- list()
-    output$annotations <- annotations
-    output$unique_sentences <- unique_sentences
 
     output
 
