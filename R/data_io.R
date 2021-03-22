@@ -428,7 +428,7 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             (length(sentences[, 1])) == 0 else FALSE) {
 
             sentences <- get_patient(uri_fun, user, password, host, replica_set, port, database, end_user, search_query, use_negation,
-                hide_duplicates, tag_query)
+                hide_duplicates, patient_id, tag_query)
 
         }
 
