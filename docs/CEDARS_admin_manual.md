@@ -60,7 +60,7 @@ The CEDARS package includes its data entry interface in the form of a Shiny app.
 database user ID and password  
 host server and port (default is 27017)  
 database name  
-whether ornot Active Directory will be used for user authentication  
+whether or not Active Directory will be used for user authentication  
 destination path to save the app, mapped from the R working directory  
 
 The function save_credentials() must be called to generate the app and associated Rdata file: 
@@ -81,7 +81,7 @@ Both the app.R and db_credentials.Rdata files must be uploaded to the Shiny inst
 
 #### RStudio Connect App Upload
 
-This option assumes you have an account with your institution's RStudio Connect service. From within RStudio, simply navigate to the folder where the app was saved and click on the app.R file. Click the "Publish ot Server" icon, making sure both necessary files are included and hit "Publish".
+This option assumes you have an account with your institution's RStudio Connect service. From within RStudio, simply navigate to the folder where the app was saved and click on the app.R file. Click the "Publish to Server" icon, making sure both necessary files are included and hit "Publish".
 
 #### RStudio Server App Upload
 
@@ -126,11 +126,11 @@ add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, new_e
 Function upload_notes() is used to transfer the raw clinical corpus to the CEDARS database. This would typically consist of a collection of clinical notes or radiology reports formatted as a dataframe with the follwing fields:
 
 "patient_id" Patient-specific unique identifier, typically a medical record number  
-"text_id" Unique identifier for the text fragment  
+"text_id" Unique identifier for the text segment  
 "text" Text segment, can be a whole note or a section, sub-section etc.       
 "text_date" Date of the clinical encounter or radiology test  
 "doc_id" Unique identifier or the document  
-"text_sequence" Optional, if a document contains more than one text fragment (each with a distinct text_id), this field indicates the order of the fragments/sections  
+"text_sequence" Optional, if a document contains more than one text segment (each with a distinct text_id), this field indicates the order of the segments/sections  
 "text_tag_1" Optional metadata, for example patient's name, medical professional name, note section name, etc.   
 "text_tag_2" Optional metadata    
 "text_tag_3" Optional metadata   
