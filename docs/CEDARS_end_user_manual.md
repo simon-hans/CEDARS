@@ -14,6 +14,8 @@ Sentences are presented in chronological order. Once you have identified and dat
 
 ![CEDARS Workflow](pics/GitHub%20Schema%202%20C.png)
 
+If you adjudicate a sentence as reporting no event, CEDARS will present the next sentence for the same patient (#1). On the other end, if you enter an event date, CEDARS will move to the next unreviewed sentence before the event date. If there are no sentences left to review before the event, the GUI moves to the next patient (#2) and the process is repeated with the following record (#3 and #4), until all selected sentences have been reviewed.
+
 ## Login
 
 ### Using RStudio Connect
