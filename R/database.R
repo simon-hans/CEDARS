@@ -1235,7 +1235,8 @@ save_tags <- function(uri_fun, user, password, host, replica_set, port, database
 
 #' Download Notes Metadata Summary
 #'
-#' Downloads text_tag_x info for the tags with "include" and/or "exclude" criteria in the core CEDARS search query.
+#' Downloads text_tag_x info for the metadata tags, along with "include" and/or
+#' "exclude" criteria in the core CEDARS search query.
 #' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
@@ -1243,6 +1244,7 @@ save_tags <- function(uri_fun, user, password, host, replica_set, port, database
 #' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @param eval_query Should tags be evaluated against stored CEDARS query?
 #' @return {
 #' List containing one dataframe per text_tag_x of interest, indicating selected status.
 #' Can take time to download for large datasets.
@@ -1255,29 +1257,45 @@ save_tags <- function(uri_fun, user, password, host, replica_set, port, database
 #' }
 #' @export
 
-download_filtered_tags <- function(uri_fun, user, password, host, replica_set, port, database){
+download_filtered_tags <- function(uri_fun, user, password, host, replica_set, port, database, eval_query = TRUE){
 
     query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
     notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
 
     # Getting query detailing text tag inclusions/exclusions
 
+    all_tags <- paste("text_tag_", 1:10, sep = "")
+
     tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
-    if (dim(tag_query)[2] > 0) {
+
+    all_tag_uniques <- list()
+
+    if (dim(tag_query)[2] > 0 & eval_query == TRUE) {
 
         tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
         tag_query <- jsonlite::fromJSON(tag_query$json())[[1]]
 
         selected_tags <- unique(c(names(tag_query$include), names(tag_query$exclude)))
-
-        all_tag_uniques <- list()
+        unselected_tags <- all_tags[!(all_tags %in% selected_tags)]
 
         for (i in 1:length(selected_tags)){
 
-            print(paste("Assessing tag ", i, " of ", length(selected_tags), "...", sep=""))
+            print(paste("Assessing query for ", selected_tags[i], ", tag ", i, " of ", length(selected_tags), "...", sep=""))
 
-            tag_uniques_dl <- notes_con$aggregate(paste('[{ \"$group\" : {\"_id\" : \"$', selected_tags[i] , '\" } }]', sep = ""), options = '{"allowDiskUse":true}')
-            tag_uniques <- tag_uniques_dl
+            # This does not work due to timeout...
+            # tag_uniques_dl <- notes_con$aggregate(paste('[{ \"$group\" : {\"_id\" : \"$', selected_tags[i] , '\" } }]', sep = ""), options = '{"allowDiskUse":true}')
+
+            tag_dl_it <- notes_con$iterate('{}', paste('{ \"', selected_tags[i], '\" : 1 , \"_id\" : 0 }', sep = ""))
+            tag_uniques <- c()
+
+            try(while(!is.null(tag_dl <- tag_dl_it$batch(1000000))){
+
+                tag_uniques <- unique(c(tag_uniques, unlist(tag_dl)))
+                print(paste("Found", length(tag_uniques), "unique values..."))
+
+            }, silent = TRUE)
+
+            tag_uniques <- data.frame(tag = tag_uniques)
             colnames(tag_uniques)[1] <- selected_tags[i]
 
             tag_uniques_filtered <- tag_filter(tag_uniques, tag_query)
@@ -1288,17 +1306,66 @@ download_filtered_tags <- function(uri_fun, user, password, host, replica_set, p
 
             all_tag_uniques[[i]] <- tag_uniques
 
-            }
+        }
 
-        names(all_tag_uniques) <- selected_tags
+        for (i in 1:length(unselected_tags)){
+
+            print(paste("Assessing query for ", unselected_tags[i], ", tag ", i, " of ", length(unselected_tags), "...", sep=""))
+
+            tag_dl_it <- notes_con$iterate('{}', paste('{ \"', unselected_tags[i], '\" : 1 , \"_id\" : 0 }', sep = ""))
+            tag_uniques <- c()
+
+            try(while(!is.null(tag_dl <- tag_dl_it$batch(1000000))){
+
+                tag_uniques <- unique(c(tag_uniques, unlist(tag_dl)))
+                print(paste("Found", length(tag_uniques), "unique values..."))
+
+            }, silent = TRUE)
+
+            tag_uniques <- data.frame(tag = tag_uniques)
+            colnames(tag_uniques)[1] <- unselected_tags[i]
+
+            tag_uniques$retained <- TRUE
+            tag_uniques <- tag_uniques[order(tag_uniques[,colnames(tag_uniques) == unselected_tags[i]], decreasing = FALSE, method= "radix"),]
+
+            all_tag_uniques[[i+length(selected_tags)]] <- tag_uniques
+
+        }
+
+        names(all_tag_uniques) <- c(selected_tags, unselected_tags)
 
     } else {
 
-        all_tag_uniques <- NA
+        if (eval_query == FALSE) print("Metadata tag query not considered.") else print("No query specifications found in regards to metadata tags!")
 
-        print("No metadata tag query on record.")
+        for (i in 1:length(all_tags)){
+
+            print(paste("Assessing query for ", all_tags[i], ", tag ", i, " of ", length(all_tags), "...", sep=""))
+
+            tag_dl_it <- notes_con$iterate('{}', paste('{ \"', all_tags[i], '\" : 1 , \"_id\" : 0 }', sep = ""))
+            tag_uniques <- c()
+
+            try(while(!is.null(tag_dl <- tag_dl_it$batch(1000000))){
+
+                tag_uniques <- unique(c(tag_uniques, unlist(tag_dl)))
+                print(paste("Found", length(tag_uniques), "unique values..."))
+
+            }, silent = TRUE)
+
+            if (!is.null(tag_uniques)) tag_uniques <- data.frame(tag = tag_uniques) else tag_uniques <- data.frame(tag = NA)
+            colnames(tag_uniques)[1] <- all_tags[i]
+
+            tag_uniques <- tag_uniques[order(tag_uniques[,colnames(tag_uniques) == all_tags[i]], decreasing = FALSE, method= "radix"),]
+
+            all_tag_uniques[[i]] <- tag_uniques
+
+        }
+
+        names(all_tag_uniques) <- all_tags
 
     }
+
+    all_tag_uniques <- all_tag_uniques[all_tags]
 
     all_tag_uniques
 
