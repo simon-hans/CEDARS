@@ -11,7 +11,8 @@ download_filtered_tags(
   host,
   replica_set,
   port,
-  database
+  database,
+  eval_query = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ download_filtered_tags(
 \item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
+
+\item{eval_query}{Should tags be evaluated against stored CEDARS query?}
 }
 \value{
 {
@@ -36,7 +39,8 @@ Can take time to download for large datasets.
 }
 }
 \description{
-Downloads text_tag_x info for the tags with "include" and/or "exclude" criteria in the core CEDARS search query.
+Downloads text_tag_x info for the metadata tags, along with "include" and/or
+"exclude" criteria in the core CEDARS search query.
 }
 \examples{
 \dontrun{
