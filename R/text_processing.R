@@ -334,8 +334,19 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 
     print("Finding all patients with notes...")
 
-    all_patients <- notes_con$aggregate('[{ \"$group\" : {\"_id\" : \"$patient_id\"} }]', options = '{"allowDiskUse":true}')
-    all_patients <- all_patients[,1]
+    # Does not work in current format, results in time-out with very large notes collections
+    # all_patients <- notes_con$aggregate('[{ \"$group\" : {\"_id\" : \"$patient_id\"} }]', options = '{"allowDiskUse":true}')
+    # all_patients <- all_patients[,1]
+
+    patients_it <- notes_con$iterate('{}', '{ \"patient_id\" : 1 , \"_id\" : 0 }')
+    all_patients <- c()
+
+    try(while(!is.null(patients_dl <- patients_it$batch(1000000))){
+
+        all_patients <- unique(c(all_patients, unlist(patients_dl)))
+        print(paste("Found", length(all_patients), "unique values..."))
+
+    }, silent = TRUE)
 
     # Need to add step to stop everything if there are no patients left to process!
     if (!is.na(patient_vect[1])) all_patients <- all_patients[all_patients %in% patient_vect]
