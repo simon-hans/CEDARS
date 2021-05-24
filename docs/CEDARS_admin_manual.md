@@ -69,12 +69,13 @@ The function save_credentials() must be called to generate the app and associate
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB"
 use_LDAP <- TRUE
 app_path <- "Out/app"
 
-save_credentials(db_user_name, db_user_pw, db_host, db_port, db_name, use_LDAP, app_path)
+save_credentials(db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name, use_LDAP, app_path)
 ```
 
 Both the app.R and db_credentials.Rdata files must be uploaded to the Shiny instance.
@@ -104,12 +105,13 @@ uri_fun <- mongo_uri_standard
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB"
 project_name <- "CEDARS Example Project"
 project_owner <- "Dr Smith"
 
-create_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, project_name, project_owner)
+create_project(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name, project_name, project_owner)
 ```
 
 If the option to use Active Directory was set to FALSE when creating the app, the add_end_user() function must be used to add end users (i.e. data abstractors) to the project:
@@ -149,10 +151,11 @@ uri_fun <- mongo_uri_standard
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB"
 
-upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, patient_notes)
+upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name, patient_notes)
 ```
 
 In a typical use case, there would be a large number of patients/notes located on a separate server, so a custom batch function to download notes and transfer to CEDARS one patient at a time would have to be devised, e.g.:
@@ -168,13 +171,27 @@ for (i in 1:10000){
 
   if (length(download_notes[,1])>0){
     
-    upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, download_notes)
+    upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name, download_notes)
     
     print(paste("notes uploaded for patient #", i, sep=""))
     
   } else print(paste("no notes for patient #", i, sep=""))
   
 }
+```
+
+Once all notes or reports have been uploaded, unique values for metadata tags can be obtained with the download_filtered_tags() function. This can be useful to select specific documents types to include/exclude in the query. By default, tags featured in the uploaded corpus will we matched with the stored CEDARS query but this can be overridden:
+
+```r
+uri_fun <- mongo_uri_standard
+db_user_name <- "myname"
+db_user_pw <- "mypassword"
+db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
+db_port <- 27017
+db_name <- "MyDB"
+
+tag_list <- download_filtered_tags(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name, eval_query = TRUE)
 ```
 
 #### Natural Language Processing Annotation
@@ -186,6 +203,7 @@ uri_fun <- mongo_uri_standard
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB"
 txt_format <- "latin1"
@@ -205,7 +223,7 @@ neg_depth <- 6
 # CEDARS supports parallel processing
 sel_cores <- 10
 
-automatic_NLP_processor(NA, txt_format, nlp_type, udmodel_path, uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, max_n_grams, neg_depth, sel_cores)
+automatic_NLP_processor(NA, txt_format, nlp_type, udmodel_path, uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name, max_n_grams, neg_depth, sel_cores)
 ```
 
 #### Event Pre-Loading
@@ -218,10 +236,11 @@ uri_fun <- mongo_uri_standard
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB"
 
-upload_events(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name, event_dates$patient_id, event_dates$event_date)
+upload_events(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name, event_dates$patient_id, event_dates$event_date)
 ```
 
 #### Search Query Definition
@@ -249,13 +268,14 @@ uri_fun <- mongo_uri_standard
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB"
 
 # All patient records will undergo a pre-search
 record_vect <- NA
 
-pre_search(record_vect, uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+pre_search(record_vect, uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name)
 ```
 
 The result is a shorter interface reaction time and more efficient data entry.
@@ -273,10 +293,11 @@ uri_fun <- mongo_uri_standard
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB"
 
-output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name)
 ```
 
 Detailed information is provided, including which sentences were reviewed.
@@ -294,10 +315,11 @@ uri_fun <- mongo_uri_standard
 db_user_name <- "myname"
 db_user_pw <- "mypassword"
 db_host <- "myserver"
+db_replica_set <- "my_mongo_set"
 db_port <- 27017
 db_name <- "MyDB
 
-terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_port, db_name)
+terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, db_name)
 ```
 
 ## Function Reference
