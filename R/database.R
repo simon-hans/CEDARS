@@ -1295,7 +1295,7 @@ download_filtered_tags <- function(uri_fun, user, password, host, replica_set, p
 
             }, silent = TRUE)
 
-            tag_uniques <- data.frame(tag = tag_uniques)
+            if (!is.null(tag_uniques)) tag_uniques <- data.frame(tag = tag_uniques) else tag_uniques <- data.frame(tag = NA)
             colnames(tag_uniques)[1] <- selected_tags[i]
 
             tag_uniques_filtered <- tag_filter(tag_uniques, tag_query)
@@ -1322,7 +1322,7 @@ download_filtered_tags <- function(uri_fun, user, password, host, replica_set, p
 
             }, silent = TRUE)
 
-            tag_uniques <- data.frame(tag = tag_uniques)
+            if (!is.null(tag_uniques)) tag_uniques <- data.frame(tag = tag_uniques) else tag_uniques <- data.frame(tag = NA)
             colnames(tag_uniques)[1] <- unselected_tags[i]
 
             tag_uniques$retained <- TRUE
