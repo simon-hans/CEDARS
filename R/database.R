@@ -972,6 +972,7 @@ terminate_project_new <- function(uri_fun, user, password, host, replica_set, po
 #' @param database MongoDB database name.
 #' @param dates Provide dates of first and last note for each patient; this is needed to assess
 #' duration of follow-up, however can take a long time with large cohorts.
+#' @param sentences_only Should only a list of sentences be provided?
 #' @return {
 #' Object of class data.frame containing patient ID for all cohort members, date of recorded event if any,
 #' abstractor comments, sentences reviewed along with statistics about review process.
@@ -983,7 +984,9 @@ terminate_project_new <- function(uri_fun, user, password, host, replica_set, po
 #' }
 #' @export
 
-download_events <- function(uri_fun, user, password, host, replica_set, port, database, dates = FALSE) {
+download_events <- function(uri_fun, user, password, host, replica_set, port, database, dates = FALSE, sentences_only = FALSE) {
+
+    if (sentences_only == TRUE) dates <- FALSE
 
     patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
     notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
@@ -1007,7 +1010,9 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
     out$sentence_time <- rep(NA, len_out)
     out$first_note_date <- rep(NA, len_out)
     out$last_note_date <- rep(NA, len_out)
-    out$sentences_bef_event_list <- rep(NA, len_out)
+    out$sentences_list <- rep(NA, len_out)
+    out$sentences_table <- rep(NA, len_out)
+    if (sentences_only == TRUE) out$sentences_table <- I(list(NA))
 
     # Computing approximate time spent per case per user
 
@@ -1024,6 +1029,11 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
     }
 
     out$case_time[!duplicated(out$end_user)] <- NA
+
+    gsub_fun <- function(x, target, replacement){
+        output <- gsub(target, replacement, x)
+        output
+    }
 
     for (i in 1:len_out){
 
@@ -1049,36 +1059,42 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
 
             sentence_df$text_date <- as.Date(sentence_df$text_date)
 
+            if (sentences_only == TRUE) {
+                add_on <- data.frame(patient_id = rep(out$patient_id[i], length(sentence_df[,1])), event_date = rep(out$event_date[i], length(sentence_df[,1])))
+                sentence_df <- cbind(add_on, sentence_df)
+                sentence_df$after_event <- NA
+                sentence_df$after_event[sentence_df$event_date > sentence_df$text_date] <- FALSE
+                sentence_df$after_event[sentence_df$event_date < sentence_df$text_date] <- TRUE
+                if (is.na(out$event_date[i])) sentence_df$after_event <- FALSE
+            }
+
+            sentence_df$selected <- sapply(sentence_df$selected, gsub_fun, "\\*START\\*", "")
+            sentence_df$selected <- sapply(sentence_df$selected, gsub_fun, "\\*END\\*", "")
+            sentence_df$note_text <- sapply(sentence_df$note_text, gsub_fun, "\\*START\\*", "")
+            sentence_df$note_text <- sapply(sentence_df$note_text, gsub_fun, "\\*END\\*", "")
+
             out$sentences_total[i] <- length(sentence_df[,1])
             out$sentences_reviewed[i] <- sum(sentence_df$reviewed)
+
+            sent_dates <- sentence_df$text_date
+            out$sentences_list[i] <- paste(paste("\"", sentence_df$selected, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
+
+            if (sentences_only == TRUE) out$sentences_table[i] <- list(sentence_df)
 
             if (is.na(out$event_date[i])) {
 
                 out$sentences_bef_event[i] <- length(sentence_df[,1])
-
-                clean_sentences <- gsub("\\*START\\*", "", sentence_df$selected)
-                clean_sentences <- gsub("\\*END\\*", "", clean_sentences)
-
-                sent_dates <- sentence_df$text_date
-                out$sentences_bef_event_list[i] <- paste(paste("\"", clean_sentences, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
 
             } else {
 
                 sentences_bef_event <- subset(sentence_df, text_date < out$event_date[i])
                 out$sentences_bef_event[i] <- length(sentences_bef_event[,1])
 
-                if (out$sentences_bef_event[i] != 0) {
-                    clean_sentences <- gsub("\\*START\\*", "", sentences_bef_event$selected)
-                    clean_sentences <- gsub("\\*END\\*", "", clean_sentences)
-                    sent_dates <- sentences_bef_event$text_date
-                    out$sentences_bef_event_list[i] <- paste(paste("\"", clean_sentences, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
-                }
-
             }
 
-            print(paste("assessed patient record", i, "of", len_out))
-
         }
+
+        print(paste("assessed patient record", i, "of", len_out))
 
     }
 
@@ -1089,9 +1105,11 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
     out$sentence_time <- round(out$case_time/out$sentences_reviewed, digits=0)
 
     # Capping cells at 32k characters, otherwise the CSV or TSV file can get corrupted
-    out$sentences_bef_event_list[!is.na(out$sentences_bef_event_list) & nchar(out$sentences_bef_event_list) > 32000] <- paste(substr(out$sentences_bef_event_list[!is.na(out$sentences_bef_event_list) & nchar(out$sentences_bef_event_list) > 32000], 1, 32000), "<TRUNCATED AT 32,000 CHARACTERS>")
+    out$sentences_list[!is.na(out$sentences_list) & nchar(out$sentences_list) > 32000] <- paste(substr(out$sentences_list[!is.na(out$sentences_list) & nchar(out$sentences_list) > 32000], 1, 32000), "<TRUNCATED AT 32,000 CHARACTERS>")
 
     out <- out[order(out$patient_id, decreasing = FALSE, method = "radix"), ]
+
+    if (sentences_only == TRUE) out <- data.table::rbindlist(out$sentences_table[!is.na(out$sentences_table)])
 
     out
 

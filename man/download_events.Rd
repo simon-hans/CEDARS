@@ -12,7 +12,8 @@ download_events(
   replica_set,
   port,
   database,
-  dates = FALSE
+  dates = FALSE,
+  sentences_only = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ download_events(
 
 \item{dates}{Provide dates of first and last note for each patient; this is needed to assess
 duration of follow-up, however can take a long time with large cohorts.}
+
+\item{sentences_only}{Should only a list of sentences be provided?}
 }
 \value{
 {

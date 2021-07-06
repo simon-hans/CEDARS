@@ -5,6 +5,7 @@ Description: Streamlined annotation pipeline for collection and aggregation of t
 Version: 2.3
 Authors@R: person("Simon", "Mantha", email = "smantha@cedars.io", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4277-5261"))
 Imports:
+    data.table,
     fastmatch,
     jsonlite,
     mongolite,
