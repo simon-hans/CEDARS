@@ -167,6 +167,8 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
     user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query = NA) {
 
+    patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
+
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
     length_list <- length(patient_vect)
@@ -259,8 +261,6 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
         parallel::stopCluster(cl)
 
     print(paste("There were ", j, " locked cases encountered.", sep = ""))
-
-    patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
 
 }
 

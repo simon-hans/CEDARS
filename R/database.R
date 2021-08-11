@@ -168,7 +168,8 @@ db_upload <- function(uri_fun, user, password, host, replica_set, port, database
 
 #' Update Patient List
 #'
-#' Updates the 'PATIENTS' collection with new entries. Used after NLP annotations have been uploaded.
+#' Updates the 'PATIENTS' collection with new entries. Lists all patients who have at
+#' least one note.
 #' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
@@ -180,8 +181,8 @@ db_upload <- function(uri_fun, user, password, host, replica_set, port, database
 
 patient_roster_update <- function(uri_fun, user, password, host, replica_set, port, database) {
 
-    annotations_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "ANNOTATIONS")
-    unique_patients <- annotations_con$distinct("patient_id")
+    notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
+    unique_patients <- notes_con$distinct("patient_id")
 
     patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
     active_patients <- patients_con$distinct("patient_id")
@@ -984,25 +985,24 @@ terminate_project_new <- function(uri_fun, user, password, host, replica_set, po
 #' }
 #' @export
 
-download_events <- function(uri_fun, user, password, host, replica_set, port, database, dates = FALSE, sentences_only = FALSE) {
-
-    if (sentences_only == TRUE) dates <- FALSE
-
-    patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
-    notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
-
+download_events <- function (uri_fun, user, password, host, replica_set, port, database,
+    dates = FALSE, sentences_only = FALSE)
+{
+    if (sentences_only == TRUE)
+        dates <- FALSE
+    patients_con <- mongo_connect(uri_fun, user, password, host,
+        replica_set, port, database, "PATIENTS")
+    notes_con <- mongo_connect(uri_fun, user, password, host,
+        replica_set, port, database, "NOTES")
     out <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 , \"reviewed\" : 1 , \"end_user\" : 1 , \"event_date\" : 1, \"time_locked\" : 1, \"pt_comments\" : 1, \"sentences\" : 1}")
-
-    # Counting sentences
-
-    len_out <- length(out[,1])
-
-    if (!("event_date" %in% colnames(out))) out$event_date <- rep(NA, len_out)
-    if (!("end_user" %in% colnames(out))) out$end_user <- rep(NA, len_out)
-    if (!("time_locked" %in% colnames(out))) out$time_locked <- rep(NA, len_out)
-
+    len_out <- length(out[, 1])
+    if (!("event_date" %in% colnames(out)))
+        out$event_date <- rep(NA, len_out)
+    if (!("end_user" %in% colnames(out)))
+        out$end_user <- rep(NA, len_out)
+    if (!("time_locked" %in% colnames(out)))
+        out$time_locked <- rep(NA, len_out)
     out$event_date <- as.Date(out$event_date)
-
     out$sentences_total <- rep(NA, len_out)
     out$sentences_reviewed <- rep(NA, len_out)
     out$sentences_bef_event <- rep(NA, len_out)
@@ -1012,107 +1012,87 @@ download_events <- function(uri_fun, user, password, host, replica_set, port, da
     out$last_note_date <- rep(NA, len_out)
     out$sentences_list <- rep(NA, len_out)
     out$sentences_table <- rep(NA, len_out)
-    if (sentences_only == TRUE) out$sentences_table <- I(list(NA))
-
-    # Computing approximate time spent per case per user
-
-    out <- out[order(out$end_user, out$time_locked, decreasing = TRUE, method = "radix"), ]
-
-    if (sum(!is.na(out$time_locked))>1) {
-
+    if (sentences_only == TRUE)
+        out$sentences_table <- I(list(NA))
+    out <- out[order(out$end_user, out$time_locked, decreasing = TRUE,
+        method = "radix"), ]
+    if (sum(!is.na(out$time_locked)) > 1) {
         delta <- out$time_locked - c(out$time_locked[-1], NA)
-
-        delta <- c(NA, delta[1:(length(delta)-1)])
-
+        delta <- c(NA, delta[1:(length(delta) - 1)])
         out$case_time <- delta
-
     }
-
     out$case_time[!duplicated(out$end_user)] <- NA
-
-    gsub_fun <- function(x, target, replacement){
+    gsub_fun <- function(x, target, replacement) {
         output <- gsub(target, replacement, x)
         output
     }
-
-    for (i in 1:len_out){
-
-        # Finding note dates span for this patient
-
-        if (dates == TRUE){
-
+    for (i in 1:len_out) {
+        if (dates == TRUE) {
             patient_id <- out$patient_id[i]
-
-            note_dates <- notes_con$find(query = paste("{ \"patient_id\" : ", patient_id," }"), field = "{ \"_id\" : 0 , \"text_date\" : 1 }")
-            note_dates$text_date <- as.Date(as.character(note_dates$text_date))
-
+            note_dates <- notes_con$find(query = paste("{ \"patient_id\" : ",
+                patient_id, " }"), field = "{ \"_id\" : 0 , \"text_date\" : 1 }")
+            note_dates$text_date <- as.Date(note_dates$text_date)
             out$first_note_date[i] <- as.character(min(note_dates$text_date))
             out$last_note_date[i] <- as.character(max(note_dates$text_date))
-
         }
-
-        # Getting sentences
-
         sentence_df <- out$sentences[[i]]
-
         if (!is.null(sentence_df)) {
-
             sentence_df$text_date <- as.Date(sentence_df$text_date)
-
             if (sentences_only == TRUE) {
-                add_on <- data.frame(patient_id = rep(out$patient_id[i], length(sentence_df[,1])), event_date = rep(out$event_date[i], length(sentence_df[,1])))
+                add_on <- data.frame(patient_id = rep(out$patient_id[i],
+                    length(sentence_df[, 1])), event_date = rep(out$event_date[i],
+                        length(sentence_df[, 1])))
                 sentence_df <- cbind(add_on, sentence_df)
                 sentence_df$after_event <- NA
-                sentence_df$after_event[sentence_df$event_date > sentence_df$text_date] <- FALSE
-                sentence_df$after_event[sentence_df$event_date < sentence_df$text_date] <- TRUE
-                if (is.na(out$event_date[i])) sentence_df$after_event <- FALSE
+                sentence_df$after_event[sentence_df$event_date >
+                        sentence_df$text_date] <- FALSE
+                sentence_df$after_event[sentence_df$event_date <
+                        sentence_df$text_date] <- TRUE
+                if (is.na(out$event_date[i]))
+                    sentence_df$after_event <- FALSE
             }
-
-            sentence_df$selected <- sapply(sentence_df$selected, gsub_fun, "\\*START\\*", "")
-            sentence_df$selected <- sapply(sentence_df$selected, gsub_fun, "\\*END\\*", "")
-            sentence_df$note_text <- sapply(sentence_df$note_text, gsub_fun, "\\*START\\*", "")
-            sentence_df$note_text <- sapply(sentence_df$note_text, gsub_fun, "\\*END\\*", "")
-
-            out$sentences_total[i] <- length(sentence_df[,1])
+            sentence_df$selected <- sapply(sentence_df$selected,
+                gsub_fun, "\\*START\\*", "")
+            sentence_df$selected <- sapply(sentence_df$selected,
+                gsub_fun, "\\*END\\*", "")
+            sentence_df$note_text <- sapply(sentence_df$note_text,
+                gsub_fun, "\\*START\\*", "")
+            sentence_df$note_text <- sapply(sentence_df$note_text,
+                gsub_fun, "\\*END\\*", "")
+            out$sentences_total[i] <- length(sentence_df[, 1])
             out$sentences_reviewed[i] <- sum(sentence_df$reviewed)
-
             sent_dates <- sentence_df$text_date
-            out$sentences_list[i] <- paste(paste("\"", sentence_df$selected, "\"", sep=""), sent_dates, sep=": ", collapse="\r")
-
-            if (sentences_only == TRUE) out$sentences_table[i] <- list(sentence_df)
-
+            out$sentences_list[i] <- paste(paste("\"", sentence_df$selected,
+                "\"", sep = ""), sent_dates, sep = ": ", collapse = "\r")
+            if (sentences_only == TRUE)
+                out$sentences_table[i] <- list(sentence_df)
             if (is.na(out$event_date[i])) {
-
-                out$sentences_bef_event[i] <- length(sentence_df[,1])
-
-            } else {
-
-                sentences_bef_event <- subset(sentence_df, text_date < out$event_date[i])
-                out$sentences_bef_event[i] <- length(sentences_bef_event[,1])
-
+                out$sentences_bef_event[i] <- length(sentence_df[,
+                    1])
             }
-
+            else {
+                sentences_bef_event <- subset(sentence_df, text_date <
+                        out$event_date[i])
+                out$sentences_bef_event[i] <- length(sentences_bef_event[,
+                    1])
+            }
         }
-
         print(paste("assessed patient record", i, "of", len_out))
-
     }
-
     out$sentences_total[is.na(out$sentences_total)] <- 0
     out$sentences_reviewed[is.na(out$sentences_reviewed)] <- 0
     out$sentences_bef_event[is.na(out$sentences_bef_event)] <- 0
     out$sentences <- NULL
-    out$sentence_time <- round(out$case_time/out$sentences_reviewed, digits=0)
-
-    # Capping cells at 32k characters, otherwise the CSV or TSV file can get corrupted
-    out$sentences_list[!is.na(out$sentences_list) & nchar(out$sentences_list) > 32000] <- paste(substr(out$sentences_list[!is.na(out$sentences_list) & nchar(out$sentences_list) > 32000], 1, 32000), "<TRUNCATED AT 32,000 CHARACTERS>")
-
-    out <- out[order(out$patient_id, decreasing = FALSE, method = "radix"), ]
-
-    if (sentences_only == TRUE) out <- data.table::rbindlist(out$sentences_table[!is.na(out$sentences_table)])
-
+    out$sentence_time <- round(out$case_time/out$sentences_reviewed,
+        digits = 0)
+    out$sentences_list[!is.na(out$sentences_list) & nchar(out$sentences_list) >
+            32000] <- paste(substr(out$sentences_list[!is.na(out$sentences_list) &
+                    nchar(out$sentences_list) > 32000], 1, 32000), "<TRUNCATED AT 32,000 CHARACTERS>")
+    out <- out[order(out$patient_id, decreasing = FALSE, method = "radix"),
+        ]
+    if (sentences_only == TRUE)
+        out <- data.table::rbindlist(out$sentences_table[!is.na(out$sentences_table)], fill = TRUE)
     out
-
 }
 
 
