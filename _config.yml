@@ -1,13 +1,5 @@
 # theme: jekyll-theme-midnight
 
-title: TestTitle
-
-header {
-  padding: 60px;
-  text-align: center;
-  background: #1abc9c;
-  color: white;
-  font-size: 30px;
-}
+title: TestTitleB
 
 show_downloads: true
