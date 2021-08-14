@@ -167,8 +167,6 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
     user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query = NA) {
 
-    patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
-
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
     length_list <- length(patient_vect)
@@ -296,6 +294,9 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
 automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", nlp_engine = "udpipe", uri_fun = mongo_uri_standard,
     user, password, host, replica_set, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
+
+    print("Updating patient roster...")
+    patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
 
     # Finding NLP model to use, if not specified
     URL <- find_model(URL)
