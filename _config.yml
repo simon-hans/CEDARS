@@ -1,3 +1,5 @@
-theme: jekyll-theme-midnight
+# theme: jekyll-theme-midnight
+
+title: Clinical Event Detection and Recording System
 
 show_downloads: true
