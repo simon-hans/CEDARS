@@ -332,13 +332,9 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
 
             # If there are no more sentences left to evaluate before an event, case is closed
 
-            if (!is.na(event_date) & event_date == "DELETE")
-                event_date <- NA
+            if (is.na(event_date)) event_date <- old_event_date else if (event_date == "DELETE") event_date <- NA
 
             event_date <- as.Date(event_date)
-
-            if (is.na(event_date))
-                event_date <- old_event_date
 
             sentences$text_date <- as.Date(sentences$text_date)
 
