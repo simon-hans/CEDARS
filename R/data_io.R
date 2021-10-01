@@ -316,7 +316,12 @@ post_data <- function(uri_fun, user, password, host, replica_set, port, database
                 if (event_date != "DELETE")
                   update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"event_date\" : { \"$date\" : ", as.numeric(strptime(event_date, "%Y-%m-%d", 'UTC'))*1000, " }, \"pt_comments\" : ", "\"", pt_comments, "\" }}", sep = "") else {
 
-                        update_value <- paste("{\"$unset\":{\"event_date\" : null }}", sep = "")
+                      # Edit 10-01-2021
+                      # Bug fix: deleting an event date did not reset case to "unreviewed"
+                      # Here we mark back as unreviewed
+                      # If actually there are no sentences left to review the "reviewed" flag will be flipped back to TRUE
+                        # update_value <- paste("{\"$unset\":{\"event_date\" : null }}", sep = "")
+                      update_value <- paste("{\"$unset\":{\"event_date\" : null }, \"$set\":{\"reviewed\" : false}}", sep = "")
 
                 }
 
