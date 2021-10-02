@@ -315,7 +315,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
             annotations <- annotations_con$find(query)
 
-            if (length(annotations[,1])>0){
+            if (nrow(annotations)>0){
 
                 # Maintaining POSIX format with UTC zone
                 annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
