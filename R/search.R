@@ -315,53 +315,57 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
             annotations <- annotations_con$find(query)
 
-            # Maintaining POSIX format with UTC zone
-            annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+            if (length(annotations[,1])>0){
 
-            # Filtering based on text metadata, if indicated
-            if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+                # Maintaining POSIX format with UTC zone
+                annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
 
-            # Getting event date
-            patient_info <- patients_con$find(query)
-            if (!is.null(patient_info$event_date)) event_date <- as.Date(patient_info$event_date) else event_date <- NA
+                # Filtering based on text metadata, if indicated
+                if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
 
-            sentences <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
+                # Getting event date
+                patient_info <- patients_con$find(query)
+                if (!is.null(patient_info$event_date)) event_date <- as.Date(patient_info$event_date) else event_date <- NA
 
-            unique_sentences <- sentences$unique_sentences
+                sentences <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
 
-            if (length(unique_sentences[, 1]) > 0) {
+                unique_sentences <- sentences$unique_sentences
 
-                # edit 2-27
-                # Removed patient_id from desired fields
-                retained_fields <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date",
-                  "selected", "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
-                  "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
-                retained_fields <- retained_fields[retained_fields %in% colnames(unique_sentences)]
+                if (length(unique_sentences[, 1]) > 0) {
 
-                # edit 2-27
-                unique_sentences <- unique_sentences[order(unique_sentences$text_date, unique_sentences$doc_id,
-                  unique_sentences$text_id, unique_sentences$paragraph_id, unique_sentences$sentence_id,
-                  decreasing = FALSE, method = "radix"), ]
-                unique_sentences$unique_id <- 1:length(unique_sentences[, 1])
-                unique_sentences$reviewed <- rep(FALSE, length(unique_sentences[, 1]))
-                unique_sentences <- subset(unique_sentences, select = c("unique_id", "reviewed", retained_fields))
+                    # edit 2-27
+                    # Removed patient_id from desired fields
+                    retained_fields <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date",
+                        "selected", "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
+                        "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
+                    retained_fields <- retained_fields[retained_fields %in% colnames(unique_sentences)]
 
-                unique_sentences$note_text <- sapply(unique_sentences$doc_id, aggregate_note, sentences$annotations, parse_result$cui_elements)
+                    # edit 2-27
+                    unique_sentences <- unique_sentences[order(unique_sentences$text_date, unique_sentences$doc_id,
+                        unique_sentences$text_id, unique_sentences$paragraph_id, unique_sentences$sentence_id,
+                        decreasing = FALSE, method = "radix"), ]
+                    unique_sentences$unique_id <- 1:length(unique_sentences[, 1])
+                    unique_sentences$reviewed <- rep(FALSE, length(unique_sentences[, 1]))
+                    unique_sentences <- subset(unique_sentences, select = c("unique_id", "reviewed", retained_fields))
 
-                # edit 2-27
-                # For consistency of data field type with results of annotations
-                unique_sentences$text_id <- as.character(unique_sentences$text_id)
-                # edit 2-27
-                # unique_sentences$patient_id <- as.double(as.character(unique_sentences$patient_id))
+                    unique_sentences$note_text <- sapply(unique_sentences$doc_id, aggregate_note, sentences$annotations, parse_result$cui_elements)
 
-                update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(unique_sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
-                  sep = "")
+                    # edit 2-27
+                    # For consistency of data field type with results of annotations
+                    unique_sentences$text_id <- as.character(unique_sentences$text_id)
+                    # edit 2-27
+                    # unique_sentences$patient_id <- as.double(as.character(unique_sentences$patient_id))
 
-                patients_con$update(query, update_value)
+                    update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(unique_sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
+                        sep = "")
 
-                # If there is an event date and it is at or before all sentences, we mark case as reviewed
-                # This is enforced only if the query orders to skip sentences after events
-                if (db_results$skip_after_event == TRUE & !is.na(event_date) & event_date <= min(as.Date(unique_sentences$text_date))) complete_case(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+                    patients_con$update(query, update_value)
+
+                    # If there is an event date and it is at or before all sentences, we mark case as reviewed
+                    # This is enforced only if the query orders to skip sentences after events
+                    if (db_results$skip_after_event == TRUE & !is.na(event_date) & event_date <= min(as.Date(unique_sentences$text_date))) complete_case(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+
+                } else complete_case(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
 
             } else complete_case(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
 
