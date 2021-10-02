@@ -583,7 +583,12 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                     complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
                     }
 
-            } else complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
+            } else {
+
+                complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
+                sentences <- NA
+
+            }
 
         } else {
 
