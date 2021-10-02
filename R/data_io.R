@@ -565,20 +565,25 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
             annotations <- annotations_con$find(query)
 
             # Maintaining POSIX format with UTC zone
-            annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+            # Edit 10-02-2021: close case if no annotations found
+            if (nrow(annotations)>0) {
 
-            # Filtering based on text metadata, if indicated
-            if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+                annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
 
-            parse_result <- parse_query(search_query)
-            search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
-            sentences <- search_results$unique_sentences
-            annotations <- search_results$annotations
-            # If still no sentences, we close
-            if (length(sentences[, 1]) > 0)
-                sentences$note_text <- sapply(sentences$doc_id, aggregate_note, annotations, parse_result$cui_elements) else {
-                complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
-            }
+                # Filtering based on text metadata, if indicated
+                if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+
+                parse_result <- parse_query(search_query)
+                search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
+                sentences <- search_results$unique_sentences
+                annotations <- search_results$annotations
+                # If still no sentences, we close
+                if (length(sentences[, 1]) > 0)
+                    sentences$note_text <- sapply(sentences$doc_id, aggregate_note, annotations, parse_result$cui_elements) else {
+                    complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
+                    }
+
+            } else complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
 
         } else {
 
@@ -593,51 +598,58 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
 
                 annotations <- annotations_con$find(query)
 
-                # Maintaining POSIX format with UTC zone
-                annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+                # Edit 10-02-2021: stop if no annotations found
+                if (nrow(annotations)>0) {
 
-                # Filtering based on text metadata, if indicated
-                if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+                    # Maintaining POSIX format with UTC zone
+                    annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
 
-                parse_result <- parse_query(search_query)
-                new_sentences <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
-                # Normally we would expect to have sentences here, not sure if any is new
-                if (length(new_sentences[, 1] > 0)) {
+                    # Filtering based on text metadata, if indicated
+                    if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
 
-                  new_sentences$note_text <- sapply(new_sentences$doc_id, aggregate_note, annotations, parse_result$cui_elements)
-                  sentences$selected <- as.character(sentences$selected)
-                  new_sentences$reviewed <- NULL
-                  new_sentences$unique_id <- NULL
-                  new_sentences$patient_id <- NULL
-                  # edit 2-27
-                  sentences <- merge(new_sentences, sentences, by = c("doc_id", "text_id", "paragraph_id",
-                    "sentence_id", "text_date", "selected", "note_text"), all.x = TRUE, all.y = TRUE)
-                  sentences$reviewed[is.na(sentences$reviewed)] <- FALSE
-                  sentences$text_tag_1[!is.na(sentences$text_tag_1.x)] <- sentences$text_tag_1.x[!is.na(sentences$text_tag_1.x)]
-                  sentences$text_tag_1[!is.na(sentences$text_tag_1.y)] <- sentences$text_tag_1.y[!is.na(sentences$text_tag_1.y)]
-                  sentences$text_tag_2[!is.na(sentences$text_tag_2.x)] <- sentences$text_tag_2.x[!is.na(sentences$text_tag_2.x)]
-                  sentences$text_tag_2[!is.na(sentences$text_tag_2.y)] <- sentences$text_tag_2.y[!is.na(sentences$text_tag_2.y)]
-                  sentences$text_tag_3[!is.na(sentences$text_tag_3.x)] <- sentences$text_tag_3.x[!is.na(sentences$text_tag_3.x)]
-                  sentences$text_tag_3[!is.na(sentences$text_tag_3.y)] <- sentences$text_tag_3.y[!is.na(sentences$text_tag_3.y)]
-                  sentences$text_tag_4[!is.na(sentences$text_tag_4.x)] <- sentences$text_tag_4.x[!is.na(sentences$text_tag_4.x)]
-                  sentences$text_tag_4[!is.na(sentences$text_tag_4.y)] <- sentences$text_tag_4.y[!is.na(sentences$text_tag_4.y)]
-                  sentences$text_tag_5[!is.na(sentences$text_tag_5.x)] <- sentences$text_tag_5.x[!is.na(sentences$text_tag_5.x)]
-                  sentences$text_tag_5[!is.na(sentences$text_tag_5.y)] <- sentences$text_tag_5.y[!is.na(sentences$text_tag_5.y)]
-                  sentences$text_tag_6[!is.na(sentences$text_tag_6.x)] <- sentences$text_tag_6.x[!is.na(sentences$text_tag_6.x)]
-                  sentences$text_tag_6[!is.na(sentences$text_tag_6.y)] <- sentences$text_tag_6.y[!is.na(sentences$text_tag_6.y)]
-                  sentences$text_tag_7[!is.na(sentences$text_tag_7.x)] <- sentences$text_tag_7.x[!is.na(sentences$text_tag_7.x)]
-                  sentences$text_tag_7[!is.na(sentences$text_tag_7.y)] <- sentences$text_tag_7.y[!is.na(sentences$text_tag_7.y)]
-                  sentences$text_tag_8[!is.na(sentences$text_tag_8.x)] <- sentences$text_tag_8.x[!is.na(sentences$text_tag_8.x)]
-                  sentences$text_tag_8[!is.na(sentences$text_tag_8.y)] <- sentences$text_tag_8.y[!is.na(sentences$text_tag_8.y)]
-                  sentences$text_tag_9[!is.na(sentences$text_tag_9.x)] <- sentences$text_tag_9.x[!is.na(sentences$text_tag_9.x)]
-                  sentences$text_tag_9[!is.na(sentences$text_tag_9.y)] <- sentences$text_tag_9.y[!is.na(sentences$text_tag_9.y)]
-                  sentences$text_tag_10[!is.na(sentences$text_tag_10.x)] <- sentences$text_tag_10.x[!is.na(sentences$text_tag_10.x)]
-                  sentences$text_tag_10[!is.na(sentences$text_tag_10.y)] <- sentences$text_tag_10.y[!is.na(sentences$text_tag_10.y)]
-                  sentences$text_date <- as.Date(sentences$text_date)
-                  # edit 2-27
-                  sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id,
-                    sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
-                  sentences$unique_id <- 1:length(sentences[, 1])
+                    parse_result <- parse_query(search_query)
+                    new_sentences <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
+                    # Normally we would expect to have sentences here, not sure if any is new
+                    if (length(new_sentences[, 1] > 0)) {
+
+                        new_sentences$note_text <- sapply(new_sentences$doc_id, aggregate_note, annotations, parse_result$cui_elements)
+                        sentences$selected <- as.character(sentences$selected)
+                        new_sentences$reviewed <- NULL
+                        new_sentences$unique_id <- NULL
+                        new_sentences$patient_id <- NULL
+
+                        # edit 2-27
+                        sentences <- merge(new_sentences, sentences, by = c("doc_id", "text_id", "paragraph_id",
+                            "sentence_id", "text_date", "selected", "note_text"), all.x = TRUE, all.y = TRUE)
+                        sentences$reviewed[is.na(sentences$reviewed)] <- FALSE
+
+                        sentences$text_tag_1[!is.na(sentences$text_tag_1.x)] <- sentences$text_tag_1.x[!is.na(sentences$text_tag_1.x)]
+                        sentences$text_tag_1[!is.na(sentences$text_tag_1.y)] <- sentences$text_tag_1.y[!is.na(sentences$text_tag_1.y)]
+                        sentences$text_tag_2[!is.na(sentences$text_tag_2.x)] <- sentences$text_tag_2.x[!is.na(sentences$text_tag_2.x)]
+                        sentences$text_tag_2[!is.na(sentences$text_tag_2.y)] <- sentences$text_tag_2.y[!is.na(sentences$text_tag_2.y)]
+                        sentences$text_tag_3[!is.na(sentences$text_tag_3.x)] <- sentences$text_tag_3.x[!is.na(sentences$text_tag_3.x)]
+                        sentences$text_tag_3[!is.na(sentences$text_tag_3.y)] <- sentences$text_tag_3.y[!is.na(sentences$text_tag_3.y)]
+                        sentences$text_tag_4[!is.na(sentences$text_tag_4.x)] <- sentences$text_tag_4.x[!is.na(sentences$text_tag_4.x)]
+                        sentences$text_tag_4[!is.na(sentences$text_tag_4.y)] <- sentences$text_tag_4.y[!is.na(sentences$text_tag_4.y)]
+                        sentences$text_tag_5[!is.na(sentences$text_tag_5.x)] <- sentences$text_tag_5.x[!is.na(sentences$text_tag_5.x)]
+                        sentences$text_tag_5[!is.na(sentences$text_tag_5.y)] <- sentences$text_tag_5.y[!is.na(sentences$text_tag_5.y)]
+                        sentences$text_tag_6[!is.na(sentences$text_tag_6.x)] <- sentences$text_tag_6.x[!is.na(sentences$text_tag_6.x)]
+                        sentences$text_tag_6[!is.na(sentences$text_tag_6.y)] <- sentences$text_tag_6.y[!is.na(sentences$text_tag_6.y)]
+                        sentences$text_tag_7[!is.na(sentences$text_tag_7.x)] <- sentences$text_tag_7.x[!is.na(sentences$text_tag_7.x)]
+                        sentences$text_tag_7[!is.na(sentences$text_tag_7.y)] <- sentences$text_tag_7.y[!is.na(sentences$text_tag_7.y)]
+                        sentences$text_tag_8[!is.na(sentences$text_tag_8.x)] <- sentences$text_tag_8.x[!is.na(sentences$text_tag_8.x)]
+                        sentences$text_tag_8[!is.na(sentences$text_tag_8.y)] <- sentences$text_tag_8.y[!is.na(sentences$text_tag_8.y)]
+                        sentences$text_tag_9[!is.na(sentences$text_tag_9.x)] <- sentences$text_tag_9.x[!is.na(sentences$text_tag_9.x)]
+                        sentences$text_tag_9[!is.na(sentences$text_tag_9.y)] <- sentences$text_tag_9.y[!is.na(sentences$text_tag_9.y)]
+                        sentences$text_tag_10[!is.na(sentences$text_tag_10.x)] <- sentences$text_tag_10.x[!is.na(sentences$text_tag_10.x)]
+                        sentences$text_tag_10[!is.na(sentences$text_tag_10.y)] <- sentences$text_tag_10.y[!is.na(sentences$text_tag_10.y)]
+                        sentences$text_date <- as.Date(sentences$text_date)
+                        # edit 2-27
+                        sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id,
+                            sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
+                        sentences$unique_id <- 1:length(sentences[, 1])
+
+                    }
 
                 }
 
