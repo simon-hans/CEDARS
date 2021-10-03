@@ -305,8 +305,6 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
     }
 
-
-
     if (is.na(pending_patients[1])) cat("No pending patients...\n\n") else {
 
         cat("Performing new searches!\n\n")
@@ -480,7 +478,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                         sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id, sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
                         sentences$unique_id <- 1:length(sentences[, 1])
 
-                        update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"updated\" : false }}", sep = "")
+                        update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"updated\" : false, \"reviewed\" : false }}", sep = "")
 
                         patients_con$update(query, update_value)
 
