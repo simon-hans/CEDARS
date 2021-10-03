@@ -473,7 +473,7 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             # sentences_for_upload$patient_id <- as.double(as.character(sentences_for_upload$patient_id))
 
             query <- paste("{ \"patient_id\" : ", new_patient_id, "}", sep = "")
-            update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences_for_upload, POSIXt = "mongo"), ", \"updated\" : false }}",
+            update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences_for_upload, POSIXt = "mongo"), ", \"updated\" : false, \"reviewed\" : false }}",
                 sep = "")
             patients_con$update(query, update_value)
 
