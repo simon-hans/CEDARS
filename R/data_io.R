@@ -652,7 +652,9 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                             sentences$text_tag_10[!is.na(sentences$text_tag_10.x)] <- sentences$text_tag_10.x[!is.na(sentences$text_tag_10.x)]
                             sentences$text_tag_10[!is.na(sentences$text_tag_10.y)] <- sentences$text_tag_10.y[!is.na(sentences$text_tag_10.y)]
                             sentences$text_date <- as.Date(sentences$text_date)
-                            sentences <- subset(sentences, select = c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6"))
+
+                            sent_fields <- colnames(sentences)[colnames(sentences) %in% c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")]
+                            sentences <- subset(sentences, select = sent_fields)
                             # edit 2-27
                             sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id,
                                 sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]

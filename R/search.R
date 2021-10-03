@@ -294,13 +294,20 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
     # We find which patients do not have a completed search yet and have not been reviewed either
     pending_patients <- patients_con$find("{ \"sentences\" : null , \"reviewed\" : false }", "{ \"_id\" : 0, \"patient_id\" : 1}")$patient_id
 
-    # If no patient vector is provided, we use all pending patients
-    if (is.na(patient_vect[1]))
-        patient_vect <- pending_patients else patient_vect <- patient_vect[patient_vect %in% pending_patients]
+    # We find which patients had new NLP annotations entered
+    updated_patients <- patients_con$find("{ \"updated\" : true }", "{ \"_id\" : 0, \"patient_id\" : 1}")$patient_id
 
-    length_list <- length(patient_vect)
+    # If no patient vector is provided, we use all patients in need of search
+    if (!is.na(patient_vect[1])) {
 
-    cat("Performing searches!\n\n")
+        pending_patients <- patient_vect[patient_vect %in% pending_patients]
+        updated_patients <- patient_vect[patient_vect %in% updated_patients]
+
+    }
+
+    length_list <- length(pending_patients)
+
+    cat("Performing new searches!\n\n")
 
     j <- 0
 
@@ -308,10 +315,10 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
         # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked
         # A record is considered open for annotation if admin lock was successful
         unlock_records(uri_fun, user, password, host, replica_set, port, database)
-        open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+        open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, pending_patients[i])
         if (open == TRUE) {
 
-            query <- paste("{ \"patient_id\" : ", patient_vect[i], "}", sep = "")
+            query <- paste("{ \"patient_id\" : ", pending_patients[i], "}", sep = "")
 
             annotations <- annotations_con$find(query)
 
@@ -363,17 +370,124 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
                     # If there is an event date and it is at or before all sentences, we mark case as reviewed
                     # This is enforced only if the query orders to skip sentences after events
-                    if (db_results$skip_after_event == TRUE & !is.na(event_date) & event_date <= min(as.Date(unique_sentences$text_date))) complete_case(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+                    if (db_results$skip_after_event == TRUE & !is.na(event_date) & event_date <= min(as.Date(unique_sentences$text_date))) complete_case(uri_fun, user, password, host, replica_set, port, database, pending_patients[i])
 
-                } else complete_case(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+                } else complete_case(uri_fun, user, password, host, replica_set, port, database, pending_patients[i])
 
-            } else complete_case(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+            } else complete_case(uri_fun, user, password, host, replica_set, port, database, pending_patients[i])
 
         } else j <- j + 1
 
-        unlock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+        unlock_records_admin(uri_fun, user, password, host, replica_set, port, database, pending_patients[i])
 
-        cat(paste(c("Completed search for patient ID ", patient_vect[i], ", # ", i, " of ", length_list, ".\n"),
+        cat(paste(c("Completed first search for patient ID ", pending_patients[i], ", # ", i, " of ", length_list, ".\n"),
+            sep = "", collapse = ""))
+
+    }
+
+    cat("\n")
+
+    print(paste("There were ", j, " locked cases encountered.", sep = ""))
+
+    length_list <- length(updated_patients)
+
+    cat("Performing search updates!\n\n")
+
+    j <- 0
+
+    for (i in 1:length_list) {
+
+        unlock_records(uri_fun, user, password, host, replica_set, port, database)
+        open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, updated_patients[i])
+        if (open == TRUE) {
+
+            # If there is an existing sentences dataframe it is merged into the new one, so as to keep any human-entered
+            # annotations Updated sets always include the older ones, so it might have earlier versions of one sentence but
+            # not vice versa, and we always keep the extra info from the update, so some identical sentences might exist
+            # with different dates
+
+            query <- paste("{ \"patient_id\" : ", updated_patients[i], "}", sep = "")
+            annotations <- annotations_con$find(query)
+
+            if (nrow(annotations)>0) {
+
+                patient_info <- patients_con$find(query)
+                if (is.data.frame(patient_info$sentences[[1]]) && length(patient_info$sentences[[1]][, 1]) > 0) sentences <- patient_info$sentences[[1]] else {
+
+                    sentences <- matrix(nrow = 0, ncol = 19)
+                    colnames(sentences) <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
+                    sentences <- as.data.frame(sentences)
+
+                }
+
+                sentences$text_date <- strptime(strftime(sentences$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
+                # Maintaining POSIX format with UTC zone
+                annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
+                # Filtering based on text metadata, if indicated
+                if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+
+                parse_result <- parse_query(search_query)
+                new_search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
+                new_sentences <- new_search_results$unique_sentences
+                processed_new_annotations <- new_search_results$annotations
+                # Normally we would expect to have sentences here, not sure if any is new
+                if (length(new_sentences[, 1]) > 0) {
+
+                    new_sentences$note_text <- sapply(new_sentences$doc_id, aggregate_note, processed_new_annotations, parse_result$cui_elements)
+                    sentences$selected <- as.character(sentences$selected)
+                    new_sentences$reviewed <- NULL
+                    new_sentences$unique_id <- NULL
+                    new_sentences$patient_id <- NULL
+
+                    sentences <- merge(new_sentences, sentences, by = c("doc_id", "text_id", "paragraph_id",
+                        "sentence_id", "text_date", "selected", "note_text"), all.x = TRUE, all.y = TRUE)
+                    sentences$reviewed[is.na(sentences$reviewed)] <- FALSE
+
+                    sentences$text_tag_1[!is.na(sentences$text_tag_1.x)] <- sentences$text_tag_1.x[!is.na(sentences$text_tag_1.x)]
+                    sentences$text_tag_1[!is.na(sentences$text_tag_1.y)] <- sentences$text_tag_1.y[!is.na(sentences$text_tag_1.y)]
+                    sentences$text_tag_2[!is.na(sentences$text_tag_2.x)] <- sentences$text_tag_2.x[!is.na(sentences$text_tag_2.x)]
+                    sentences$text_tag_2[!is.na(sentences$text_tag_2.y)] <- sentences$text_tag_2.y[!is.na(sentences$text_tag_2.y)]
+                    sentences$text_tag_3[!is.na(sentences$text_tag_3.x)] <- sentences$text_tag_3.x[!is.na(sentences$text_tag_3.x)]
+                    sentences$text_tag_3[!is.na(sentences$text_tag_3.y)] <- sentences$text_tag_3.y[!is.na(sentences$text_tag_3.y)]
+                    sentences$text_tag_4[!is.na(sentences$text_tag_4.x)] <- sentences$text_tag_4.x[!is.na(sentences$text_tag_4.x)]
+                    sentences$text_tag_4[!is.na(sentences$text_tag_4.y)] <- sentences$text_tag_4.y[!is.na(sentences$text_tag_4.y)]
+                    sentences$text_tag_5[!is.na(sentences$text_tag_5.x)] <- sentences$text_tag_5.x[!is.na(sentences$text_tag_5.x)]
+                    sentences$text_tag_5[!is.na(sentences$text_tag_5.y)] <- sentences$text_tag_5.y[!is.na(sentences$text_tag_5.y)]
+                    sentences$text_tag_6[!is.na(sentences$text_tag_6.x)] <- sentences$text_tag_6.x[!is.na(sentences$text_tag_6.x)]
+                    sentences$text_tag_6[!is.na(sentences$text_tag_6.y)] <- sentences$text_tag_6.y[!is.na(sentences$text_tag_6.y)]
+                    sentences$text_tag_7[!is.na(sentences$text_tag_7.x)] <- sentences$text_tag_7.x[!is.na(sentences$text_tag_7.x)]
+                    sentences$text_tag_7[!is.na(sentences$text_tag_7.y)] <- sentences$text_tag_7.y[!is.na(sentences$text_tag_7.y)]
+                    sentences$text_tag_8[!is.na(sentences$text_tag_8.x)] <- sentences$text_tag_8.x[!is.na(sentences$text_tag_8.x)]
+                    sentences$text_tag_8[!is.na(sentences$text_tag_8.y)] <- sentences$text_tag_8.y[!is.na(sentences$text_tag_8.y)]
+                    sentences$text_tag_9[!is.na(sentences$text_tag_9.x)] <- sentences$text_tag_9.x[!is.na(sentences$text_tag_9.x)]
+                    sentences$text_tag_9[!is.na(sentences$text_tag_9.y)] <- sentences$text_tag_9.y[!is.na(sentences$text_tag_9.y)]
+                    sentences$text_tag_10[!is.na(sentences$text_tag_10.x)] <- sentences$text_tag_10.x[!is.na(sentences$text_tag_10.x)]
+                    sentences$text_tag_10[!is.na(sentences$text_tag_10.y)] <- sentences$text_tag_10.y[!is.na(sentences$text_tag_10.y)]
+                    sentences$text_date <- as.Date(sentences$text_date)
+
+                    sent_fields <- colnames(sentences)[colnames(sentences) %in% c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")]
+                    sentences <- subset(sentences, select = sent_fields)
+                    # edit 2-27
+                    sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id,
+                        sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
+                    sentences$unique_id <- 1:length(sentences[, 1])
+
+                    update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
+                        sep = "")
+
+                    patients_con$update(query, update_value)
+
+                } else complete_case(uri_fun, user, password, host, replica_set, port, database, updated_patients[i])
+
+            } else complete_case(uri_fun, user, password, host, replica_set, port, database, updated_patients[i])
+
+        } else j <- j + 1
+
+        unlock_records_admin(uri_fun, user, password, host, replica_set, port, database, updated_patients[i])
+
+        cat(paste(c("Completed updated search for patient ID ", updated_patients[i], ", # ", i, " of ", length_list, ".\n"),
             sep = "", collapse = ""))
 
     }
