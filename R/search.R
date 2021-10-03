@@ -305,7 +305,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
     }
 
-    if (is.na(pending_patients[1])) cat("No pending patients...\n\n") else {
+    if (is.null(pending_patients) || is.na(pending_patients[1])) cat("No pending patients...\n\n") else {
 
         cat("Performing new searches!\n\n")
 
@@ -392,7 +392,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
     }
 
-    if (is.na(updated_patients[1])) cat("No updated patients...\n\n") else {
+    if (is.null(updated_patients) || is.na(updated_patients[1])) cat("No updated patients...\n\n") else {
 
         length_list <- length(updated_patients)
 
