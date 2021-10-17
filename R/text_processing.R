@@ -358,7 +358,8 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 
         print("Finding patients with missing annotations...")
 
-        unique_missing <- list()
+        unique_missing_patients <- list()
+        unique_missing_texts <- list()
 
         for (i in 1:l_all_patients){
 
@@ -382,32 +383,38 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 
             if (length(missing_text) > 0) {
 
-                unique_missing$patient_id[[i]] <- all_patients[i]
-                unique_missing$text_id[[i]] <- missing_text
+                unique_missing_patients[[i]] <- all_patients[i]
+                unique_missing_texts[[i]] <- missing_text
 
             } else {
 
-                unique_missing$patient_id[[i]] <- NA
-                unique_missing$text_id[[i]] <- NA
+                unique_missing_patients[[i]] <- NA
+                unique_missing_texts[[i]] <- NA
 
             }
 
         }
 
-        unique_missing_patients <- unlist(unique_missing$patient_id)
-        unique_missing_patients <- unique_missing_patients[!is.na(unique_missing_patients)]
+        unique_missing_patients <- unlist(unique_missing_patients)
 
-        if (is.na(patient_vect[1]))
-            patient_vect <- unique_missing_patients else patient_vect <- patient_vect[patient_vect %in% unique_missing_patients]
+        if (!is.na(patient_vect[1])){
 
-        patient_vect <- patient_vect[order(patient_vect, decreasing = FALSE, method = "radix")]
+            unique_missing_texts <- unique_missing_texts[unique_missing_patients %in% patient_vect]
+            unique_missing_patients <- unique_missing_patients[unique_missing_patients %in% patient_vect]
 
-        if (!is.na(patient_vect[1])) {
+        } else {
+
+            unique_missing_texts <- unique_missing_texts[!is.na(unique_missing_patients)]
+            unique_missing_patients <- unique_missing_patients[!is.na(unique_missing_patients)]
+
+        }
+
+        if (length(unique_missing_patients)>0) {
 
             print("Annotating...")
 
-            batch_processor_db(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user,
-                password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query)
+            batch_processor_db(unique_missing_patients, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user,
+                password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query, unique_missing_texts)
 
         } else print("No records to annotate!")
 
