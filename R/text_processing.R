@@ -162,10 +162,12 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
 #' @param tag_query If desired, "include" and "exclude" criteria used to filter documents based on metadata tags.
+#' @param unique_missing_texts List of missing text_id's, one vector for each patient.
 #' @keywords internal
 
 batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
-    user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query = NA) {
+    user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query = NA,
+    unique_missing_texts = NA) {
 
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
@@ -219,6 +221,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
             sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
             # Applying metadata tag filter
             if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query)
+
+            if (!is.na(unique_missing_texts)) sub_corpus <- subset(sub_corpus, text_id %in% unique_missing_texts[[i]])
 
             sub_corpus <- sub_corpus[order(sub_corpus$text_date, sub_corpus$doc_id, sub_corpus$text_id, decreasing = c(FALSE, FALSE, FALSE), method = "radix"),]
 
