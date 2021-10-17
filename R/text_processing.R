@@ -401,7 +401,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 
 #' Upload Notes to Database
 #'
-#' Allows user to populate notes in database from dataframe; could be easily inserted into wrapper batch function to serially download from other DB etc. Notes dataframe must contain: 'patient_id', 'text_id' (a unique identifier for each text segment), along with 'text', 'text_date', 'doc_id' (designates unique EHR document) and ideally 'text_sequence' which indicates order of text section within document. 'doc_section_name' along 'text_tag_1' to 'text_tag_10' are optional. 'text_date' must be in format '%Y-%m-%d'!
+#' Allows user to populate notes in database from dataframe; could be easily inserted into wrapper batch function to serially download from other DB etc. Notes dataframe must contain: 'patient_id', 'text_id' (a unique identifier for each text segment), along with 'text', 'text_date', 'doc_id' (designates unique EHR document) and ideally 'text_sequence' which indicates order of text section within document. 'doc_section_name' along 'text_tag_1' to 'text_tag_10' are optional. 'text_date' must be in format '%Y-%m-%d'! Only one patient at a time.
 #' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
@@ -424,13 +424,15 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
 
     mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
 
+    patient_id <- unique(notes$patient_id)
+
     if (anyNA(match(c("patient_id", "text_id", "text", "text_date", "doc_id"), colnames(notes))))
         print("Error: missing field.") else {
 
-            if (is.numeric(notes$patient_id)) min_val_pt <- min(notes$patient_id) else min_val_pt <- 0
+            if (is.numeric(notes$patient_id) & length(patient_id)==1) min_val_pt <- min(notes$patient_id) else min_val_pt <- 0
             if ("text_sequence" %in% colnames(notes) & is.numeric(notes$text_sequence)) min_val_seq <- min(notes$text_sequence)
             if ("text_sequence" %in% colnames(notes) & !is.numeric(notes$text_sequence)) min_val_seq <- 0
-            if (min_val_pt <=0 | min_val_seq <=0) print("Error: patient ID and text sequence values must be numeric and >0.") else {
+            if (min_val_pt <=0 | min_val_seq <=0) print("Error: patient ID and text sequence values must be numeric and >0; notes for only 1 patient can be uploaded at a time.") else {
 
                 date_check <- !(as.character(as.Date(notes$text_date, format = "%Y-%m-%d")) == notes$text_date)
 
@@ -464,8 +466,16 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
 
                     notes$text_date <- strptime(notes$text_date, "%Y-%m-%d", 'UTC')
 
-                    suppressWarnings(upload_results <- mongo_con$insert(notes, stop_on_error = FALSE))
-                    print(paste(upload_results$nInserted, " of ", length(notes[, 1]), " records inserted!", sep = ""))
+                    # Getting notes already in DB
+                    notes_cedars <- notes_con$find(query = paste('{\"patient_id\" :', patient_id[1], '}'), fields =  '{\"text_id\" : 1, \"_id\" : 0}')
+                    notes <- subset(notes, !(text_id %in% notes_cedars$text_id))
+
+                    if (length(notes[,1])>0) {
+
+                        suppressWarnings(upload_results <- mongo_con$insert(notes, stop_on_error = FALSE))
+                        print(paste(upload_results$nInserted, " of ", length(notes[, 1]), " records inserted!", sep = ""))
+
+                    } else print("All notes already in CEDARS! Nothing uploaded.")
 
                     }
 
