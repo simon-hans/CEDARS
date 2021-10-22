@@ -222,7 +222,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
             # Applying metadata tag filter
             if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query)
 
-            if (!is.na(unique_missing_texts)) sub_corpus <- subset(sub_corpus, text_id %in% unique_missing_texts[[i]])
+            if (!is.na(unique_missing_texts[1])) sub_corpus <- subset(sub_corpus, text_id %in% unique_missing_texts[[i]])
 
             sub_corpus <- sub_corpus[order(sub_corpus$text_date, sub_corpus$doc_id, sub_corpus$text_id, decreasing = c(FALSE, FALSE, FALSE), method = "radix"),]
 
