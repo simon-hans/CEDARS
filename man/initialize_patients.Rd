@@ -4,7 +4,16 @@
 \alias{initialize_patients}
 \title{Initialize Patient List}
 \usage{
-initialize_patients(uri_fun, user, password, host, replica_set, port, database)
+initialize_patients(
+  uri_fun,
+  user,
+  password,
+  host,
+  replica_set,
+  port,
+  database,
+  patient_vect = NA
+)
 }
 \arguments{
 \item{uri_fun}{Uniform resource identifier (URI) string generating function for MongoDB credentials.}
@@ -20,6 +29,8 @@ initialize_patients(uri_fun, user, password, host, replica_set, port, database)
 \item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
+
+\item{patient_vect}{Vector of patient ID's. Default is NA, in which case all patients will be listed.}
 }
 \value{
 {

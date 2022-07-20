@@ -21,7 +21,8 @@ batch_processor_db(
   max_n_grams_length,
   negex_depth,
   select_cores,
-  tag_query = NA
+  tag_query = NA,
+  unique_missing_texts = NA
 )
 }
 \arguments{
@@ -58,6 +59,8 @@ batch_processor_db(
 \item{select_cores}{How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.}
 
 \item{tag_query}{If desired, "include" and "exclude" criteria used to filter documents based on metadata tags.}
+
+\item{unique_missing_texts}{List of missing text_id's, one vector for each patient.}
 }
 \description{
 NLP annotates documents for a cohort of patients, in parallel. Locks each record before proceeding with NLP annotations.

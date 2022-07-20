@@ -286,7 +286,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
     parse_result <- parse_query(search_query)
 
     # Making sure all patients with annotations are considered
-    patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
+    patient_roster_update(uri_fun, user, password, host, replica_set, port, database, patient_vect)
 
     patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
     annotations_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "ANNOTATIONS")

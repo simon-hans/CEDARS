@@ -300,7 +300,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     user, password, host, replica_set, port, database, max_n_grams_length = 7, negex_depth = 6, select_cores = NA, URL = NA) {
 
     print("Updating patient roster...")
-    patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
+    patient_roster_update(uri_fun, user, password, host, replica_set, port, database, patient_vect)
 
     # Finding NLP model to use, if not specified
     URL <- find_model(URL)
@@ -450,7 +450,9 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
 
 upload_notes <- function(uri_fun, user, password, host, replica_set, port, database, notes) {
 
-    mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
+    # mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
+    # Changed 7-20-2022
+    notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
 
     patient_id <- unique(notes$patient_id)
 
@@ -495,12 +497,13 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
                     notes$text_date <- strptime(notes$text_date, "%Y-%m-%d", 'UTC')
 
                     # Getting notes already in DB
+
                     notes_cedars <- notes_con$find(query = paste('{\"patient_id\" :', patient_id[1], '}'), fields =  '{\"text_id\" : 1, \"_id\" : 0}')
                     notes <- subset(notes, !(text_id %in% notes_cedars$text_id))
 
                     if (length(notes[,1])>0) {
 
-                        suppressWarnings(upload_results <- mongo_con$insert(notes, stop_on_error = FALSE))
+                        suppressWarnings(upload_results <- notes_con$insert(notes, stop_on_error = FALSE))
                         print(paste(upload_results$nInserted, " of ", length(notes[, 1]), " records inserted!", sep = ""))
 
                     } else print("All notes already in CEDARS! Nothing uploaded.")

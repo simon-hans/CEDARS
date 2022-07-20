@@ -177,9 +177,10 @@ db_upload <- function(uri_fun, user, password, host, replica_set, port, database
 #' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @param patient_vect Vector of patient ID's. Default is NA, in which case all unlocked records will be listed.
 #' @keywords internal
 
-patient_roster_update <- function(uri_fun, user, password, host, replica_set, port, database) {
+patient_roster_update <- function(uri_fun, user, password, host, replica_set, port, database, patient_vect = NA) {
 
     notes_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "NOTES")
     unique_patients <- notes_con$distinct("patient_id")
@@ -188,6 +189,11 @@ patient_roster_update <- function(uri_fun, user, password, host, replica_set, po
     active_patients <- patients_con$distinct("patient_id")
 
     missing_patients <- unique_patients[!(unique_patients %in% active_patients)]
+
+    if (!is.na(patient_vect)){
+      missing_patients <- missing_patients[missing_patients %in% patient_vect]
+    }
+
     missing_patients <- data.frame(patient_id = missing_patients, reviewed = rep(FALSE, length(missing_patients)),
         locked = rep(FALSE, length(missing_patients)), updated = rep(FALSE, length(missing_patients)), admin_locked = rep(FALSE,
             length(missing_patients)))
@@ -451,6 +457,7 @@ initialize_annotations <- function(uri_fun, user, password, host, replica_set, p
 #' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @param patient_vect Vector of patient ID's. Default is NA, in which case all patients will be listed.
 #' @return {
 #' Confirmation that requested operation was completed, or error message if attempt failed.
 #' }
@@ -461,7 +468,7 @@ initialize_annotations <- function(uri_fun, user, password, host, replica_set, p
 #' }
 #' @export
 
-initialize_patients <- function(uri_fun, user, password, host, replica_set, port, database) {
+initialize_patients <- function(uri_fun, user, password, host, replica_set, port, database, patient_vect = NA) {
 
     first_answer <- readline("Are you sure you want to proceed? Event data will be irreversibly deleted. (yes/no) ")
 
@@ -487,7 +494,7 @@ initialize_patients <- function(uri_fun, user, password, host, replica_set, port
         if ("PATIENTS" %in% collections$name)
             print("Deletion failed!") else {
 
-            patient_roster_update(uri_fun, user, password, host, replica_set, port, database)
+            patient_roster_update(uri_fun, user, password, host, replica_set, port, database, patient_vect)
             print("Initialization successful!")
 
         }

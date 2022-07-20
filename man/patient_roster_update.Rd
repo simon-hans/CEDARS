@@ -11,7 +11,8 @@ patient_roster_update(
   host,
   replica_set,
   port,
-  database
+  database,
+  patient_vect = NA
 )
 }
 \arguments{
@@ -28,8 +29,11 @@ patient_roster_update(
 \item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
+
+\item{patient_vect}{Vector of patient ID's. Default is NA, in which case all unlocked records will be listed.}
 }
 \description{
-Updates the 'PATIENTS' collection with new entries. Used after NLP annotations have been uploaded.
+Updates the 'PATIENTS' collection with new entries. Lists all patients who have at
+least one note.
 }
 \keyword{internal}
