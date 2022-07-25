@@ -272,6 +272,12 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
     use_negation <- db_results$exclude_negated[1]
     hide_duplicates <- db_results$hide_duplicates[1]
 
+    # Edits 7-25-2022
+    date_min <- db_results$date_min
+    date_max <- db_results$date_max
+    if (!is.na(date_min)) date_min <- strptime(strftime(date_min, tz = "UTC"), "%Y-%m-%d", 'UTC')
+    if (!is.na(date_max)) date_max <- strptime(strftime(date_max, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
     # Getting tag query, if it exists
     tag_query <- db_results$tag_query
     if (!is.null(tag_query$exact)) {
@@ -328,6 +334,10 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
                     # Maintaining POSIX format with UTC zone
                     annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
+                    # Edit 7-25-2022
+                    if (!is.na(date_min)) annotations <- subset(annotations, as.Date(text_date) >= as.Date(date_min))
+                    if (!is.na(date_max)) annotations <- subset(annotations, as.Date(text_date) <= as.Date(date_max))
 
                     # Filtering based on text metadata, if indicated
                     if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
