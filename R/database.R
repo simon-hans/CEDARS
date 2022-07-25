@@ -190,7 +190,7 @@ patient_roster_update <- function(uri_fun, user, password, host, replica_set, po
 
     missing_patients <- unique_patients[!(unique_patients %in% active_patients)]
 
-    if (!is.na(patient_vect)){
+    if (!is.na(patient_vect[1])){
       missing_patients <- missing_patients[missing_patients %in% patient_vect]
     }
 
