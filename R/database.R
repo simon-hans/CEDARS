@@ -387,7 +387,7 @@ save_query <- function(uri_fun, user, password, host, replica_set, port, databas
 
     update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation, " , \"hide_duplicates\" : ",
                           converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, ", \"tag_query\" : ", jsonlite::toJSON(tag_query),
-                          "\", \"date_min\" : ", date_min, "\", \"date_max\" : ", date_max, "}", sep = "")
+                          ", \"date_min\" : ", date_min, ", \"date_max\" : ", date_max, "}", sep = "")
 
     query_out <- query_con$replace(query = "{}", update = update_value, upsert = TRUE)
 
