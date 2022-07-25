@@ -354,6 +354,8 @@ populate_query <- function(uri_fun, user, password, host, replica_set, port, dat
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param skip_after_event Should sentences occurring after recorded clinical event be skipped?
 #' @param tag_query List with 2 sublists, namely "include" and "exclude", indicating matching strings for metadata tag parameters.
+#' @param date_min Minimum date for text search; does not apply to NLP processing.
+#' @param date_max Maximum date for text search; does not apply to NLP processing.
 #' @return {
 #' Confirmation that requested operation was completed, or error message if attempt failed.
 #' }
@@ -367,7 +369,7 @@ populate_query <- function(uri_fun, user, password, host, replica_set, port, dat
 #' }
 #' @export
 
-save_query <- function(uri_fun, user, password, host, replica_set, port, database, search_query, use_negation, hide_duplicates, skip_after_event, tag_query = NA) {
+save_query <- function(uri_fun, user, password, host, replica_set, port, database, search_query, use_negation, hide_duplicates, skip_after_event, tag_query = NA, date_min = NA, date_max = NA) {
 
     search_query <- sanitize_query(search_query)
 
@@ -380,8 +382,12 @@ save_query <- function(uri_fun, user, password, host, replica_set, port, databas
     if (skip_after_event == TRUE)
         converted_skip_after_event <- "true" else converted_skip_after_event <- "false"
 
+    date_min <- as.Date(date_min)
+    date_max <- as.Date(date_max)
+
     update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation, " , \"hide_duplicates\" : ",
-                          converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, ", \"tag_query\" : ", jsonlite::toJSON(tag_query), "}", sep = "")
+                          converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, ", \"tag_query\" : ", jsonlite::toJSON(tag_query),
+                          "\", \"date_min\" : ", date_min, "\", \"date_max\" : ", date_max, "}", sep = "")
 
     query_out <- query_con$replace(query = "{}", update = update_value, upsert = TRUE)
 
