@@ -382,12 +382,12 @@ save_query <- function(uri_fun, user, password, host, replica_set, port, databas
     if (skip_after_event == TRUE)
         converted_skip_after_event <- "true" else converted_skip_after_event <- "false"
 
-    date_min <- as.Date(date_min)
-    date_max <- as.Date(date_max)
+    if (is.na(date_min)) date_min <- "null" else date_min <- paste("{\"$date\" : \"", strftime(as.POSIXlt(as.Date(date_min)), "%Y-%m-%dT%H:%M:%S%z"), "\"}", sep = "")
+    if (is.na(date_max)) date_max <- "null" else date_max <- paste("{\"$date\" : \"", strftime(as.POSIXlt(as.Date(date_max)), "%Y-%m-%dT%H:%M:%S%z"), "\"}", sep = "")
 
-    update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation, " , \"hide_duplicates\" : ",
-                          converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, ", \"tag_query\" : ", jsonlite::toJSON(tag_query),
-                          " , \"date_min\" : {\"$date\" : \"", strftime(as.POSIXlt(date_min), "%Y-%m-%dT%H:%M:%S%z"), "\"} , \"date_max\" : {\"$date\" : \"", strftime(as.POSIXlt(date_max), "%Y-%m-%dT%H:%M:%S%z"), "\"}}", sep = "")
+    update_value <- paste("{ \"query\" : \"", search_query, "\", \"exclude_negated\" : ", converted_negation,
+                          " , \"hide_duplicates\" : ", converted_hide_duplicates, " , \"skip_after_event\" : ", converted_skip_after_event, ", \"tag_query\" : ", jsonlite::toJSON(tag_query),
+                          " , \"date_min\" : ",  date_min,  ", \"date_max\" : ", date_max, "}", sep = "")
 
     query_out <- query_con$replace(query = "{}", update = update_value, upsert = TRUE)
 
