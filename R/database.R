@@ -1194,7 +1194,8 @@ upload_events <- function(uri_fun, user, password, host, replica_set, port, data
 #' @examples
 #' \dontrun{
 #' upload_comments(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
-#' host = 'server1234', port = NA, database = 'TEST_PROJECT', patient_ids = ids, comments = comment_text)
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', patient_ids = ids,
+#' comments = comment_text)
 #' }
 #' @export
 

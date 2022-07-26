@@ -16,7 +16,9 @@ save_query(
   use_negation,
   hide_duplicates,
   skip_after_event,
-  tag_query = NA
+  tag_query = NA,
+  date_min = NA,
+  date_max = NA
 )
 }
 \arguments{
@@ -43,6 +45,10 @@ save_query(
 \item{skip_after_event}{Should sentences occurring after recorded clinical event be skipped?}
 
 \item{tag_query}{List with 2 sublists, namely "include" and "exclude", indicating matching strings for metadata tag parameters.}
+
+\item{date_min}{Minimum date for text search; does not apply to NLP processing.}
+
+\item{date_max}{Maximum date for text search; does not apply to NLP processing.}
 }
 \value{
 {
