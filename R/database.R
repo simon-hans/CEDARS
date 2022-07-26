@@ -1114,7 +1114,7 @@ download_events <- function (uri_fun, user, password, host, replica_set, port, d
 
 #' Upload Event Data
 #'
-#' Uploads event dates for patients already in the patient list. Useful when some events have already been documented before runnning CEDARS, for example as a second-line method to catch events missed with a different approach. Only event dates for existing records are altered, missing patient records are not added!
+#' Uploads event dates for patients already in the patient list. Useful when some events have already been documented before running CEDARS, for example as a second-line method to catch events missed with a different approach. Only event dates for existing records are altered, missing patient records are not added!
 #' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
@@ -1136,7 +1136,9 @@ download_events <- function (uri_fun, user, password, host, replica_set, port, d
 
 upload_events <- function(uri_fun, user, password, host, replica_set, port, database, patient_ids, event_dates) {
 
-    if (class(event_dates) != "Date") print("Error: event dates must be of class Date!") else {
+  if (length(patient_ids) == length(event_dates)){
+
+    if (class(event_dates) != "Date") print("Error: event dates must be of class date!") else {
 
         event_dates <- data.frame(patient_id = patient_ids, event_date = event_dates)
         event_dates$event_date <- as.character(event_dates$event_date)
@@ -1168,6 +1170,70 @@ upload_events <- function(uri_fun, user, password, host, replica_set, port, data
         }
 
     }
+
+  } else print("Length of patient ID and event date vectors must match!")
+
+}
+
+
+#' Upload Comments
+#'
+#' Uploads patient comments for patients already in the patient list. Useful when some comments have already been documented before running CEDARS. Only comments for existing records are altered, missing patient records are not added!
+#' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
+#' @param user MongoDB user name.
+#' @param password MongoDB user password.
+#' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
+#' @param port MongoDB port.
+#' @param database MongoDB database name.
+#' @param patient_ids Vector of patient ID's.
+#' @param comments Vector of patient comments.
+#' @return {
+#' Objects of class character, reporting on completed event uploads.
+#' }
+#' @examples
+#' \dontrun{
+#' upload_comments(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', patient_ids = ids, comments = comment_text)
+#' }
+#' @export
+
+upload_comments <- function(uri_fun, user, password, host, replica_set, port, database, patient_ids, comments) {
+
+  if (length(patient_ids) == length(comments)){
+
+    if (class(comments) != "character") print("Error: event dates must be of class character!") else {
+
+      comments <- data.frame(patient_id = patient_ids, comment = comments)
+      comments$comment[is.na(comments$comment)] <- "null"
+
+      patients_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
+
+      current_patients <- patients_con$find(query = "{}", field = "{ \"_id\" : 0 , \"patient_id\" : 1 }")
+
+      current_outcomes <- merge(comments, current_patients, by = "patient_id", all.x = FALSE, all.y = FALSE)
+
+      len_set <- length(current_outcomes[, 1])
+
+      for (i in 1:len_set) {
+
+        pt_query <- paste("{", paste("\"patient_id\" : ", current_outcomes$patient_id[i], sep = ""), "}")
+
+        if (current_outcomes$comment[i] == "null") {
+
+          pt_update <- paste("{ \"$unset\" : {\"pt_comments\" : ", current_outcomes$comment[i], "}}", sep = "")
+
+        } else pt_update <- paste("{ \"$set\" : {\"pt_comments\" : \"", current_outcomes$comment[i], "\" }}", sep = "")
+
+        patients_con$update(pt_query, pt_update)
+
+        print(paste("Updated record", i, "of", len_set))
+
+      }
+
+    }
+
+  } else print("Length of patient ID and comment vectors must match!")
 
 }
 
