@@ -443,8 +443,9 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
         if (length(sentences[, 1]) > 0) {
 
             # edit 2-27
+            # Modifed 10-05-2022
             retained_fields <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date",
-                "selected", "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
+                "selected", "note_text", "par_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
                 "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
             retained_fields <- retained_fields[retained_fields %in% colnames(sentences)]
 
@@ -590,8 +591,11 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                     sentences <- search_results$unique_sentences
                     processed_annotations <- search_results$annotations
                     # If still no sentences, we close
-                    if (length(sentences[, 1]) > 0)
-                        sentences$note_text <- sapply(sentences$doc_id, aggregate_note, processed_annotations, parse_result$cui_elements) else {
+                    # Changed 10-05-2022
+                    if (length(sentences[, 1]) > 0){
+                      sentences$note_text <- sapply(sentences$doc_id, aggregate_note, processed_annotations, parse_result$cui_elements)
+                      sentences$par_text <- sapply(1:nrow(sentences), aggregate_paragraph, processed_annotations, sentences)
+                      } else {
                             complete_case(uri_fun, user, password, host, replica_set, port, database, selected_patient)
                         }
 
@@ -633,14 +637,17 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                         if (length(new_sentences[, 1]) > 0) {
 
                             new_sentences$note_text <- sapply(new_sentences$doc_id, aggregate_note, processed_new_annotations, parse_result$cui_elements)
+                            # Added 10-05-2022
+                            new_sentences$par_text <- sapply(1:nrow(new_sentences), aggregate_paragraph, processed_new_annotations, new_sentences)
                             sentences$selected <- as.character(sentences$selected)
                             new_sentences$reviewed <- NULL
                             new_sentences$unique_id <- NULL
                             new_sentences$patient_id <- NULL
 
                             # edit 2-27
+                            # Modified 10-05-2022
                             sentences <- merge(new_sentences, sentences, by = c("doc_id", "text_id", "paragraph_id",
-                                "sentence_id", "text_date", "selected", "note_text"), all.x = TRUE, all.y = TRUE)
+                                "sentence_id", "text_date", "selected", "note_text", "par_text"), all.x = TRUE, all.y = TRUE)
                             sentences$reviewed[is.na(sentences$reviewed)] <- FALSE
 
                             sentences$text_tag_1[!is.na(sentences$text_tag_1.x)] <- sentences$text_tag_1.x[!is.na(sentences$text_tag_1.x)]
@@ -665,7 +672,8 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                             sentences$text_tag_10[!is.na(sentences$text_tag_10.y)] <- sentences$text_tag_10.y[!is.na(sentences$text_tag_10.y)]
                             sentences$text_date <- as.Date(sentences$text_date)
 
-                            sent_fields <- colnames(sentences)[colnames(sentences) %in% c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")]
+                            # Modified 10-05-2022
+                            sent_fields <- colnames(sentences)[colnames(sentences) %in% c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "par_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")]
                             sentences <- subset(sentences, select = sent_fields)
                             # edit 2-27
                             sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id,
@@ -695,8 +703,8 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
 
 #' Aggregate Contents of a Note
 #'
-#' When using atomized notes, this function 'pastes' back the different sections together in the intended order. Preselected lemmas are marked, along with those for which thr CUI is
-#' in the list of interest.
+#' When using atomized notes, this function 'pastes' back the different sections together in the intended order. Pre-selected lemmas are marked, along with those for which the CUI
+#' is in the list of interest.
 #' @param selected_doc_id Document ID for the note to which the sentence belongs.
 #' @param annotations NLP annotations dataframe.
 #' @param cui_elements Vector of UMLS concept unique identifier (CUI) elements derived from the search query.
@@ -721,6 +729,39 @@ aggregate_note <- function(selected_doc_id, annotations, cui_elements) {
     out <- paste(pasted_sections, collapse = "\n\n")
 
     out
+
+}
+
+
+#' Aggregate Contents of a Paragraph
+#'
+#' When using atomized notes, this function 'pastes' back the different sections together in the intended order for ONE paragraph.
+#' There is NO marking of lemmas.
+#' @param df_index Index of sentences dataframe; allows iteration.
+#' @param annotations NLP annotations dataframe.
+#' @param sentences_df Dataframe of unique sentences.
+#' @return Aggregated paragraph in one text string.
+#' @keywords internal
+
+aggregate_paragraph <- function(df_index, annotations, sentences_df) {
+
+  selected_doc_id <- sentences_df$doc_id[df_index]
+  selected_text_id <- sentences_df$text_id[df_index]
+  selected_par_id <- sentences_df$paragraph_id[df_index]
+
+  par_df <- subset(annotations, doc_id == selected_doc_id & text_id == selected_text_id & paragraph_id == selected_par_id)
+
+  # probably not needed
+  # par_df$text_sequence <- as.numeric(as.character(par_df$text_sequence))
+
+  # par_df <- par_df[order(par_df$text_sequence, par_df$text_id, par_df$paragraph_id, par_df$sentence_id,
+  #                          par_df$token_id, decreasing = FALSE, method = "radix"), ]
+
+  par_df <- par_df[order(par_df$sentence_id, par_df$token_id, decreasing = FALSE, method = "radix"), ]
+
+  out <- paste_sections(1, list(par_df))
+
+  out
 
 }
 

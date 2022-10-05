@@ -354,8 +354,9 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
 
                         # edit 2-27
                         # Removed patient_id from desired fields
+                        # Modified 10-05-2022
                         retained_fields <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date",
-                            "selected", "note_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
+                            "selected", "note_text", "par_text", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5",
                             "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
                         retained_fields <- retained_fields[retained_fields %in% colnames(unique_sentences)]
 
@@ -368,6 +369,8 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                         unique_sentences <- subset(unique_sentences, select = c("unique_id", "reviewed", retained_fields))
 
                         unique_sentences$note_text <- sapply(unique_sentences$doc_id, aggregate_note, sentences$annotations, parse_result$cui_elements)
+                        # Added 10-05-2022
+                        unique_sentences$par_text <- sapply(1:nrow(unique_sentences), aggregate_paragraph, sentences$annotations, unique_sentences)
 
                         # edit 2-27
                         # For consistency of data field type with results of annotations
@@ -429,8 +432,9 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                     patient_info <- patients_con$find(query)
                     if (is.data.frame(patient_info$sentences[[1]]) && length(patient_info$sentences[[1]][, 1]) > 0) sentences <- patient_info$sentences[[1]] else {
 
-                        sentences <- matrix(nrow = 0, ncol = 19)
-                        colnames(sentences) <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
+                        sentences <- matrix(nrow = 0, ncol = 20)
+                        # Modified 10-05-2022
+                        colnames(sentences) <- c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "par_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
                         sentences <- as.data.frame(sentences)
 
                     }
@@ -451,13 +455,16 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                     if (length(new_sentences[, 1]) > 0) {
 
                         new_sentences$note_text <- sapply(new_sentences$doc_id, aggregate_note, processed_new_annotations, parse_result$cui_elements)
+                        # Added 10-05-2022
+                        new_sentences$par_text <- sapply(1:nrow(new_sentences), aggregate_paragraph, processed_new_annotations, new_sentences)
                         sentences$selected <- as.character(sentences$selected)
                         new_sentences$reviewed <- NULL
                         new_sentences$unique_id <- NULL
                         new_sentences$patient_id <- NULL
 
+                        # Modified 10-05-2022
                         sentences <- merge(new_sentences, sentences, by = c("doc_id", "text_id", "paragraph_id",
-                            "sentence_id", "text_date", "selected", "note_text"), all.x = TRUE, all.y = TRUE)
+                            "sentence_id", "text_date", "selected", "note_text", "par_text"), all.x = TRUE, all.y = TRUE)
                         sentences$reviewed[is.na(sentences$reviewed)] <- FALSE
 
                         sentences$text_tag_1[!is.na(sentences$text_tag_1.x)] <- sentences$text_tag_1.x[!is.na(sentences$text_tag_1.x)]
@@ -482,7 +489,8 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                         sentences$text_tag_10[!is.na(sentences$text_tag_10.y)] <- sentences$text_tag_10.y[!is.na(sentences$text_tag_10.y)]
                         sentences$text_date <- as.Date(sentences$text_date)
 
-                        sent_fields <- colnames(sentences)[colnames(sentences) %in% c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")]
+                        # Modified 10-05-2022
+                        sent_fields <- colnames(sentences)[colnames(sentences) %in% c("doc_id", "text_id", "paragraph_id", "sentence_id", "text_date", "selected", "note_text", "par_text", "unique_id", "reviewed", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")]
                         sentences <- subset(sentences, select = sent_fields)
                         # edit 2-27
                         sentences <- sentences[order(sentences$text_date, sentences$doc_id, sentences$text_id, sentences$paragraph_id, sentences$sentence_id, decreasing = FALSE, method = "radix"), ]
