@@ -405,6 +405,7 @@ save_query <- function(uri_fun, user, password, host, replica_set, port, databas
 #' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
+#' @param override Override safety checks, move directly to initialization!
 #' @return {
 #' Confirmation that requested operation was completed, or error message if attempt failed.
 #' }
@@ -415,40 +416,41 @@ save_query <- function(uri_fun, user, password, host, replica_set, port, databas
 #' }
 #' @export
 
-initialize_annotations <- function(uri_fun, user, password, host, replica_set, port, database) {
+initialize_annotations <- function(uri_fun, user, password, host, replica_set, port, database, override = FALSE) {
+
+  if (override != TRUE){
 
     first_answer <- readline("Are you sure you want to proceed? All annotations will be irreversibly deleted. (yes/no) ")
 
-    if (first_answer != "yes")
-        stop("Deletion cancelled") else {
+    if (first_answer != "yes") stop("Deletion cancelled") else {
 
-        second_answer <- readline("Are you absolutely positive you want to permanently delete the annotations? (yes/no) ")
+      second_answer <- readline("Are you absolutely positive you want to permanently delete the annotations? (yes/no) ")
 
-    }
+      }
 
-    if (second_answer != "yes")
-        stop("Database deletion cancelled") else {
+    } else if (override == TRUE) second_answer <- "yes"
 
-        # Dropping the collections
+    if (second_answer != "yes") stop("Database deletion cancelled") else {
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "ANNOTATIONS")
-        mongo_con$drop()
-        mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
-        mongo_con$drop()
+      # Dropping the collections
 
-        # Verifying deletion
+      mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "ANNOTATIONS")
+      mongo_con$drop()
+      mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "PATIENTS")
+      mongo_con$drop()
 
-        mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, NA)
-        collections <- (mongo_con$run("{\"listCollections\": 1}")[[1]])$firstBatch
-        if ("ANNOTATIONS" %in% collections$name | "PATIENTS" %in% collections$name)
-            print("Deletion failed!") else {
+      # Verifying deletion
 
-            populate_annotations(uri_fun, user, password, host, replica_set, port, database)
-            print("Initialization successful!")
+      mongo_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, NA)
+      collections <- (mongo_con$run("{\"listCollections\": 1}")[[1]])$firstBatch
+      if ("ANNOTATIONS" %in% collections$name | "PATIENTS" %in% collections$name) print("Deletion failed!") else {
+
+        populate_annotations(uri_fun, user, password, host, replica_set, port, database)
+        print("Initialization successful!")
 
         }
 
-    }
+      }
 
 }
 
