@@ -364,8 +364,8 @@ tag_filter <- function(tagged_df, tag_query, date_min, date_max){
 
       # Filtering on dates
 
-      if (!is.na(date_min)) tagged_df <- subset(tagged_df, text_date >= date_min)
-      if (!is.na(date_max)) tagged_df <- subset(tagged_df, text_date <= date_max)
+      if (!is.na(date_min)) tagged_df <- subset(tagged_df, text_date >= as.Date(date_min))
+      if (!is.na(date_max)) tagged_df <- subset(tagged_df, text_date <= as.Date(date_max))
 
       if (length(tagged_df[1,]) == 0){
 
