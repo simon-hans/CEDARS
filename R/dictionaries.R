@@ -201,7 +201,7 @@ negex_upload <- function(uri_fun, user, password, host, replica_set, port, datab
 #' Split a Token
 #'
 #' Splits a token in its different grams and outputs. Processes one row from the UMLS MRCONSO file at a time.
-#' @param i Iteration number, i.e. row number withint MRCONSO.
+#' @param i Iteration number, i.e. row number within MRCONSO.
 #' @param df MRCONSO dataframe.
 #' @param max_grams Maximum length of token in grams.
 #' @return A list which includes the original data for one UMLS concept unique identifier (CUI).

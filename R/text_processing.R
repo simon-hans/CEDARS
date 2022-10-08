@@ -88,6 +88,7 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
 #' Process All Documents for One Patient
 #'
 #' Performs NLP annotations on all documents using previously established cluster, including NegEx and UMLS CUI tags.
+#' @param no_cores Number of detected cores minus 1, used if OS is Linux for parallel processing.
 #' @param cl Computing cluster.
 #' @param sub_corpus Data frame of text to annotate.
 #' @param text_format Text format.
@@ -100,44 +101,49 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
 #' @return NLP annotations dataframe.
 #' @keywords internal
 
-patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected, max_n_grams_length,
-    negex_depth, single_core_model) {
+patient_processor_par <- function(no_cores, cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected, max_n_grams_length,
+                                  negex_depth, single_core_model) {
 
-    sub_corpus_short <- subset(sub_corpus, select = c("text", "text_id", "text_date", "text_sequence", "doc_section_name",
-        "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7",
-        "text_tag_8", "text_tag_9", "text_tag_10"))
+  sub_corpus_short <- subset(sub_corpus, select = c("text", "text_id", "text_date", "text_sequence", "doc_section_name",
+                                                    "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7",
+                                                    "text_tag_8", "text_tag_9", "text_tag_10"))
 
-    # Convert text to ASCII
-    sub_corpus_short$text <- sanitize(sub_corpus_short$text)
+  # Convert text to ASCII
+  sub_corpus_short$text <- sanitize(sub_corpus_short$text)
 
-    # Only keeping rows with at least one non-white space character
-    sub_corpus_short <- sub_corpus_short[grepl("\\S+", sub_corpus_short$text), ]
+  # Only keeping rows with at least one non-white space character
+  sub_corpus_short <- sub_corpus_short[grepl("\\S+", sub_corpus_short$text), ]
 
-    if (length(sub_corpus_short[, 1]) > 0) {
+  if (length(sub_corpus_short[, 1]) > 0) {
 
-        sub_corpus_short <- split.data.frame(sub_corpus_short, row(sub_corpus_short)[, 1])
+    sub_corpus_short <- split.data.frame(sub_corpus_short, row(sub_corpus_short)[, 1])
 
-        if (!is.na(cl[1]))
-            annotations <- parallel::parLapply(cl, sub_corpus_short, document_processor, text_format, nlp_engine,
-                negex_simp, negex_depth) else {
+    if (!is.na(cl[1])) {
 
-            annotations <- lapply(sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth,
-                single_core_model)
+      annotations <- parallel::parLapply(cl, sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth)
 
-        }
+    } else if (Sys.info()["sysname"] == "Linux") {
 
-        output <- do.call("rbind", annotations)
+      annotations <- mclapply(sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth, single_core_model, mc.cores = no_cores)
 
-        # Inserting UMLS tags
-        if (max_n_grams_length > 0 & !is.na(umls_selected))
-            output <- umls_processor(output, umls_selected, max_n_grams_length)
+    } else {
 
-        output <- output[order(output$doc_id, output$paragraph_id, output$sentence_id, output$token_id, decreasing = FALSE,
-            method = "radix"), ]
+      annotations <- lapply(sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth, single_core_model)
 
-    } else output <- NA
+    }
 
-    output
+    output <- do.call("rbind", annotations)
+
+    # Inserting UMLS tags
+    if (max_n_grams_length > 0 & !is.na(umls_selected))
+      output <- umls_processor(output, umls_selected, max_n_grams_length)
+
+    output <- output[order(output$doc_id, output$paragraph_id, output$sentence_id, output$token_id, decreasing = FALSE,
+                           method = "radix"), ]
+
+  } else output <- NA
+
+  output
 
 }
 
@@ -178,17 +184,18 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
     # We create a computing cluster If requested # of cores > available minus one, will use available minus one If
     # no specified # of desired cores, will use available minus one
     no_cores <- parallel::detectCores() - 1
-    if (is.na(select_cores) | select_cores > no_cores | select_cores < 1) {
+    if ((is.na(select_cores) | select_cores > no_cores | select_cores < 1) & Sys.info()["sysname"] == "Windows") {
 
         cat("Initializing cluster...\n\n")
         cl <- parallel::makeCluster(no_cores)
 
     } else {
 
-        if (select_cores > 1) {
+        if (select_cores > 1 & Sys.info()["sysname"] == "Windows") {
 
             cat("Initializing cluster...\n\n")
             cl <- parallel::makeCluster(select_cores)
+
         } else cl <- NA
 
     }
@@ -235,7 +242,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
                 # Convert dates to character, at least this is required for UDPipe
                 sub_corpus$text_date <- as.character(sub_corpus$text_date)
 
-                annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
+                annotations <- patient_processor_par(no_cores, cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
                   max_n_grams_length, negex_depth, single_core_model)
 
                 if (is.data.frame(annotations)) {
