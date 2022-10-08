@@ -163,11 +163,13 @@ patient_processor_par <- function(cl, sub_corpus, text_format, nlp_engine, negex
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
 #' @param tag_query If desired, "include" and "exclude" criteria used to filter documents based on metadata tags.
 #' @param unique_missing_texts List of missing text_id's, one vector for each patient.
+#' @param date_min Minimum date filter.
+#' @param date_max Maximum date filter.
 #' @keywords internal
 
 batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
     user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query = NA,
-    unique_missing_texts = NA) {
+    unique_missing_texts = NA, date_min, date_max) {
 
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
@@ -220,7 +222,7 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 
             sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
             # Applying metadata tag filter
-            if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query)
+            if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query, date_min, date_max)
 
             if (!is.na(unique_missing_texts[1])) sub_corpus <- subset(sub_corpus, text_id %in% unique_missing_texts[[i]])
 
@@ -312,6 +314,14 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
     # Getting tag query, if it exists we determine if it should apply to NLP pipeline
     query_con <- mongo_connect(uri_fun, user, password, host, replica_set, port, database, "QUERY")
     tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
+
+    # Getting min/max date filters
+    db_results <- query_con$find("{}")
+    date_min <- db_results$date_min
+    date_max <- db_results$date_max
+    if (!is.na(date_min)) date_min <- strptime(strftime(date_min, tz = "UTC"), "%Y-%m-%d", 'UTC')
+    if (!is.na(date_max)) date_max <- strptime(strftime(date_max, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
     if (!is.null(tag_query$tag_query$exact)) {
 
         tag_query <- query_con$iterate('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
@@ -418,7 +428,7 @@ automatic_NLP_processor <- function(patient_vect = NA, text_format = "latin1", n
             print("Annotating...")
 
             batch_processor_db(unique_missing_patients, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun, user,
-                password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query, unique_missing_texts)
+                password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query, unique_missing_texts, date_min, date_max)
 
         } else print("No records to annotate!")
 

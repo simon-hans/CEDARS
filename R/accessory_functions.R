@@ -258,10 +258,12 @@ find_model <- function(selected_model_path){
 #' If no "include" criterion specified, all rows kept unless tag listed in "exclude".
 #' @param tagged_df Input dataframe.
 #' @param tag_query List of "included" and "excluded" tags.
+#' @param date_min Minimum date filter.
+#' @param date_max Maximum date filter.
 #' @return Subset of input dataframe fitting metadata inclusion/exclusion criteria.
 #' @keywords internal
 
-tag_filter <- function(tagged_df, tag_query){
+tag_filter <- function(tagged_df, tag_query, date_min, date_max){
 
     # Prepping for grepl
 
@@ -356,7 +358,24 @@ tag_filter <- function(tagged_df, tag_query){
 
     match_vect_final <- match_vect_include & !match_vect_exclude
 
-    if (length(tagged_df[1,]) > 1) tagged_df <- tagged_df[match_vect_final,] else {
+    if (length(tagged_df[1,]) > 1){
+
+      tagged_df <- tagged_df[match_vect_final,]
+
+      # Filtering on dates
+
+      if (!is.na(date_min)) tagged_df <- subset(tagged_df, text_date >= date_min)
+      if (!is.na(date_max)) tagged_df <- subset(tagged_df, text_date <= date_max)
+
+      if (length(tagged_df[1,]) == 0){
+
+        new_df <- data.frame(name = tagged_df[match_vect_final,])
+        colnames(new_df) <- colnames(tagged_df)
+        tagged_df <- new_df
+
+      }
+
+      } else {
 
         new_df <- data.frame(name = tagged_df[match_vect_final,])
         colnames(new_df) <- colnames(tagged_df)

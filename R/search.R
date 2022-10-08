@@ -340,7 +340,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                     if (!is.na(date_max)) annotations <- subset(annotations, as.Date(text_date) <= as.Date(date_max))
 
                     # Filtering based on text metadata, if indicated
-                    if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+                    if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query, date_min, date_max)
 
                     # Getting event date
                     patient_info <- patients_con$find(query)
@@ -445,7 +445,7 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                     annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
 
                     # Filtering based on text metadata, if indicated
-                    if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+                    if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query, date_min, date_max)
 
                     parse_result <- parse_query(search_query)
                     new_search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)

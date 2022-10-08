@@ -584,7 +584,7 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                     if (!is.na(date_max)) annotations <- subset(annotations, as.Date(text_date) <= as.Date(date_max))
 
                     # Filtering based on text metadata, if indicated
-                    if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+                    if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query, date_min, date_max)
 
                     parse_result <- parse_query(search_query)
                     search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)
@@ -627,7 +627,7 @@ get_patient <- function(uri_fun, user, password, host, replica_set, port, databa
                         annotations$text_date <- strptime(strftime(annotations$text_date, tz = "UTC"), "%Y-%m-%d", 'UTC')
 
                         # Filtering based on text metadata, if indicated
-                        if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query)
+                        if (!is.na(tag_query[1])) annotations <- tag_filter(annotations, tag_query, date_min, date_max)
 
                         parse_result <- parse_query(search_query)
                         new_search_results <- sentence_search(parse_result, annotations, use_negation, hide_duplicates)

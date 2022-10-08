@@ -1351,6 +1351,12 @@ download_filtered_tags <- function(uri_fun, user, password, host, replica_set, p
 
     tag_query <- query_con$find('{}', '{ \"tag_query\" : 1 , \"_id\" : 0 }')
 
+    db_results <- query_con$find("{}")
+    date_min <- db_results$date_min
+    date_max <- db_results$date_max
+    if (!is.na(date_min)) date_min <- strptime(strftime(date_min, tz = "UTC"), "%Y-%m-%d", 'UTC')
+    if (!is.na(date_max)) date_max <- strptime(strftime(date_max, tz = "UTC"), "%Y-%m-%d", 'UTC')
+
     all_tag_uniques <- list()
 
     if (dim(tag_query)[2] > 0 & eval_query == TRUE) {
@@ -1381,7 +1387,7 @@ download_filtered_tags <- function(uri_fun, user, password, host, replica_set, p
             if (!is.null(tag_uniques)) tag_uniques <- data.frame(tag = tag_uniques) else tag_uniques <- data.frame(tag = NA)
             colnames(tag_uniques)[1] <- selected_tags[i]
 
-            tag_uniques_filtered <- tag_filter(tag_uniques, tag_query)
+            tag_uniques_filtered <- tag_filter(tag_uniques, tag_query, date_min, date_max)
             tag_uniques_filtered$retained <- TRUE
             tag_uniques <- merge(tag_uniques, tag_uniques_filtered, by = selected_tags[i], all.x = TRUE, all.y = TRUE)
             tag_uniques$retained[is.na(tag_uniques$retained)] <- FALSE
