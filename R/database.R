@@ -354,8 +354,8 @@ populate_query <- function(uri_fun, user, password, host, replica_set, port, dat
 #' @param hide_duplicates Should duplicated sentences be removed for search results?
 #' @param skip_after_event Should sentences occurring after recorded clinical event be skipped?
 #' @param tag_query List with 2 sublists, namely "include" and "exclude", indicating matching strings for metadata tag parameters.
-#' @param date_min Minimum date for text search; does not apply to NLP processing.
-#' @param date_max Maximum date for text search; does not apply to NLP processing.
+#' @param date_min Minimum date for NLP processing and text search.
+#' @param date_max Maximum date for NLP processing and text search.
 #' @return {
 #' Confirmation that requested operation was completed, or error message if attempt failed.
 #' }
