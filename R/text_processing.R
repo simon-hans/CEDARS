@@ -70,13 +70,15 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
         annotated_text <- negex_processor(annotated_text, negex_simp, negex_depth)
 
     # Adding back tags
-    tag_data <- c(text_date, text_sequence, doc_section_name, doc_id, text_tag_1, text_tag_2, text_tag_3, text_tag_4,
-        text_tag_5, text_tag_6, text_tag_7, text_tag_8, text_tag_9, text_tag_10)
-    tags <- t(matrix(rep(tag_data, length(annotated_text[, 1])), nrow = length(tag_data), ncol = length(annotated_text[,
-        1])))
-    tags <- as.data.frame(tags)
-    colnames(tags) <- c("text_date", "text_sequence", "doc_section_name", "doc_id", "text_tag_1", "text_tag_2",
-        "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7", "text_tag_8", "text_tag_9", "text_tag_10")
+    nr = nrow(annotated_text)
+    tags <- data.frame("text_date" = rep(text_date, nr),  "text_sequence" = rep(text_sequence, nr),
+                       "doc_section_name" = rep(doc_section_name, nr), "doc_id" = rep(doc_id, nr),
+                       "text_tag_1" = rep(text_tag_1, nr), "text_tag_2" = rep(text_tag_2, nr),
+                       "text_tag_3" = rep(text_tag_3, nr), "text_tag_4" = rep(text_tag_4, nr),
+                       "text_tag_5" = rep(text_tag_5, nr), "text_tag_6" = rep(text_tag_6, nr),
+                       "text_tag_7" = rep(text_tag_7, nr), "text_tag_8" = rep(text_tag_8, nr),
+                       "text_tag_9" = rep(text_tag_9, nr), "text_tag_10" = rep(text_tag_10, nr),
+                       stringsAsFactors = FALSE)
 
     annotated_text <- cbind(annotated_text, tags)
 
@@ -132,7 +134,8 @@ patient_processor_par <- function(select_cores, cl, sub_corpus, text_format, nlp
 
     }
 
-    output <- do.call("rbind", annotations)
+    # output <- do.call("rbind", annotations)
+    output <- data.table::rbindlist(annotations, use.names = TRUE)
 
     # Inserting UMLS tags
     if (max_n_grams_length > 0 & !is.na(umls_selected))
