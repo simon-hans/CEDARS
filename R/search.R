@@ -381,6 +381,21 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                         update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(unique_sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
                             sep = "")
 
+                        # Max document is allowed on MongoDB is 16,777,216 bytes
+                        # If sentences table bigger than 16,000,000 bytes, duplicated
+                        # notes are removed.
+                        # This should only affect a very small number of records
+                        # Added 10-10-2022
+
+                        if (object.size(update_value) > 16000000){
+
+                          unique_sentences <- unique_sentences[order(unique_sentences$text_date, decreasing = FALSE, method = "radix"),]
+                          unique_sentences$note_text[duplicated(unique_sentences$doc_id)] <- "***DUPLICATED***"
+                          update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(unique_sentences, POSIXt = "mongo"), ", \"updated\" : false }}",
+                                                sep = "")
+
+                        }
+
                         patients_con$update(query, update_value)
 
                         # If there is an event date and it is at or before all sentences, we mark case as reviewed
@@ -497,6 +512,21 @@ pre_search <- function(patient_vect = NA, uri_fun, user, password, host, replica
                         sentences$unique_id <- 1:length(sentences[, 1])
 
                         update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"updated\" : false, \"reviewed\" : false }}", sep = "")
+
+                        # Max document is allowed on MongoDB is 16,777,216 bytes
+                        # If sentences table bigger than 16,000,000 bytes, duplicated
+                        # notes are removed.
+                        # This should only affect a very small number of records
+                        # Added 10-10-2022
+
+                        if (object.size(update_value) > 16000000){
+
+                          sentences <- sentences[order(sentences$text_date, decreasing = FALSE, method = "radix"),]
+                          sentences$note_text[duplicated(sentences$doc_id)] <- "***DUPLICATED***"
+                          update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences, POSIXt = "mongo"), ", \"updated\" : false, \"reviewed\" : false }}",
+                                                sep = "")
+
+                        }
 
                         patients_con$update(query, update_value)
 

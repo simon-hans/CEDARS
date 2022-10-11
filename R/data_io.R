@@ -476,6 +476,22 @@ commit_patient <- function(uri_fun, user, password, host, replica_set, port, dat
             query <- paste("{ \"patient_id\" : ", new_patient_id, "}", sep = "")
             update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences_for_upload, POSIXt = "mongo"), ", \"updated\" : false, \"reviewed\" : false }}",
                 sep = "")
+
+            # Max document is allowed on MongoDB is 16,777,216 bytes
+            # If sentences table bigger than 16,000,000 bytes, duplicated
+            # notes are removed.
+            # This should only affect a very small number of records
+            # Added 10-10-2022
+
+            if (object.size(update_value) > 16000000){
+
+              sentences_for_upload <- sentences_for_upload[order(sentences_for_upload$text_date, decreasing = FALSE, method = "radix"),]
+              sentences_for_upload$note_text[duplicated(sentences_for_upload$doc_id)] <- "***DUPLICATED***"
+              update_value <- paste("{\"$set\":{\"sentences\": ", jsonlite::toJSON(sentences_for_upload, POSIXt = "mongo"), ", \"updated\" : false, \"reviewed\" : false }}",
+                                    sep = "")
+
+            }
+
             patients_con$update(query, update_value)
 
             # If all dates for sentences left to evaluate are after previously reviewed sentences, we close the case and
