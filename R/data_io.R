@@ -738,9 +738,20 @@ aggregate_note <- function(selected_doc_id, annotations, cui_elements) {
     note_df <- note_df[order(note_df$text_sequence, note_df$text_id, note_df$paragraph_id, note_df$sentence_id,
         note_df$token_id, decreasing = FALSE, method = "radix"), ]
 
+    # Added 6-07-2023
+    # Find note section names
+    if ("doc_section_name" %in% colnames(note_df)) section_names <- note_df$doc_section_name[!duplicated(note_df$text_sequence)] else {
+      section_names <- "unknown section"
+    }
+
     note_list <- split(note_df, note_df$text_sequence)
 
     pasted_sections <- sapply(1:length(note_list), paste_sections, note_list)
+
+    # Added 6-07-2023
+    # Add section names to text
+    # if ("doc_section_name" %in% colnames(note_df)) pasted_sections <- paste(section_names, pasted_sections, sep =  "\n\n")
+    pasted_sections <- paste(section_names, pasted_sections, sep =  "\n\n")
 
     out <- paste(pasted_sections, collapse = "\n\n")
 
