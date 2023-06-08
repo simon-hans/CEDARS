@@ -743,7 +743,7 @@ aggregate_note <- function(selected_doc_id, annotations, cui_elements) {
     if ("doc_section_name" %in% colnames(note_df)) {
       section_names <- note_df$doc_section_name[!duplicated(note_df$text_sequence)]
       section_names <- paste(section_names, "\n\n", sep = "")
-      sections_names[duplicated(section_names)] <- ""
+      section_names[duplicated(section_names)] <- ""
     }
 
     note_list <- split(note_df, note_df$text_sequence)
