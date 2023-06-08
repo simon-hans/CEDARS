@@ -740,8 +740,10 @@ aggregate_note <- function(selected_doc_id, annotations, cui_elements) {
 
     # Added 6-07-2023
     # Find note section names
-    if ("doc_section_name" %in% colnames(note_df)) section_names <- note_df$doc_section_name[!duplicated(note_df$text_sequence)] else {
-      section_names <- "unknown section"
+    if ("doc_section_name" %in% colnames(note_df)) {
+      section_names <- note_df$doc_section_name[!duplicated(note_df$text_sequence)]
+      section_names <- paste(section_names, "\n\n", sep = "")
+      sections_names[duplicated(section_names)] <- ""
     }
 
     note_list <- split(note_df, note_df$text_sequence)
@@ -750,8 +752,7 @@ aggregate_note <- function(selected_doc_id, annotations, cui_elements) {
 
     # Added 6-07-2023
     # Add section names to text
-    # if ("doc_section_name" %in% colnames(note_df)) pasted_sections <- paste(section_names, pasted_sections, sep =  "\n\n")
-    pasted_sections <- paste(section_names, pasted_sections, sep =  "\n\n")
+    if ("doc_section_name" %in% colnames(note_df)) pasted_sections <- paste(section_names, pasted_sections, sep =  "")
 
     out <- paste(pasted_sections, collapse = "\n\n")
 
