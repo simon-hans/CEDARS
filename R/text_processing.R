@@ -1,8 +1,4 @@
-
-
 #' Functions to process documents with NLP engine
-
-
 #' Process a Document
 #'
 #' Processes one EHR document with NLP pipeline and applies NegEx.
@@ -281,6 +277,9 @@ batch_processor_db <- function(
       }
 
     print(cl)
+    doParallel::registerDoParallel(cl = cl)
+    print(foreach::getDoParRegistered())
+    print("Worker available: ", foreach::getDoParWorkers())
     cat("Performing annotations!\n\n")
 
     j <- 0
@@ -289,46 +288,45 @@ batch_processor_db <- function(
         i = 1:length_list) %dopar% {
             unlock_records(uri_fun, user, password, host, replica_set, port, database)
             open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
-        if (open == TRUE) {
+            if (open == TRUE) {
+                sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+                # Applying metadata tag filter
+                if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query, date_min, date_max)
 
-            sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
-            # Applying metadata tag filter
-            if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query, date_min, date_max)
+                if (!is.na(unique_missing_texts[1])) sub_corpus <- subset(sub_corpus, text_id %in% unique_missing_texts[[i]])
 
-            if (!is.na(unique_missing_texts[1])) sub_corpus <- subset(sub_corpus, text_id %in% unique_missing_texts[[i]])
+                sub_corpus <- sub_corpus[order(sub_corpus$text_date, sub_corpus$doc_id, sub_corpus$text_id, decreasing = c(FALSE, FALSE, FALSE), method = "radix"),]
 
-            sub_corpus <- sub_corpus[order(sub_corpus$text_date, sub_corpus$doc_id, sub_corpus$text_id, decreasing = c(FALSE, FALSE, FALSE), method = "radix"),]
+                if (length(sub_corpus[, 1]) > 0) {
 
-            if (length(sub_corpus[, 1]) > 0) {
+                    print(paste("Annotating", length(sub_corpus[, 1]), "documents..."))
 
-                print(paste("Annotating", length(sub_corpus[, 1]), "documents..."))
+                    # Convert dates to character, at least this is required for UDPipe
+                    sub_corpus$text_date <- as.character(sub_corpus$text_date)
 
-                # Convert dates to character, at least this is required for UDPipe
-                sub_corpus$text_date <- as.character(sub_corpus$text_date)
+                    annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
+                    max_n_grams_length, negex_depth, single_core_model)
 
-                annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
-                  max_n_grams_length, negex_depth, single_core_model)
+                    if (is.data.frame(annotations)) {
 
-                if (is.data.frame(annotations)) {
+                        # Converting dates back to date
+                        annotations$text_date <- as.Date(annotations$text_date)
 
-                    # Converting dates back to date
-                    annotations$text_date <- as.Date(annotations$text_date)
+                        row.names(annotations) <- NULL
+                        db_upload(uri_fun, user, password, host, replica_set, port, database, patient_vect[i], annotations)
 
-                    row.names(annotations) <- NULL
-                    db_upload(uri_fun, user, password, host, replica_set, port, database, patient_vect[i], annotations)
+                    }
 
                 }
 
+                unlock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+
+                cat(paste(c("Completed annotations for patient ID ", patient_vect[i], ", # ", i, " of ", length_list,
+                    ".\n"), sep = "", collapse = ""))
+
+            } else {
+                j <- j + 1
             }
-
-            unlock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
-
-            cat(paste(c("Completed annotations for patient ID ", patient_vect[i], ", # ", i, " of ", length_list,
-                ".\n"), sep = "", collapse = ""))
-
-        } else {
-            j <- j + 1
-        }
         }
 
     
