@@ -143,7 +143,8 @@ patient_processor_par <- function(
     negex_simp,
     umls_selected,
     max_n_grams_length,
-    negex_depth, single_core_model) {
+    negex_depth,
+    single_core_model) {
 
   sub_corpus_short <- subset(sub_corpus, select = c(
     "text", "text_id", "text_date", "text_sequence", "doc_section_name",
