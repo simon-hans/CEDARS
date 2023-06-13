@@ -156,7 +156,7 @@ patient_processor_par <- function(
 
   # Only keeping rows with at least one non-white space character
   sub_corpus_short <- sub_corpus_short[grepl("\\S+", sub_corpus_short$text), ]
-
+  cat(select_cores, " cores selected.\n")
   if (length(sub_corpus_short[, 1]) > 0) {
 
     sub_corpus_short <- split.data.frame(
