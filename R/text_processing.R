@@ -57,7 +57,12 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
 
     # Running the NLP engine chosen by the user
     if (nlp_engine == "udpipe") {
-        annotated_text <- udpipe::udpipe_annotate(nlp_model, text, doc_id = text_id, tokenizer = "tokenizer", tagger = "default",
+        annotated_text <- udpipe::udpipe_annotate(
+            nlp_model,
+            text,
+            doc_id = text_id,
+            tokenizer = "tokenizer",
+            tagger = "default",
             parser = "default")
         annotated_text <- as.data.frame(annotated_text, detailed = TRUE)
     }
@@ -67,7 +72,10 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
 
     # Entering NegEx annotations
     if (negex_depth > 0)
-        annotated_text <- negex_processor(annotated_text, negex_simp, negex_depth)
+        annotated_text <- negex_processor(
+            annotated_text,
+            negex_simp,
+            negex_depth)
 
     # Adding back tags
     nr = nrow(annotated_text)
@@ -77,7 +85,7 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
                        "text_tag_3" = rep(text_tag_3, nr), "text_tag_4" = rep(text_tag_4, nr),
                        "text_tag_5" = rep(text_tag_5, nr), "text_tag_6" = rep(text_tag_6, nr),
                        "text_tag_7" = rep(text_tag_7, nr), "text_tag_8" = rep(text_tag_8, nr),
-                       "text_tag_9" = rep(text_tag_9, nr), "text_tag_10" = rep(text_tag_10, nr),
+                       "text_tag_9" = rep(text_tag_9, nr), "text_tag_10" = rep(text_tag_10, nr), # nolint: line_length_linter.
                        stringsAsFactors = FALSE)
 
     annotated_text <- cbind(annotated_text, tags)
@@ -103,12 +111,22 @@ document_processor <- function(text_df, text_format, nlp_engine, negex_simp, neg
 #' @return NLP annotations dataframe.
 #' @keywords internal
 
-patient_processor_par <- function(select_cores, cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected, max_n_grams_length,
-                                  negex_depth, single_core_model) {
+patient_processor_par <- function(
+    select_cores,
+    cl,
+    sub_corpus,
+    text_format,
+    nlp_engine,
+    negex_simp,
+    umls_selected,
+    max_n_grams_length,
+    negex_depth, single_core_model) {
 
-  sub_corpus_short <- subset(sub_corpus, select = c("text", "text_id", "text_date", "text_sequence", "doc_section_name",
-                                                    "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4", "text_tag_5", "text_tag_6", "text_tag_7",
-                                                    "text_tag_8", "text_tag_9", "text_tag_10"))
+  sub_corpus_short <- subset(sub_corpus, select = c(
+    "text", "text_id", "text_date", "text_sequence", "doc_section_name",
+    "doc_id", "text_tag_1", "text_tag_2", "text_tag_3", "text_tag_4",
+    "text_tag_5", "text_tag_6", "text_tag_7",
+    "text_tag_8", "text_tag_9", "text_tag_10"))
 
   # Convert text to ASCII
   sub_corpus_short$text <- sanitize(sub_corpus_short$text)
@@ -124,7 +142,7 @@ patient_processor_par <- function(select_cores, cl, sub_corpus, text_format, nlp
 
       annotations <- parallel::parLapply(cl, sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth)
 
-    } else if (select_cores !=1 & Sys.info()["sysname"] == "Linux") {
+    } else if (select_cores != 1 && Sys.info()["sysname"] == "Linux") {
 
       annotations <- parallel::mclapply(sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth, single_core_model, mc.cores = select_cores)
 
