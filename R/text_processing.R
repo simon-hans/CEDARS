@@ -256,7 +256,7 @@ batch_processor_db <- function(
     # If no specified # of desired cores, will use available minus one
 
     no_cores <- parallel::detectCores() - 1
-    cat("Number of cores available: ", no_cores, "\n")
+    cat("Number of cores available: ", no_cores, "selected", select_cores, "\n")
 
     if (is.na(select_cores) || select_cores > no_cores || select_cores < 1)
         select_cores <- no_cores
