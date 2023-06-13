@@ -62,6 +62,7 @@ document_processor <- function(
     if (!(nlp_engine %in% c("udpipe")))
         (return(print("No available NLP engine selected.")))
 
+    cat("Running UDPIPE with ", select_cores, " cores.\n")
     # Running the NLP engine chosen by the user
     if (nlp_engine == "udpipe") {
         annotated_text <- udpipe::udpipe_annotate(
@@ -113,7 +114,9 @@ document_processor <- function(
 
 #' Process All Documents for One Patient
 #'
-#' Performs NLP annotations on all documents using previously established cluster, including NegEx and UMLS CUI tags.
+#' Performs NLP annotations on all documents using previously
+#' established cluster, including NegEx and UMLS CUI tags.
+#'
 #' @param select_cores Desired number of cores.
 #' @param cl Computing cluster.
 #' @param sub_corpus Data frame of text to annotate.
@@ -121,8 +124,12 @@ document_processor <- function(
 #' @param nlp_engine NLP engine, UDPipe only for now.
 #' @param negex_simp Simplifed negex.
 #' @param umls_selected Processed UMLS table.
-#' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
-#' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
+#' @param max_n_grams_length Maximum length of tokens for matching with
+#' UMLS concept unique identifiers (CUI's). Shorter values will result
+#' in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
+#' @param negex_depth Maximum distance between negation item and token to
+#' negate. Shorter distances will result in decreased sensitivity
+#' but increased specificity for negation.
 #' @param single_core_model NLP model in case parallel processing is not used.
 #' @return NLP annotations dataframe.
 #' @keywords internal
@@ -152,7 +159,10 @@ patient_processor_par <- function(
 
   if (length(sub_corpus_short[, 1]) > 0) {
 
-    sub_corpus_short <- split.data.frame(sub_corpus_short, row(sub_corpus_short)[, 1])
+    sub_corpus_short <- split.data.frame(
+        sub_corpus_short,
+        row(sub_corpus_short)[, 1])
+
     annotations <- lapply(
         sub_corpus_short,
         document_processor,
@@ -163,26 +173,12 @@ patient_processor_par <- function(
         single_core_model,
         select_cores)
 
-    # if (!is.na(cl[1])) {
-
-    #   annotations <- parallel::parLapply(cl, sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth)
-
-    # } else if (select_cores != 1 && Sys.info()["sysname"] == "Linux") {
-
-    #   annotations <- parallel::mclapply(sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth, single_core_model, mc.cores = select_cores)
-
-    # } else {
-
-    #   annotations <- lapply(sub_corpus_short, document_processor, text_format, nlp_engine, negex_simp, negex_depth, single_core_model)
-
-    # }
-
-    # output <- do.call("rbind", annotations)
     output <- data.table::rbindlist(annotations, use.names = TRUE)
 
     # Inserting UMLS tags
-    if (max_n_grams_length > 0 && !is.na(umls_selected))
-      output <- umls_processor(output, umls_selected, max_n_grams_length)
+    if (max_n_grams_length > 0 && !is.na(umls_selected)) {
+        output <- umls_processor(output, umls_selected, max_n_grams_length)
+    }
 
     output <- output[order(
         output$doc_id,
@@ -192,7 +188,9 @@ patient_processor_par <- function(
         decreasing = FALSE,
         method = "radix"), ]
 
-  } else output <- NA
+  } else {
+    output <- NA
+  }
 
   output
 
@@ -201,59 +199,90 @@ patient_processor_par <- function(
 
 #' Batch NLP Annotations for a Cohort
 #'
-#' NLP annotates documents for a cohort of patients, in parallel. Locks each record before proceeding with NLP annotations.
+#' NLP annotates documents for a cohort of patients, in parallel.
+#' Locks each record before proceeding with NLP annotations.
 #' @param patient_vect Vector of patient ID's.
 #' @param text_format Text format.
 #' @param nlp_engine NLP engine, UDPipe only for now.
 #' @param URL UDPipe model URL.
 #' @param negex_simp Simplifed negex.
 #' @param umls_selected Processed UMLS table.
-#' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
+#' @param uri_fun Uniform resource identifier (URI)
+#' string generating function for MongoDB credentials.
 #' @param user MongoDB user name.
 #' @param password MongoDB user password.
 #' @param host MongoDB host server.
 #' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
-#' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
-#' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
-#' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
-#' @param tag_query If desired, "include" and "exclude" criteria used to filter documents based on metadata tags.
-#' @param unique_missing_texts List of missing text_id's, one vector for each patient.
+#' @param max_n_grams_length Maximum length of tokens for matching with
+#' UMLS concept unique identifiers (CUI's). Shorter values will result
+#' in faster processing. If ) is chosen, UMLS CUI tags will not be provided.
+#' @param negex_depth Maximum distance between negation
+#' item and token to negate. Shorter distances will result
+#' in decreased sensitivity but increased specificity for negation.
+#' @param select_cores How many CPU cores should be used for parallel
+#' processing? Max allowed is total number of cores minus one.
+#' If 1 is entered, parallel processing will not be used.
+#' @param tag_query If desired, "include" and "exclude"
+#' criteria used to filter documents based on metadata tags.
+#' @param unique_missing_texts List of missing text_id's,
+#' one vector for each patient.
 #' @param date_min Minimum date filter.
 #' @param date_max Maximum date filter.
 #' @keywords internal
 
-batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex_simp, umls_selected, uri_fun,
-    user, password, host, replica_set, port, database, max_n_grams_length, negex_depth, select_cores, tag_query = NA,
-    unique_missing_texts = NA, date_min, date_max) {
+batch_processor_db <- function(
+    patient_vect,
+    text_format,
+    nlp_engine,
+    URL,
+    negex_simp,
+    umls_selected,
+    uri_fun,
+    user,
+    password,
+    host,
+    replica_set,
+    port,
+    database,
+    max_n_grams_length,
+    negex_depth,
+    select_cores,
+    tag_query = NA,
+    unique_missing_texts = NA,
+    date_min,
+    date_max) {
 
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
     length_list <- length(patient_vect)
 
     # We create a computing cluster if OS is Windows
-    # If requested # of cores > available minus one, will use available minus one
+    # If requested # of cores > available minus one,
+    # will use available minus one
     # If no specified # of desired cores, will use available minus one
 
     no_cores <- parallel::detectCores() - 1
 
-    if (is.na(select_cores) || select_cores > no_cores || select_cores < 1) select_cores <- no_cores
+    if (is.na(select_cores) || select_cores > no_cores || select_cores < 1)
+        select_cores <- no_cores
 
     if (select_cores != 1 && Sys.info()["sysname"] == "Windows") {
 
       cat("Initializing cluster...\n\n")
       cl <- parallel::makeCluster(no_cores)
-      parallel::clusterExport(cl, c("sanitize", "standardize_nlp", "negation_tagger", "negex_token_tagger", "id_expander",
-                                    "negex_processor", "negex_simp", "negex_depth", "URL"), envir = environment())
+      parallel::clusterExport(cl, c(
+        "sanitize", "standardize_nlp", "negation_tagger",
+        "negex_token_tagger", "id_expander",
+        "negex_processor", "negex_simp", "negex_depth", "URL"),
+        envir = environment())
       parallel::clusterEvalQ(cl, {nlp_model <- udpipe::udpipe_load_model(URL)})
       single_core_model <- NA
 
       } else {
-
         cl <- NA
         single_core_model <- udpipe::udpipe_load_model(URL)
-
       }
 
     cat("Performing annotations!\n\n")
@@ -261,9 +290,11 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
     j <- 0
 
     for (i in 1:length_list) {
-        # Records for this patient undergo admin lock during the upload But first, old user-locked records are unlocked
-        # A record is considered open for annotation if 1) the patient is not in the roster yet or 2) admin lock was
-        # successful
+        # Records for this patient undergo admin lock during the upload
+        # But first, old user-locked records are unlocked
+        # A record is considered open for annotation if
+        # 1) the patient is not in the roster yet or
+        # 2) admin lock was successful
         unlock_records(uri_fun, user, password, host, replica_set, port, database)
         open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
         if (open == TRUE) {
@@ -303,7 +334,9 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
             cat(paste(c("Completed annotations for patient ID ", patient_vect[i], ", # ", i, " of ", length_list,
                 ".\n"), sep = "", collapse = ""))
 
-        } else j <- j + 1
+        } else {
+            j <- j + 1
+        }
 
     }
 
@@ -330,7 +363,8 @@ batch_processor_db <- function(patient_vect, text_format, nlp_engine, URL, negex
 #' @param replica_set MongoDB replica set, if indicated.
 #' @param port MongoDB port.
 #' @param database MongoDB database name.
-#' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing. If 0 is chosen, UMLS CUI tags will not be provided.
+#' @param max_n_grams_length Maximum length of tokens for matching with UMLS concept unique identifiers (CUI's). Shorter values will result in faster processing.
+#' If 0 is chosen, UMLS CUI tags will not be provided.
 #' @param negex_depth Maximum distance between negation item and token to negate. Shorter distances will result in decreased sensitivity but increased specificity for negation.
 #' @param select_cores How many CPU cores should be used for parallel processing? Max allowed is total number of cores minus one. If 1 is entered, parallel processing will not be used.
 #' @param URL UDPipe model URL.
