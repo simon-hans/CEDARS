@@ -315,7 +315,7 @@ batch_processor_db <- function(
                 sub_corpus$text_date <- as.character(sub_corpus$text_date)
 
                 annotations <- patient_processor_par(select_cores, cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
-                  max_n_grams_length, negex_depth, single_core_model, select_cores)
+                  max_n_grams_length, negex_depth, single_core_model)
 
                 if (is.data.frame(annotations)) {
 
