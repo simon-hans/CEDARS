@@ -21,8 +21,7 @@ document_processor <- function(
     nlp_engine,
     negex_simp,
     negex_depth,
-    single_core_model = NA,
-    select_cores = 1) {
+    single_core_model = NA) {
 
     if (!is.na(single_core_model[1]))
         nlp_model <- single_core_model
@@ -62,7 +61,6 @@ document_processor <- function(
     if (!(nlp_engine %in% c("udpipe")))
         (return(print("No available NLP engine selected.")))
 
-    cat("Running UDPIPE with ", select_cores, " cores.\n")
     # Running the NLP engine chosen by the user
     if (nlp_engine == "udpipe") {
         annotated_text <- udpipe::udpipe_annotate(
@@ -71,8 +69,7 @@ document_processor <- function(
             doc_id = text_id,
             tokenizer = "tokenizer",
             tagger = "default",
-            parser = "default",
-            parallel.cores = select_cores)
+            parser = "default")
         annotated_text <- as.data.frame(annotated_text, detailed = TRUE)
     }
 
@@ -135,7 +132,6 @@ document_processor <- function(
 #' @keywords internal
 
 patient_processor_par <- function(
-    select_cores,
     cl,
     sub_corpus,
     text_format,
@@ -157,7 +153,6 @@ patient_processor_par <- function(
 
   # Only keeping rows with at least one non-white space character
   sub_corpus_short <- sub_corpus_short[grepl("\\S+", sub_corpus_short$text), ]
-  cat(select_cores, " cores selected.\n")
   if (length(sub_corpus_short[, 1]) > 0) {
 
     sub_corpus_short <- split.data.frame(
@@ -171,8 +166,7 @@ patient_processor_par <- function(
         nlp_engine,
         negex_simp,
         negex_depth,
-        single_core_model,
-        select_cores)
+        single_core_model)
 
     output <- data.table::rbindlist(annotations, use.names = TRUE)
 
@@ -272,7 +266,7 @@ batch_processor_db <- function(
     if (select_cores != 1 && Sys.info()["sysname"] == "Windows") {
 
       cat("Initializing cluster...\n\n")
-      cl <- parallel::makeCluster(no_cores)
+      cl <- parallel::makeCluster(no_cores, type = "PSOCK")
       parallel::clusterExport(cl, c(
         "sanitize", "standardize_nlp", "negation_tagger",
         "negex_token_tagger", "id_expander",
@@ -282,22 +276,19 @@ batch_processor_db <- function(
       single_core_model <- NA
 
       } else {
-        cl <- NA
+        cl <- parallel::makeCluster(no_cores, type = "FORK")
         single_core_model <- udpipe::udpipe_load_model(URL)
       }
 
+    print(cl)
     cat("Performing annotations!\n\n")
 
     j <- 0
 
-    for (i in 1:length_list) {
-        # Records for this patient undergo admin lock during the upload
-        # But first, old user-locked records are unlocked
-        # A record is considered open for annotation if
-        # 1) the patient is not in the roster yet or
-        # 2) admin lock was successful
-        unlock_records(uri_fun, user, password, host, replica_set, port, database)
-        open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+    x <- foreach(
+        i = 1:length_list) %dopar% {
+            unlock_records(uri_fun, user, password, host, replica_set, port, database)
+            open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
         if (open == TRUE) {
 
             sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
@@ -315,7 +306,7 @@ batch_processor_db <- function(
                 # Convert dates to character, at least this is required for UDPipe
                 sub_corpus$text_date <- as.character(sub_corpus$text_date)
 
-                annotations <- patient_processor_par(select_cores, cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
+                annotations <- patient_processor_par(cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
                   max_n_grams_length, negex_depth, single_core_model)
 
                 if (is.data.frame(annotations)) {
@@ -338,8 +329,60 @@ batch_processor_db <- function(
         } else {
             j <- j + 1
         }
+        }
 
-    }
+    
+
+    # for (i in 1:length_list) {
+    #     # Records for this patient undergo admin lock during the upload
+    #     # But first, old user-locked records are unlocked
+    #     # A record is considered open for annotation if
+    #     # 1) the patient is not in the roster yet or
+    #     # 2) admin lock was successful
+    #     unlock_records(uri_fun, user, password, host, replica_set, port, database)
+    #     open <- lock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+    #     if (open == TRUE) {
+
+    #         sub_corpus <- db_download(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+    #         # Applying metadata tag filter
+    #         if (is.list(tag_query) & length(sub_corpus[, 1]) > 0) sub_corpus <- tag_filter(sub_corpus, tag_query, date_min, date_max)
+
+    #         if (!is.na(unique_missing_texts[1])) sub_corpus <- subset(sub_corpus, text_id %in% unique_missing_texts[[i]])
+
+    #         sub_corpus <- sub_corpus[order(sub_corpus$text_date, sub_corpus$doc_id, sub_corpus$text_id, decreasing = c(FALSE, FALSE, FALSE), method = "radix"),]
+
+    #         if (length(sub_corpus[, 1]) > 0) {
+
+    #             print(paste("Annotating", length(sub_corpus[, 1]), "documents..."))
+
+    #             # Convert dates to character, at least this is required for UDPipe
+    #             sub_corpus$text_date <- as.character(sub_corpus$text_date)
+
+    #             annotations <- patient_processor_par(select_cores, cl, sub_corpus, text_format, nlp_engine, negex_simp, umls_selected,
+    #               max_n_grams_length, negex_depth, single_core_model)
+
+    #             if (is.data.frame(annotations)) {
+
+    #                 # Converting dates back to date
+    #                 annotations$text_date <- as.Date(annotations$text_date)
+
+    #                 row.names(annotations) <- NULL
+    #                 db_upload(uri_fun, user, password, host, replica_set, port, database, patient_vect[i], annotations)
+
+    #             }
+
+    #         }
+
+    #         unlock_records_admin(uri_fun, user, password, host, replica_set, port, database, patient_vect[i])
+
+    #         cat(paste(c("Completed annotations for patient ID ", patient_vect[i], ", # ", i, " of ", length_list,
+    #             ".\n"), sep = "", collapse = ""))
+
+    #     } else {
+    #         j <- j + 1
+    #     }
+
+    # }
 
     cat("\n")
 
