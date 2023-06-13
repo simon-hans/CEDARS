@@ -1,3 +1,4 @@
+# Functions to process text with NLP engine
 #' Functions to process documents with NLP engine
 #' Process a Document
 #'
@@ -248,7 +249,6 @@ batch_processor_db <- function(
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
     length_list <- length(patient_vect)
-)
 
     # We create a computing cluster if OS is Windows
     # If requested # of cores > available minus one,
