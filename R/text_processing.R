@@ -248,6 +248,7 @@ batch_processor_db <- function(
     # print('Loading NLP model...') nlp_model <- udpipe::udpipe_load_model(URL)
 
     length_list <- length(patient_vect)
+)
 
     # We create a computing cluster if OS is Windows
     # If requested # of cores > available minus one,
@@ -274,7 +275,7 @@ batch_processor_db <- function(
 
       } else {
         cat("Initializing FORK Cluster...\n\n")
-        cl <- parallel::makeCluster(no_cores, type = "FORK")
+        cl <- parallel::makeCluster(select_cores, type = "FORK")
         single_core_model <- udpipe::udpipe_load_model(URL)
       }
 
