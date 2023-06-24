@@ -45,6 +45,9 @@ ui <- fluidPage(
 
     tags$br(),
 
+    # This results in error message at run time because "NA" does not fit yyyy-mm-dd:
+    # "Warning: Couldn't coerce the `value` argument to a date string with format yyyy-mm-dd"
+    # There is no available corrective action but this is innocuous
     dateInput(inputId = "event_date", label = NULL, value = NA),
 
     tags$h3("Selected sentence:"),
@@ -170,7 +173,11 @@ server <- function(input, output, session) {
 
         }
 
+        # This results in error message at run time because "NA" does not fit yyyy-mm-dd:
+        # "Warning: Couldn't coerce the `value` argument to a date string with format yyyy-mm-dd"
+        # There is no available corrective action but this is innocuous
         updateDateInput(session = session, inputId = "event_date", value = NA)
+
         updateTextInput(session = session, inputId = "search_patient_id", value = NA)
 
         if (input$user_id != "" | cedars.env$g_ldap == TRUE) {
