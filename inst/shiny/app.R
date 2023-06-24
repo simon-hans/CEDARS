@@ -102,7 +102,7 @@ server <- function(input, output, session) {
 
     observeEvent(eventExpr = input$enter_date, {
 
-        if (length(input$event_date) > 0) cedars.env$new_event_date <- as.character(as.Date(input$event_date), origin = "1970-01-01") else cedars.env$new_event_date <- NA
+        if (length(input$event_date) > 0) cedars.env$new_event_date <- as.character(input$event_date) else cedars.env$new_event_date <- NA
 
         if (!is.na(cedars.env$new_event_date)) cedars.env$get_position <- NA else cedars.env$get_position <- cedars.env$position
 
@@ -171,7 +171,7 @@ server <- function(input, output, session) {
         }
 
         updateDateInput(session = session, inputId = "event_date", value = NA)
-        updateDateInput(session = session, inputId = "search_patient_id", value = NA)
+        updateTextInput(session = session, inputId = "search_patient_id", value = NA)
 
         if (input$user_id != "" | cedars.env$g_ldap == TRUE) {
 
