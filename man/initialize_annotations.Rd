@@ -12,7 +12,8 @@ initialize_annotations(
   host,
   replica_set,
   port,
-  database
+  database,
+  override = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ initialize_annotations(
 \item{port}{MongoDB port.}
 
 \item{database}{MongoDB database name.}
+
+\item{override}{Override safety checks, move directly to initialization!}
 }
 \value{
 {

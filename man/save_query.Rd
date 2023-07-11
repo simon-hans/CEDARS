@@ -46,9 +46,9 @@ save_query(
 
 \item{tag_query}{List with 2 sublists, namely "include" and "exclude", indicating matching strings for metadata tag parameters.}
 
-\item{date_min}{Minimum date for text search; does not apply to NLP processing.}
+\item{date_min}{Minimum date for NLP processing and text search.}
 
-\item{date_max}{Maximum date for text search; does not apply to NLP processing.}
+\item{date_max}{Maximum date for NLP processing and text search.}
 }
 \value{
 {

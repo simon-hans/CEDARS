@@ -5,6 +5,7 @@
 \title{Process All Documents for One Patient}
 \usage{
 patient_processor_par(
+  select_cores,
   cl,
   sub_corpus,
   text_format,
@@ -17,6 +18,8 @@ patient_processor_par(
 )
 }
 \arguments{
+\item{select_cores}{Desired number of cores.}
+
 \item{cl}{Computing cluster.}
 
 \item{sub_corpus}{Data frame of text to annotate.}

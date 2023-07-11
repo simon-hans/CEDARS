@@ -4,12 +4,16 @@
 \alias{tag_filter}
 \title{Filter Dataframe Based on Metadata Tags}
 \usage{
-tag_filter(tagged_df, tag_query)
+tag_filter(tagged_df, tag_query, date_min, date_max)
 }
 \arguments{
 \item{tagged_df}{Input dataframe.}
 
 \item{tag_query}{List of "included" and "excluded" tags.}
+
+\item{date_min}{Minimum date filter.}
+
+\item{date_max}{Maximum date filter.}
 }
 \value{
 Subset of input dataframe fitting metadata inclusion/exclusion criteria.

@@ -7,7 +7,7 @@
 token_splitter(i, df, max_grams)
 }
 \arguments{
-\item{i}{Iteration number, i.e. row number withint MRCONSO.}
+\item{i}{Iteration number, i.e. row number within MRCONSO.}
 
 \item{df}{MRCONSO dataframe.}
 

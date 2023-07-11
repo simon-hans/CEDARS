@@ -2,6 +2,7 @@
 
 export(add_end_user)
 export(automatic_NLP_processor)
+export(batch_upload_notes)
 export(create_project)
 export(delete_end_user)
 export(download_events)

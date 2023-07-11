@@ -22,7 +22,9 @@ batch_processor_db(
   negex_depth,
   select_cores,
   tag_query = NA,
-  unique_missing_texts = NA
+  unique_missing_texts = NA,
+  date_min,
+  date_max
 )
 }
 \arguments{
@@ -61,6 +63,10 @@ batch_processor_db(
 \item{tag_query}{If desired, "include" and "exclude" criteria used to filter documents based on metadata tags.}
 
 \item{unique_missing_texts}{List of missing text_id's, one vector for each patient.}
+
+\item{date_min}{Minimum date filter.}
+
+\item{date_max}{Maximum date filter.}
 }
 \description{
 NLP annotates documents for a cohort of patients, in parallel. Locks each record before proceeding with NLP annotations.
