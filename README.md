@@ -34,72 +34,127 @@ Multiple users can load the web GUI and annotate records at the same time. Once 
 The R CEDARS package includes a small simulated clinical notes corpus. This corpus is fictitious and does not contain information from real patients. Once access to MongoDB has been achieved, you can install and test drive CEDARS with the following code:
 
 ```r
+Sys.unsetenv("GITHUB_PAT")
 devtools::install_github("simon-hans/CEDARS", upgrade="never")
-library(CEDARS)
 
-# The code below creates an instance of CEDARS project on a public test MongoDB cluster, populated
-# with fictitious EHR corpora.
+# Loading required packages
+
+library(CEDARS)
+library(readr)
+
+# The code below creates an instance of CEDARS project on a public test MongoDB
+# cluster, populated with fictitious EHR corpora.
 
 # MongoDB credentials
-db_user_name <- "testUser"
-db_user_pw <- "testPW"
-db_host <- "cedars.yvjp6.mongodb.net"
-db_replica_set <- NA
-db_port <- NA
-
-# Using standard MongoDB URL format
 uri_fun <- mongo_uri_standard
+user <- "testUser"
+password <- "testPW"
+host <- "cedars.yvjp6.mongodb.net"
+project_user_name_pw <- "pwdpwd123"
+project_user_name <- "proj_user"
+replica_set <- NA
+port <- NA
+database <- find_project_name()
+project_name <- "external_proj"
+investigator <- "scott"
 
-# Name for MongoDB database which will contain the CEDARS project
-# In this case we generate a random name
-mongo_database <- find_project_name()
+# Generate app
+# Create directory to save RConnect app
+# This app will need to be uploaded to a shiny server
+# The app then generates a GUI to enter annotations,
+# accesses MongoDB in the background
 
-# We create the database and all required collections on a test cluster
-create_project(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database,
-  "CEDARS Example Project", "Dr Smith")
+if (!dir.exists("app")) dir.create("app")
 
-# Adding one CEDARS end user
-add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database, "John",
-  "strongpassword")
 
-# Negex is included with CEDARS and required for assessment of negation
-negex_upload(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
+# Initialize CEDARS project
 
-# Uploading the small simulated collection of EHR corpora
-upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database,
-  simulated_patients)
+create_project(uri_fun, user, password, host, replica_set,
+               port, database, project_name, investigator)
 
-# This is a simple query which will report all sentences with a word starting in
-# "bleed" or "hem", or an exact match for "bled"
+
+# Separate access if LDAP not used
+# Rarely use if ever
+
+add_end_user(uri_fun, user, password, host, replica_set, port,
+             database, project_user_name, project_user_name_pw)
+
+
+# Upload NegEx
+# If udpipe model not in your R install, will download and save main english one
+
+negex_upload(uri_fun, user, password, host, replica_set, port, database)
+
+
+# Generate search query
+
 search_query <- "bleed* OR hem* OR bled"
+
 use_negation <- TRUE
 hide_duplicates <- TRUE
 skip_after_event <- TRUE
-save_query(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database, search_query,
-  use_negation, hide_duplicates, skip_after_event)
 
-# Running the NLP annotations on EHR corpora
-# We are only using one core, for large datasets parallel processing is faster
-automatic_NLP_processor(NA, "latin1", "udpipe", uri_fun, db_user_name, db_user_pw,
-  db_host, db_replica_set, db_port, mongo_database, max_n_grams_length = 0, negex_depth = 6, select_cores = 1)
+tag_query <- list(exact = FALSE, nlp_apply = FALSE, include = NA, exclude = NA)
 
-# Pre-searching based on query
-# This is optional but will speed-up the interface
-pre_search(patient_vect = NA, uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
+save_query(uri_fun, user, password, host, replica_set,
+           port, database, search_query, use_negation,
+           hide_duplicates, skip_after_event, tag_query)
 
-# Start the CEDARS GUI locally
-# Your user name is "John", password is "strongpassword"
-# Once you have entered those credentials, click on button "ENTER NEW DATE" and CEDARS will seek the first record to annotate
-# Try out the interface, adjudicating sentences, entering event dates, comments, moving between sentences and searching for records
-# Once you have entered some data, close the GUI
-start_local(db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
 
-# Obtaining events and info associated with data entry
-# The annotations entered in the GUI are now available in this dataframe
-event_output <- download_events(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
+# Uploading EMD documents, i.e. clinical notes and radiology reports
 
-# Remove project from MongoDB
-terminate_project(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database, fast=TRUE)
+# for reading a csv file use read_csv
+# EMR_docs <- read_csv("data/simulated_patients.csv")  # Use for CSV files
+
+load("data/simulated_patients.RData")
+EMR_docs <- as.data.frame(simulated_patients)
+
+id_list <- unique(EMR_docs$patient_id)
+
+for (i in 1:length(id_list)){
+
+  patient_id_instance <- id_list[i]
+  documents <- subset(EMR_docs, patient_id == patient_id_instance)
+  upload_notes(uri_fun, user, password, host, replica_set,
+               port, database, documents)
+  print(paste("documents uploaded for patient #", i, sep=""))
+
+}
+
+
+# Generate NLP annotations
+
+automatic_NLP_processor(patient_vect = NA, text_format = "latin1",
+                        nlp_engine = "udpipe", uri_fun = mongo_uri_standard,
+                        user, password, host, replica_set, port,
+                        database, max_n_grams_length = 0, negex_depth = 6)
+
+
+# Performing search to speed up process later on
+# Documents/sentences with matching keywords of interest
+# are selected and prepped for annotation
+
+pre_search(patient_vect = NA, uri_fun, user, password,
+           host, replica_set, port, database)
+
+
+# Upload Shiny app on RConnect/locally and have annotator(s) do the work!
+# use project_user_name and project_user_name_pw to login in the UI
+
+start_local(user, password, host, replica_set, port, database)
+
+# Once human annotator has completed work on GUI, download events
+
+output <- download_events(uri_fun, user, password, host, replica_set,
+                          port, database, dates = TRUE, sentences_only = FALSE)
+
+
+# Delete project
+# This is irreversible!
+
+terminate_project(uri_fun, user, password, host, replica_set,
+                  port, database, fast=TRUE)
+
 ```
 
 If your systems use a different MongoDB URI string standard, you will have to substitute your string-generating function.
