@@ -531,3 +531,36 @@ upload_notes <- function(uri_fun, user, password, host, replica_set, port, datab
     gc()
 
 }
+
+
+#' Upload Notes for Multiple Patients to Database
+#'
+#' Allows user to populate notes in database from dataframe. Notes dataframe must contain: 'patient_id', 'text_id' (a unique identifier for each text segment), along with 'text', 'text_date', 'doc_id' (designates unique EHR document) and ideally 'text_sequence' which indicates order of text section within document. 'doc_section_name' along 'text_tag_1' to 'text_tag_10' are optional. 'text_date' must be in format '%Y-%m-%d'!.
+#' @param uri_fun Uniform resource identifier (URI) string generating function for MongoDB credentials.
+#' @param user MongoDB user name.
+#' @param password MongoDB user password.
+#' @param host MongoDB host server.
+#' @param replica_set MongoDB replica set, if indicated.
+#' @param port MongoDB port.
+#' @param database MongoDB database name.
+#' @param notes Dataframe of EHR documents with metadata. The documents can consist of full notes or note subsections.
+#' @return {
+#' Confirmation that requested operation was completed, or error message if attempt failed.
+#' }
+#' @examples
+#' \dontrun{
+#' upload_notes(uri_fun = mongo_uri_standard, user = 'John', password = 'db_password_1234',
+#' host = 'server1234', port = NA, database = 'TEST_PROJECT', notes = simulated_patients)
+#' }
+#' @export
+
+batch_upload_notes <- function(uri_fun, user, password, host, replica_set, port, database, notes){
+
+  ids <- unique(notes$patient_id)
+
+  for (i in 1:length(ids)){
+    upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database,
+                 subset(notes, patient_id == ids[i]))
+  }
+
+}
