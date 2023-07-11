@@ -66,7 +66,7 @@ add_end_user(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port
 negex_upload(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database)
 
 # Uploading the small simulated collection of EHR corpora
-upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database,
+batch_upload_notes(uri_fun, db_user_name, db_user_pw, db_host, db_replica_set, db_port, mongo_database,
   simulated_patients)
 
 # This is a simple query which will report all sentences with a word starting in
